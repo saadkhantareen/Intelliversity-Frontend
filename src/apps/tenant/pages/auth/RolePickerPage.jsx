@@ -1,77 +1,28 @@
 /**
- * RolePickerPage.jsx — Shown when a user has MULTIPLE roles.
+ * RolePickerPage.jsx — Fallback redirect.
  *
- * User sees cards for each role and picks which "hat" to wear.
- * After picking, activeRole is set and they're redirected to their dashboard.
+ * The role picker is now inline on the login page (Step 2).
+ * If a user lands here directly (e.g., from a bookmark or session restore),
+ * redirect them to the login page which handles both steps.
  */
 
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useAuth } from "../../../../hooks/useAuth";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 
-const roleConfig = {
-  admin: {
-    label: "University Admin",
-    description: "Manage users, courses, departments, and settings",
-    icon: "\u{1F3DB}\u{FE0F}",
-  },
-  teacher: {
-    label: "Teacher",
-    description: "Manage your classes, attendance, and grading",
-    icon: "\u{1F469}\u{200D}\u{1F3EB}",
-  },
-  student: {
-    label: "Student",
-    description: "View courses, results, attendance, and AI assistant",
-    icon: "\u{1F393}",
-  },
+const dashboardMap = {
+  admin: "/admin/dashboard",
+  teacher: "/teacher/dashboard",
+  student: "/student/dashboard",
 };
 
 export default function RolePickerPage() {
-  const { roles, switchRole } = useAuth();
-  const navigate = useNavigate();
+  const { user, activeRole } = useAuth();
 
-  function handleRoleSelect(role) {
-    switchRole(role);
-    navigate("/");
+  // If user is already logged in with an active role, go to their dashboard
+  if (user && activeRole) {
+    return <Navigate to={dashboardMap[activeRole] || "/"} replace />;
   }
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
-      <h1 className="text-2xl font-bold mb-2">Welcome Back!</h1>
-      <p className="text-gray-500 mb-8">
-        You have multiple roles. Continue as:
-      </p>
-
-      <div className="grid gap-4 w-full max-w-lg">
-        {roles.map((role) => {
-          const config = roleConfig[role] || {
-            label: role,
-            description: "",
-            icon: "\u{1F464}",
-          };
-
-          return (
-            <Card
-              key={role}
-              className="cursor-pointer hover:border-primary transition-colors"
-              onClick={() => handleRoleSelect(role)}
-            >
-              <CardContent className="flex items-center gap-4 p-6">
-                <span className="text-4xl">{config.icon}</span>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg">{config.label}</h3>
-                  <p className="text-gray-500 text-sm">{config.description}</p>
-                </div>
-                <Button variant="outline" size="sm">
-                  Continue
-                </Button>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-    </div>
-  );
+  // Otherwise redirect to login (role picker is now part of the login page)
+  return <Navigate to="/login" replace />;
 }

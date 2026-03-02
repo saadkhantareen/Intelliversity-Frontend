@@ -39,8 +39,8 @@ export function TenantProvider({ children }) {
       return;
     }
 
-    // Save the slug so the API client can use it
-    localStorage.setItem("tenantSlug", slug);
+    // Save the slug so the API client can use it as X-Tenant-Token header
+    localStorage.setItem("tenantToken", slug);
 
     resolveTenant(slug)
       .then((data) => {

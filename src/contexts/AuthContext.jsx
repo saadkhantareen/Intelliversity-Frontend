@@ -16,7 +16,7 @@
  */
 
 import { createContext, useState, useCallback, useEffect } from "react";
-import { login as loginApi, getMe } from "../lib/api/auth.api";
+import { login as loginApi, logout as logoutApi, getMe } from "../lib/api/auth.api";
 
 export const AuthContext = createContext({
   user: null,
@@ -99,9 +99,18 @@ export function AuthProvider({ children }) {
   );
 
   /**
-   * logout() — Clear everything and redirect to login.
+   * logout() — Blacklist the refresh token on the backend, then clear everything.
+   * The try/catch ensures logout always works locally even if the API call fails.
    */
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    try {
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (refreshToken) {
+        await logoutApi(refreshToken);
+      }
+    } catch {
+      // Ignore API errors — logout should always succeed locally
+    }
     setUser(null);
     setRoles([]);
     setActiveRole(null);

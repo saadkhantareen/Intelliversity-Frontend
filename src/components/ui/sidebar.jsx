@@ -1,5 +1,5 @@
 "use client";
-import * as React from "react"
+import React from "react"
 import { cva } from "class-variance-authority";
 import { PanelLeftIcon } from "lucide-react"
 import { Slot } from "radix-ui"
