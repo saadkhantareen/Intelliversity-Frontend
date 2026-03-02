@@ -34,7 +34,6 @@ export default function PlatformLoginPage() {
 
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [debugResult, setDebugResult] = useState(null);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -51,17 +50,6 @@ export default function PlatformLoginPage() {
       );
     } finally {
       setLoading(false);
-    }
-  }
-
-  // Development-only debug helper: perform a login and show raw result
-  async function handleDebugLogin() {
-    try {
-      setDebugResult({ status: 'pending' });
-      const data = await login('debug@intelliversity.com', 'password');
-      setDebugResult({ status: 'ok', data });
-    } catch (err) {
-      setDebugResult({ status: 'error', error: err?.response?.data || err.message });
     }
   }
 
@@ -123,23 +111,6 @@ export default function PlatformLoginPage() {
             </Button>
           </form>
 
-          {import.meta.env.DEV && (
-            <div className="mt-4">
-              <button
-                type="button"
-                onClick={handleDebugLogin}
-                className="text-sm text-muted-foreground underline"
-              >
-                Debug: test login
-              </button>
-
-              {debugResult && (
-                <pre className="mt-2 bg-gray-50 p-2 text-xs rounded">
-                  {JSON.stringify(debugResult, null, 2)}
-                </pre>
-              )}
-            </div>
-          )}
           <p className="text-center text-xs text-muted-foreground mt-6">
             This portal is for platform administrators only.
             <br />

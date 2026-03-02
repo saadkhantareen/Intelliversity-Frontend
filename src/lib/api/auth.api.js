@@ -9,17 +9,11 @@ import apiClient from "./client";
  * Backend response includes: access, refresh, user: { id, name, email, roles: [...] }
  */
 export async function login(email, password) {
-  try {
-    const response = await apiClient.post("/api/v1/auth/login/", {
-      email,
-      password,
-    });
-    if (import.meta.env.DEV) console.log('login response', response);
-    return response.data;
-  } catch (err) {
-    if (import.meta.env.DEV) console.error('login error', err?.response || err);
-    throw err;
-  }
+  const response = await apiClient.post("/api/v1/auth/login/", {
+    email,
+    password,
+  });
+  return response.data;
 }
 
 /**

@@ -11,13 +11,8 @@
 
 import axios from "axios";
 
-// In development when MSW mocks are enabled, use a relative base URL
-// so the mock worker can intercept requests (handlers are defined
-// with relative paths like `/api/v1/...`). In other environments
-// use the configured API base URL.
-const useMocks = import.meta.env.DEV && import.meta.env.VITE_USE_MOCKS === 'true';
 const apiClient = axios.create({
-  baseURL: useMocks ? '' : import.meta.env.VITE_API_BASE_URL || "http://localhost:8000",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000",
   headers: {
     "Content-Type": "application/json",
   },
