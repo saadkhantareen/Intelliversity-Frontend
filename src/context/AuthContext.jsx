@@ -6,15 +6,12 @@ const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [user, setUser]                       = useState(null)
-  const [token, setToken]                     = useState(
-    localStorage.getItem('token') || null   // ← localStorage se uthao
-  )
+  const [token, setToken]                     = useState(localStorage.getItem('access_token') || null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading]             = useState(false)
 
-  // ── Page refresh pe token check karo ──
   useEffect(() => {
-    const savedToken = localStorage.getItem('token')
+    const savedToken = localStorage.getItem('access_token')
     const savedUser  = localStorage.getItem('user')
 
     if (savedToken && savedUser) {
@@ -28,49 +25,45 @@ export function AuthProvider({ children }) {
     setIsLoading(true)
     try {
       const res = await authService.login(credentials)
+      const { tokens, user, university } = res.data
 
-      // localStorage mein save karo
-      localStorage.setItem('token', res.data.token)
-      localStorage.setItem('user', JSON.stringify(res.data.user))
+      localStorage.setItem('access_token', tokens.access)
+      localStorage.setItem('refresh_token', tokens.refresh)
+      localStorage.setItem('user', JSON.stringify({ ...user, university }))
 
-      setUser(res.data.user)
-      setToken(res.data.token)
+      setUser({ ...user, university })
+      setToken(tokens.access)
       setIsAuthenticated(true)
-      toast.success(`Welcome back, ${res.data.user.name}!`)
+      toast.success(`Welcome back, ${user.first_name}!`)
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Login failed')
-      throw err  // ← yeh add karo
+      const errors = err.response?.data
+      // backend returns nested error objects
+      const message =
+        errors?.non_field_errors?.[0]?.detail ||
+        errors?.detail ||
+        errors?.email?.[0]?.detail ||
+        errors?.password?.[0]?.detail ||
+        'Login failed'
+      toast.error(message)
+      throw err
     } finally {
       setIsLoading(false)
     }
   }
 
-  const logout = async () => {
-    try {
-      await authService.logout()
-    } catch (err) {
-      console.log(err)
-    } finally {
-      // localStorage clear karo
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
+  const logout = () => {
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
+    localStorage.removeItem('user')
 
-      setUser(null)
-      setToken(null)
-      setIsAuthenticated(false)
-      toast.success('Logged out successfully')
-    }
+    setUser(null)
+    setToken(null)
+    setIsAuthenticated(false)
+    toast.success('Logged out successfully')
   }
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      token,
-      isAuthenticated,
-      isLoading,
-      login,
-      logout
-    }}>
+    <AuthContext.Provider value={{ user, token, isAuthenticated, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   )
@@ -81,13 +74,3 @@ export function useAuth() {
   if (!ctx) throw new Error('useAuth must be used inside <AuthProvider>')
   return ctx
 }
-// ```
-
-// ---
-
-// **Test karo:**
-// ```
-// Login karo         → token localStorage mein save ✅
-// Page refresh karo  → token localStorage se uthao ✅
-// Dashboard pe raho  → /login pe redirect nahi ✅
-// Logout karo        → localStorage clear ✅
