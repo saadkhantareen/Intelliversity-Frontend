@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react'
 // ── Tenant Config ────────────────────────────────────────────────
 const TENANT_CONFIG = {
   student: { label: 'Student Portal',  color: '#0ea5e9' },
-  teacher: { label: 'Teacher Portal',  color: '#10b981' },
+  faculty: { label: 'Faculty Portal',  color: '#10b981' },
   admin:   { label: 'Admin Portal',    color: '#f59e0b' },
 }
 
