@@ -1,27 +1,23 @@
-import { createContext, useContext, useState, useEffect } from 'react'
-import { authService } from '../services/auth.service'
+import { createContext, useContext, useState, useCallback } from 'react'
+import { authService } from '@/services/auth.service'
 import toast from 'react-hot-toast'
 
 const AuthContext = createContext(null)
 
+function loadStoredAuth() {
+  const savedToken = localStorage.getItem('access_token')
+  const savedUser  = localStorage.getItem('user')
+  if (savedToken && savedUser) {
+    return { token: savedToken, user: JSON.parse(savedUser), isAuthenticated: true }
+  }
+  return { token: null, user: null, isAuthenticated: false }
+}
+
 export function AuthProvider({ children }) {
-  const [user, setUser]                       = useState(null)
-  const [token, setToken]                     = useState(localStorage.getItem('access_token') || null)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [isLoading, setIsLoading]             = useState(false)
+  const [auth, setAuth] = useState(loadStoredAuth)
+  const [isLoading, setIsLoading] = useState(false)
 
-  useEffect(() => {
-    const savedToken = localStorage.getItem('access_token')
-    const savedUser  = localStorage.getItem('user')
-
-    if (savedToken && savedUser) {
-      setToken(savedToken)
-      setUser(JSON.parse(savedUser))
-      setIsAuthenticated(true)
-    }
-  }, [])
-
-  const login = async (credentials) => {
+  const login = useCallback(async (credentials) => {
     setIsLoading(true)
     try {
       const res = await authService.login(credentials)
@@ -31,13 +27,14 @@ export function AuthProvider({ children }) {
       localStorage.setItem('refresh_token', tokens.refresh)
       localStorage.setItem('user', JSON.stringify({ ...user, university }))
 
-      setUser({ ...user, university })
-      setToken(tokens.access)
-      setIsAuthenticated(true)
+      setAuth({
+        user:  { ...user, university },
+        token: tokens.access,
+        isAuthenticated: true,
+      })
       toast.success(`Welcome back, ${user.first_name}!`)
     } catch (err) {
       const errors = err.response?.data
-      // backend returns nested error objects
       const message =
         errors?.non_field_errors?.[0]?.detail ||
         errors?.detail ||
@@ -49,21 +46,28 @@ export function AuthProvider({ children }) {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem('access_token')
     localStorage.removeItem('refresh_token')
     localStorage.removeItem('user')
 
-    setUser(null)
-    setToken(null)
-    setIsAuthenticated(false)
+    setAuth({ token: null, user: null, isAuthenticated: false })
     toast.success('Logged out successfully')
+  }, [])
+
+  const value = {
+    user:            auth.user,
+    token:           auth.token,
+    isAuthenticated: auth.isAuthenticated,
+    isLoading,
+    login,
+    logout,
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, isAuthenticated, isLoading, login, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   )

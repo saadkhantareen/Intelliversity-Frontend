@@ -1,5 +1,5 @@
-import { useTenant } from "../../context/TenantContext";
-import { useAuth } from "../../context/AuthContext";
+import { useTenant } from "@/context/TenantContext";
+import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, Link } from "react-router-dom";
