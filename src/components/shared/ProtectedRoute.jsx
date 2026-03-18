@@ -1,11 +1,12 @@
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { useTenant } from '../../context/TenantContext'
 
 function ProtectedRoute() {
-  const { isAuthenticated, isLoading } = useAuth()
+  const { isAuthenticated, isCheckingAuth, user } = useAuth()
+  const { portal } = useTenant()
 
-  // auth check ho raha hai — wait karo
-  if (isLoading) {
+  if (isCheckingAuth) {
     return (
       <div className="flex h-screen items-center justify-center">
         <p className="text-gray-400">Loading...</p>
@@ -13,12 +14,21 @@ function ProtectedRoute() {
     )
   }
 
-  // authenticated nahi — login pe bhejo
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
   }
 
-  // authenticated — page dikhao
+  if (portal && user?.roles && !user.roles.includes(portal)) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-500 mb-2">Access Denied</h1>
+          <p className="text-gray-500">You don't have permission to access this portal.</p>
+        </div>
+      </div>
+    )
+  }
+
   return <Outlet />
 }
 
