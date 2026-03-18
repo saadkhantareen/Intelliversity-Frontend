@@ -6,9 +6,10 @@ const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [user, setUser]                       = useState(null)
-  const [token, setToken]                     = useState(localStorage.getItem('access_token') || null)
+  const [token, setToken]                     = useState(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [isLoading, setIsLoading]             = useState(false)
+  const [isLoading, setIsLoading]             = useState(false)   // login button
+  const [isCheckingAuth, setIsCheckingAuth]   = useState(true)    // initial check
 
   useEffect(() => {
     const savedToken = localStorage.getItem('access_token')
@@ -19,6 +20,7 @@ export function AuthProvider({ children }) {
       setUser(JSON.parse(savedUser))
       setIsAuthenticated(true)
     }
+    setIsCheckingAuth(false)  // ← done, render now
   }, [])
 
   const login = async (credentials) => {
@@ -37,9 +39,10 @@ export function AuthProvider({ children }) {
       toast.success(`Welcome back, ${user.first_name}!`)
     } catch (err) {
       const errors = err.response?.data
-      // backend returns nested error objects
+      console.log('error response:', errors)
       const message =
         errors?.non_field_errors?.[0]?.detail ||
+        errors?.non_field_errors?.[0] ||
         errors?.detail ||
         errors?.email?.[0]?.detail ||
         errors?.password?.[0]?.detail ||
@@ -63,7 +66,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, isAuthenticated, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, token, isAuthenticated, isLoading, isCheckingAuth, login, logout }}>
       {children}
     </AuthContext.Provider>
   )
