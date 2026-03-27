@@ -12,16 +12,34 @@ export function AuthProvider({ children }) {
   const [isCheckingAuth, setIsCheckingAuth]   = useState(true)    // initial check
 
   useEffect(() => {
-    const savedToken = localStorage.getItem('access_token')
-    const savedUser  = localStorage.getItem('user')
+  const savedToken = localStorage.getItem('access_token')
+  const savedUser  = localStorage.getItem('user')
 
-    if (savedToken && savedUser) {
+  if (savedToken && savedUser) {
+    try {
+      // decode JWT and check expiry
+      const payload = JSON.parse(atob(savedToken.split('.')[1]))
+      const isExpired = payload.exp * 1000 < Date.now()
+
+      if (isExpired) {
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('refresh_token')
+        localStorage.removeItem('user')
+        setIsCheckingAuth(false)
+        return
+      }
+
       setToken(savedToken)
       setUser(JSON.parse(savedUser))
       setIsAuthenticated(true)
+    } catch (err) {
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
+      localStorage.removeItem('user')
     }
-    setIsCheckingAuth(false)  // ← done, render now
-  }, [])
+  }
+  setIsCheckingAuth(false)
+}, [])
 
   const login = async (credentials) => {
     setIsLoading(true)
