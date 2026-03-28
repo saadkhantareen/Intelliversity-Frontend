@@ -1,24 +1,8 @@
 // src/components/layout/DashboardShell.jsx
-//
-// The ONE component that renders the sidebar + topbar chrome.
-// Never used directly in routes — always via a portal-specific layout wrapper
-// (StudentLayout, TeacherLayout, AdminLayout) that passes a `config` prop.
-//
-// config shape:
-// {
-//   accent:   string,          // hex colour e.g. "#2563eb"
-//   portal:   string,          // "student" | "teacher" | "admin"
-//   label:    string,          // display name e.g. "Student Portal"
-//   badge:    { bg, text },    // badge colours
-//   sections: [                // sidebar nav
-//     { title: string, items: [{ label, to, Icon }] }
-//   ]
-// }
-
 import { useState, useRef, useEffect } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { useTenant } from "../../context/TenantContext"
+import { useTenant } from "../../context/TenantContext";
 import {
   IcBell, IcSearch, IcMenu, IcChevronLeft, IcLogout,
 } from "./icons";
@@ -56,7 +40,6 @@ export function DashboardShell({ config }) {
     ? university
     : university?.name || "";
 
-  // Close mobile drawer on navigation
   useEffect(() => { setMobileOpen(false); }, [navigate]);
 
   useEffect(() => {
@@ -71,8 +54,6 @@ export function DashboardShell({ config }) {
 
   const SidebarContent = () => (
     <div className="iv-sb-inner" style={{ "--accent": accent }}>
-
-      {/* Header row */}
       <div className="iv-sb-head">
         <div className="iv-sb-brand">
           <div className="iv-sb-icon" style={{ background: accent }}>
@@ -102,7 +83,6 @@ export function DashboardShell({ config }) {
         </button>
       </div>
 
-      {/* Nav sections */}
       <nav className="iv-sb-nav">
         {sections.map((section) => (
           <div className="iv-sb-section" key={section.title}>
@@ -130,7 +110,6 @@ export function DashboardShell({ config }) {
         ))}
       </nav>
 
-      {/* Footer: user card */}
       <div className={`iv-sb-foot${collapsed ? " iv-sb-foot--col" : ""}`}>
         <div className="iv-user-row">
           <div
@@ -167,13 +146,10 @@ export function DashboardShell({ config }) {
       <style>{css(accent)}</style>
 
       <div className="iv-root">
-
-        {/* Desktop sidebar */}
         <aside className={`iv-sidebar iv-sidebar--desk${collapsed ? " iv-sidebar--col" : ""}`}>
           <SidebarContent />
         </aside>
 
-        {/* Mobile overlay */}
         {mobileOpen && (
           <div
             className="iv-overlay"
@@ -182,18 +158,13 @@ export function DashboardShell({ config }) {
           />
         )}
 
-        {/* Mobile drawer */}
         <aside className={`iv-sidebar iv-sidebar--mob${mobileOpen ? " iv-sidebar--mob-open" : ""}`}>
           <SidebarContent />
         </aside>
 
-        {/* Main column */}
         <div className={`iv-main${collapsed ? " iv-main--col" : ""}`}>
-
-          {/* Topbar — same height as sidebar header, shares border line */}
           <header className="iv-topbar" style={{ "--accent": accent }}>
             <div className="iv-topbar-l">
-              {/* Hamburger — mobile only */}
               <button
                 className="iv-hamburger iv-mob-only"
                 onClick={() => setMobileOpen(true)}
@@ -202,7 +173,6 @@ export function DashboardShell({ config }) {
                 <IcMenu s={20} />
               </button>
 
-              {/* Search */}
               <div className={`iv-search${searchFocused ? " iv-search--on" : ""}`}>
                 <span className="iv-search-ic"><IcSearch s={15} /></span>
                 <input
@@ -225,7 +195,6 @@ export function DashboardShell({ config }) {
             </div>
 
             <div className="iv-topbar-r">
-              {/* Notification bell */}
               <button className="iv-topbar-btn" aria-label="Notifications">
                 <IcBell s={17} />
                 <span className="iv-notif-dot" />
@@ -233,7 +202,6 @@ export function DashboardShell({ config }) {
 
               <div className="iv-divider" />
 
-              {/* User pill */}
               <div className="iv-topbar-user">
                 <div
                   className="iv-topbar-av"
@@ -249,7 +217,6 @@ export function DashboardShell({ config }) {
             </div>
           </header>
 
-          {/* Page content */}
           <main className="iv-page">
             <Outlet />
           </main>
@@ -266,35 +233,44 @@ const css = (accent) => `
     --sb-w: 232px;
     --sb-wc: 60px;
     --bar-h: 54px;
-    --sb-bg: #ffffff;
-    --sb-border: #e5e7eb;
-    --sb-text: #6b7280;
-    --sb-text-hi: #111827;
-    --sb-hover: #f9fafb;
-    --sb-active: #f3f4f6;
-    --top-bg: #ffffff;
-    --top-border: #e5e7eb;
-    --page-bg: #f9fafb;
+
+    /* Sidebar + Topbar = warm off-white */
+    --shell-bg: #f5f3ef;
+    --sb-bg: #f5f3ef;
+    --top-bg: #f5f3ef;
+
+    /* Page content = clean white */
+    --page-bg: #ffffff;
+
+    --sb-border: rgba(0,0,0,0.07);
+    --sb-text: #8a8a8e;
+    --sb-text-hi: #1a1a1a;
+    --sb-hover: rgba(0,0,0,0.04);
+    --sb-active-bg: #ffffff;
+    --sb-active-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 0.5px 1px rgba(0,0,0,0.04);
+    --top-border: rgba(0,0,0,0.07);
     --accent: ${accent};
     --ease: cubic-bezier(.4,0,.2,1);
     display: flex;
     height: 100vh;
     overflow: hidden;
-    background: var(--page-bg);
+    background: var(--shell-bg);
   }
 
-  /* Dark mode overrides */
+  /* ── Dark mode ── */
   @media (prefers-color-scheme: dark) {
     .iv-root {
-      --sb-bg: #111827;
-      --sb-border: rgba(255,255,255,0.08);
+      --shell-bg: #1a1d24;
+      --sb-bg: #1a1d24;
+      --top-bg: #1a1d24;
+      --page-bg: #0d1117;
+      --sb-border: rgba(255,255,255,0.06);
       --sb-text: #9ca3af;
       --sb-text-hi: #f9fafb;
-      --sb-hover: rgba(255,255,255,0.04);
-      --sb-active: rgba(255,255,255,0.08);
-      --top-bg: #111827;
-      --top-border: rgba(255,255,255,0.08);
-      --page-bg: #0d1117;
+      --sb-hover: rgba(255,255,255,0.045);
+      --sb-active-bg: rgba(255,255,255,0.09);
+      --sb-active-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      --top-border: rgba(255,255,255,0.06);
     }
   }
 
@@ -304,7 +280,7 @@ const css = (accent) => `
     width: var(--sb-w);
     height: 100vh;
     background: var(--sb-bg);
-    border-right: 1px solid var(--sb-border);
+    border-right: none;
     display: flex;
     flex-direction: column;
     transition: width .22s var(--ease);
@@ -339,7 +315,7 @@ const css = (accent) => `
     .iv-mob-only { display: none !important; }
   }
 
-  /* ── Sidebar inner (fixed width to prevent reflow during collapse) ── */
+  /* ── Sidebar inner ── */
   .iv-sb-inner {
     display: flex;
     flex-direction: column;
@@ -360,7 +336,7 @@ const css = (accent) => `
     align-items: center;
     justify-content: space-between;
     padding: 0 10px 0 14px;
-    border-bottom: 1px solid var(--sb-border);
+    border-bottom: none;
     background: var(--sb-bg);
   }
   .iv-sb-brand {
@@ -415,23 +391,25 @@ const css = (accent) => `
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 6px 0;
+    padding: 10px 0;
     scrollbar-width: none;
   }
   .iv-sb-nav::-webkit-scrollbar { display: none; }
   .iv-sb-section { padding: 2px 0; }
   .iv-sb-section + .iv-sb-section {
-    border-top: 1px solid var(--sb-border);
-    margin-top: 4px;
+    margin-top: 6px;
     padding-top: 6px;
   }
   .iv-sb-section-title {
     font-size: 10px; font-weight: 600;
     letter-spacing: .7px;
     text-transform: uppercase;
-    color: #9ca3af;
+    color: #b0b0b4;
     padding: 4px 14px 5px;
     margin: 0;
+  }
+  @media (prefers-color-scheme: dark) {
+    .iv-sb-section-title { color: #6b7280; }
   }
   .iv-sb-list { list-style: none; margin: 0; padding: 0; }
 
@@ -439,13 +417,13 @@ const css = (accent) => `
     display: flex; align-items: center; gap: 9px;
     padding: 0 10px;
     height: 36px;
-    border-radius: 7px;
-    margin: 1px 6px;
+    border-radius: 8px;
+    margin: 2px 6px;
     color: var(--sb-text);
     text-decoration: none;
     font-size: 13px; font-weight: 450;
     white-space: nowrap; overflow: hidden;
-    transition: background .14s, color .14s;
+    transition: background .14s, color .14s, box-shadow .14s;
     position: relative;
   }
   .iv-nav-item:hover {
@@ -453,17 +431,13 @@ const css = (accent) => `
     color: var(--sb-text-hi);
   }
   .iv-nav-item--active {
-    background: var(--sb-active);
+    background: var(--sb-active-bg);
+    box-shadow: var(--sb-active-shadow);
     color: var(--sb-text-hi);
-    font-weight: 500;
+    font-weight: 550;
   }
   .iv-nav-item--active::before {
-    content: "";
-    position: absolute;
-    left: 0; top: 7px; bottom: 7px;
-    width: 3px;
-    border-radius: 0 2px 2px 0;
-    background: var(--accent);
+    content: none;
   }
   .iv-nav-icon {
     flex-shrink: 0;
@@ -522,20 +496,20 @@ const css = (accent) => `
     flex: 1; min-width: 0;
     display: flex; flex-direction: column;
     overflow: hidden;
+    background: var(--shell-bg);
   }
 
-  /* ── Topbar ──
-     Same height as iv-sb-head. Shares the same border-bottom line,
-     creating the seamless blended effect. */
+  /* ── Topbar ── blended with sidebar, same off-white */
   .iv-topbar {
     height: var(--bar-h);
     flex-shrink: 0;
     background: var(--top-bg);
-    border-bottom: 1px solid var(--top-border);
+    border-bottom: none;
     display: flex; align-items: center;
     justify-content: space-between;
     padding: 0 16px 0 18px;
     gap: 10px;
+    z-index: 10;
   }
   .iv-topbar-l {
     display: flex; align-items: center; gap: 8px;
@@ -551,39 +525,39 @@ const css = (accent) => `
     padding: 0;
     transition: background .14s;
   }
-  .iv-hamburger:hover { background: #f3f4f6; }
+  .iv-hamburger:hover { background: rgba(0,0,0,.05); }
 
   /* Search */
   .iv-search {
     display: flex; align-items: center; gap: 7px;
-    background: #f3f4f6;
-    border: 1px solid transparent;
-    border-radius: 8px;
+    background: rgba(255,255,255,.6);
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 9px;
     padding: 0 10px;
     height: 34px;
     width: 100%; max-width: 340px;
     transition: border-color .16s, background .16s, box-shadow .16s;
   }
   .iv-search--on {
-    background: #fff;
+    background: #ffffff;
     border-color: var(--accent);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
   }
   @media (prefers-color-scheme: dark) {
-    .iv-search { background: rgba(255,255,255,.06); }
+    .iv-search { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,0.06); }
     .iv-search--on { background: rgba(255,255,255,.09); }
   }
-  .iv-search-ic { color: #9ca3af; display: flex; align-items: center; flex-shrink: 0; }
+  .iv-search-ic { color: #b0b0b4; display: flex; align-items: center; flex-shrink: 0; }
   .iv-search--on .iv-search-ic { color: var(--accent); }
   .iv-search-inp {
     flex: 1; background: transparent; border: none; outline: none;
-    font-size: 13px; color: #111827; padding: 0;
+    font-size: 13px; color: #1a1a1a; padding: 0;
   }
   @media (prefers-color-scheme: dark) {
     .iv-search-inp { color: #f9fafb; }
     .iv-search-inp::placeholder { color: #6b7280; }
   }
-  .iv-search-inp::placeholder { color: #9ca3af; }
+  .iv-search-inp::placeholder { color: #b0b0b4; }
   .iv-search-clr {
     background: none; border: none; color: #9ca3af;
     cursor: pointer; font-size: 15px; line-height: 1;
@@ -592,7 +566,7 @@ const css = (accent) => `
     border-radius: 50%;
     transition: background .14s;
   }
-  .iv-search-clr:hover { background: #e5e7eb; }
+  .iv-search-clr:hover { background: rgba(0,0,0,.08); }
 
   /* Topbar right */
   .iv-topbar-r {
@@ -602,14 +576,14 @@ const css = (accent) => `
   .iv-topbar-btn {
     width: 34px; height: 34px;
     background: transparent; border: none;
-    color: #6b7280; cursor: pointer;
+    color: #8a8a8e; cursor: pointer;
     border-radius: 6px;
     display: flex; align-items: center; justify-content: center;
     position: relative;
     transition: background .14s;
     padding: 0;
   }
-  .iv-topbar-btn:hover { background: #f3f4f6; }
+  .iv-topbar-btn:hover { background: rgba(0,0,0,.05); }
   @media (prefers-color-scheme: dark) {
     .iv-topbar-btn:hover { background: rgba(255,255,255,.06); }
     .iv-hamburger:hover  { background: rgba(255,255,255,.06); }
@@ -623,7 +597,7 @@ const css = (accent) => `
   }
   .iv-divider {
     width: 1px; height: 20px;
-    background: var(--top-border);
+    background: var(--sb-border);
     margin: 0 3px;
   }
   .iv-topbar-user {
@@ -639,25 +613,37 @@ const css = (accent) => `
   .iv-topbar-uinfo { display: flex; flex-direction: column; gap: 1px; }
   .iv-topbar-uname {
     font-size: 12.5px; font-weight: 500;
-    color: #111827; white-space: nowrap;
+    color: var(--sb-text-hi); white-space: nowrap;
   }
   .iv-topbar-urole {
-    font-size: 11px; color: #9ca3af;
+    font-size: 11px; color: var(--sb-text);
     white-space: nowrap; text-transform: capitalize;
   }
-  @media (prefers-color-scheme: dark) {
-    .iv-topbar-uname { color: #f9fafb; }
-  }
 
-  /* ── Page content ── */
+  /* ── Page content — Floating Card Style ── */
   .iv-page {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
     padding: 24px;
+    background: var(--page-bg);
+    
+    /* All four corners rounded */
+    border-radius: 16px;
+    
+    /* Margin to create the floating effect */
+    margin: 16px 16px 16px 0;
+    
+    /* Subtle shadow to lift it off the background */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   }
+
   @media (max-width: 640px) {
-    .iv-page { padding: 16px; }
+    .iv-page { 
+      padding: 16px; 
+      border-radius: 12px; 
+      margin: 12px 12px 12px 0;
+    }
     .iv-search { max-width: 180px; }
   }
 `;

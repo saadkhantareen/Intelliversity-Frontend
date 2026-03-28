@@ -34,3 +34,5 @@ All statements in these docs are derived from the current code under `src/` and 
 - Portal shell UI is implemented via `DashboardShell` and portal-specific config wrappers.
 - Layout components live under `src/components/layout/` and contain the dashboard shell and portal wrapper files (e.g. `DashboardShell.jsx`, `StudentLayout.jsx`, `FacultyLayout.jsx`, `AdminLayout.jsx`, `icons.jsx`, `PortalLayouts.jsx`).
 - Current route surface is intentionally small, while side navigation already contains future route placeholders.
+
+- **`10-bulk-upload.md`**: Explains the Frontend Bulk Upload implementation bridging files to the admin dashboard.

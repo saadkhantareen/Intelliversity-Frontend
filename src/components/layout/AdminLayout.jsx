@@ -1,6 +1,7 @@
 import DashboardShell3 from "./DashboardShell";
 import {
   IcGrid as IcGrid3, IcUsers as IcUsers3, IcBook as IcBook3,
+  IcUpload,
   IcSettings, IcChart as IcChart3, IcTenant, IcArchive as IcArchive3,
   IcBell as IcBell3,
 } from "./icons";
@@ -16,6 +17,7 @@ const ADMIN_CONFIG = {
       items: [
         { label: "Dashboard",     to: "/dashboard",    Icon: IcGrid3 },
         { label: "Users",         to: "/users",        Icon: IcUsers3 },
+        { label: "Bulk Upload",   to: "/users/bulk-upload", Icon: IcUpload },
         { label: "Courses",       to: "/courses",      Icon: IcBook3 },
         { label: "Departments",   to: "/departments",  Icon: IcArchive3 },
         { label: "Announcements", to: "/announcements",Icon: IcBell3 },

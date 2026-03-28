@@ -1,3 +1,4 @@
+import BulkUploadPage from './pages/admin/BulkUploadPage';
 import './App.css'
 import { Routes, Route } from 'react-router-dom'
 import ProtectedRoute from './components/shared/ProtectedRoute'
@@ -22,6 +23,20 @@ function ProfileRouter() {
   return <NotFound />
 }
 
+import { StudentLayout } from './components/layout/StudentLayout'
+import { FacultyLayout } from './components/layout/FacultyLayout'
+import { AdminLayout } from './components/layout/AdminLayout'
+import { Outlet } from 'react-router-dom'
+
+function PortalLayoutRouter() {
+  const { portal } = useTenant()
+
+  if (portal === 'student') return <StudentLayout />
+  if (portal === 'faculty') return <FacultyLayout />
+  if (portal === 'admin')   return <AdminLayout />
+  return <Outlet />
+}
+
 function App() {
   return (
     <Routes>
@@ -29,10 +44,13 @@ function App() {
       <Route path="/forgot-password"               element={<ForgotPasswordPage />} />
       <Route path="/reset-password/:uidb64/:token" element={<ResetPasswordPage />} />
       <Route element={<ProtectedRoute />}>
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/profile"   element={<ProfileRouter />} />
-        <Route path="/users"   element={<UsersPage />} />
-        <Route path="/users/:userId"   element={<UserDetailPage />} />
+        <Route element={<PortalLayoutRouter />}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/profile"   element={<ProfileRouter />} />
+          <Route path="/users"   element={<UsersPage />} />
+          <Route path="/users/bulk-upload"   element={<BulkUploadPage />} />
+          <Route path="/users/:userId"   element={<UserDetailPage />} />
+        </Route>
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
