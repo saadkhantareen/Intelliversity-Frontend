@@ -1,46 +1,53 @@
-import { createContext, useContext, useMemo } from 'react'
+import { createContext, useContext, useEffect, useState } from "react";
+import { globalService } from "@/services/global.service";
+import { applyThemeToCSS, applyFavicon } from "@/utils/tenantUtils";
 
-const TENANT_CONFIG = {
-  student: { label: 'Student Portal',  color: '#0ea5e9' },
-  faculty: { label: 'Faculty Portal',  color: '#10b981' },
-  admin:   { label: 'Admin Portal',    color: '#f59e0b' },
-}
-
-function detectTenant() {
-  const parts      = window.location.hostname.split('.')
-  const portal     = parts[0]
-  const university = parts[1]
-
-  if (!TENANT_CONFIG[portal]) return null
-
-  return { portal, university, config: TENANT_CONFIG[portal] }
-}
-
-const TenantContext = createContext(null)
+const TenantContext = createContext(null);
 
 export function TenantProvider({ children }) {
-  const value = useMemo(() => {
-    const tenant = detectTenant()
-    if (tenant) {
-      return {
-        portal:     tenant.portal,
-        university: tenant.university,
-        config:     tenant.config,
-        isValid:    true,
+  const [tenant, setTenant] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    async function loadTenant() {
+      try {
+        const domain = window.location.hostname;
+
+        const res = await globalService.getTenantBranding(domain);
+
+        if (res.status !== 200 || !res.data) {
+          throw new Error("Invalid tenant");
+        }
+
+        const data = res.data;
+
+        setTenant(data);
+
+        applyThemeToCSS(data.theme_config);
+        applyFavicon(data.favicon_url);
+      } catch (err) {
+        console.log("Error!");
+        setError(true);
+      } finally {
+        setIsLoading(false);
       }
     }
-    return { portal: null, university: null, config: null, isValid: false }
-  }, [])
+
+    loadTenant();
+  }, []);
 
   return (
-    <TenantContext.Provider value={value}>
+    <TenantContext.Provider
+      value={{ tenant, isTenantLoading: isLoading, error }}
+    >
       {children}
     </TenantContext.Provider>
-  )
+  );
 }
 
 export function useTenant() {
-  const ctx = useContext(TenantContext)
-  if (!ctx) throw new Error('useTenant must be used inside <TenantProvider>')
-  return ctx
+  const ctx = useContext(TenantContext);
+  if (!ctx) throw new Error("useTenant must be used inside <TenantProvider>");
+  return ctx;
 }

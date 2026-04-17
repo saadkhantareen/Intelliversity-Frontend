@@ -12,6 +12,13 @@ export default defineConfig({
   },
   server: {
     host: true,
+    allowedHosts: [
+      "student.comsats.intelliversity.com",
+      "admin.comsats.intelliversity.com",
+    ],
     port: 5173,
+    hmr: {
+      host: "student.comsats.intelliversity.com",
+    },
   },
 });
