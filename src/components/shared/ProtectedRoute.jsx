@@ -1,10 +1,12 @@
 import { Navigate, Outlet } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
-import { useTenant } from '../../context/TenantContext'
+import { useAuth } from '@/context/AuthContext'
+import { useTenant } from '@/context/TenantContext'
+
 
 function ProtectedRoute() {
   const { isAuthenticated, isCheckingAuth, user } = useAuth()
   const { portal } = useTenant()
+
 
   if (isCheckingAuth) {
     return (

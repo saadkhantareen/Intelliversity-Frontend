@@ -1,57 +1,54 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useEffect, useState } from "react";
+import { globalService } from "@/services/global.service";
+import { applyThemeToCSS, applyFavicon } from "@/utils/tenantUtils";
 
-// ── Tenant Config ────────────────────────────────────────────────
-const TENANT_CONFIG = {
-  student: { label: 'Student Portal',  color: '#0ea5e9' },
-  faculty: { label: 'Faculty Portal',  color: '#10b981' },
-  admin:   { label: 'Admin Portal',    color: '#f59e0b' },
-}
+const TenantContext = createContext(null);
 
-// ── Detect from subdomain ────────────────────────────────────────
-function detectTenant() {
-  const parts      = window.location.hostname.split('.')
-  const portal     = parts[0]   // 'student'
-  const university = parts[1]   // 'nust'
 
-  if (!TENANT_CONFIG[portal]) return null
-
-  return { portal, university }
-}
-
-// ── Context ──────────────────────────────────────────────────────
-const TenantContext = createContext(null)
-
-// ── Provider ─────────────────────────────────────────────────────
 export function TenantProvider({ children }) {
-  const [portal, setPortal]         = useState(null)
-  const [university, setUniversity] = useState(null)
-  const [config, setConfig]         = useState(null)
-  const [isValid, setIsValid]       = useState(false)
-  const [isResolved, setIsResolved] = useState(false)
+  const [tenant, setTenant] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    const tenant = detectTenant()
-    if (tenant) {
-      setPortal(tenant.portal)
-      setUniversity(tenant.university)
-      setConfig(TENANT_CONFIG[tenant.portal])
-      setIsValid(true)
-    } else {
-      setIsValid(false)
+    async function loadTenant() {
+      try {
+        const domain = window.location.hostname;
+
+        const res = await globalService.getTenantBranding(domain);
+
+        if (res.status !== 200 || !res.data) {
+          throw new Error("Invalid tenant");
+        }
+
+        const data = res.data;
+
+        setTenant(data);
+
+        applyThemeToCSS(data.theme_config);
+        applyFavicon(data.favicon_url);
+      } catch (err) {
+        console.log("Error!");
+        setError(true);
+      } finally {
+        setIsLoading(false);
+      }
     }
-    setIsResolved(true)
-  }, [])
+
+    loadTenant();
+  }, []);
 
   return (
-    <TenantContext.Provider value={{ portal, university, config, isValid, isResolved }}>
+    <TenantContext.Provider
+      value={{ tenant, isTenantLoading: isLoading, error }}
+    >
       {children}
     </TenantContext.Provider>
-  )
+  );
 }
 
-// ── Hook ─────────────────────────────────────────────────────────
 export function useTenant() {
-  const ctx = useContext(TenantContext)
-  if (!ctx) throw new Error('useTenant must be used inside <TenantProvider>')
-  return ctx
+  const ctx = useContext(TenantContext);
+  if (!ctx) throw new Error("useTenant must be used inside <TenantProvider>");
+  return ctx;
 }
