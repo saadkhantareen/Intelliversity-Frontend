@@ -4,22 +4,42 @@ import toast from "react-hot-toast";
 
 const AuthContext = createContext(null);
 
-function loadStoredAuth() {
-  const savedToken = localStorage.getItem("access_token");
-  const savedUser = localStorage.getItem("user");
-  if (savedToken && savedUser) {
-    return {
-      token: savedToken,
-      user: JSON.parse(savedUser),
-      isAuthenticated: true,
-    };
-  }
-  return { token: null, user: null, isAuthenticated: false };
-}
-
 export function AuthProvider({ children }) {
-  const [auth, setAuth] = useState(loadStoredAuth);
-  const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser]                       = useState(null)
+  const [token, setToken]                     = useState(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isLoading, setIsLoading]             = useState(false)   // login button
+  const [isCheckingAuth, setIsCheckingAuth]   = useState(true)    // initial check
+
+  useEffect(() => {
+  const savedToken = localStorage.getItem('access_token')
+  const savedUser  = localStorage.getItem('user')
+
+  if (savedToken && savedUser) {
+    try {
+      // decode JWT and check expiry
+      const payload = JSON.parse(atob(savedToken.split('.')[1]))
+      const isExpired = payload.exp * 1000 < Date.now()
+
+      if (isExpired) {
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('refresh_token')
+        localStorage.removeItem('user')
+        setIsCheckingAuth(false)
+        return
+      }
+
+      setToken(savedToken)
+      setUser(JSON.parse(savedUser))
+      setIsAuthenticated(true)
+    } catch (err) {
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
+      localStorage.removeItem('user')
+    }
+  }
+  setIsCheckingAuth(false)
+}, [])
 
   const login = useCallback(async (credentials) => {
     setIsLoading(true);
@@ -38,9 +58,11 @@ export function AuthProvider({ children }) {
       });
       toast.success(`Welcome back, ${user.first_name}!`);
     } catch (err) {
-      const errors = err.response?.data;
+      const errors = err.response?.data
+      console.log('error response:', errors)
       const message =
         errors?.non_field_errors?.[0]?.detail ||
+        errors?.non_field_errors?.[0] ||
         errors?.detail ||
         errors?.email?.[0]?.detail ||
         errors?.password?.[0]?.detail ||
@@ -61,16 +83,11 @@ export function AuthProvider({ children }) {
     toast.success("Logged out successfully");
   }, []);
 
-  const value = {
-    user: auth.user,
-    token: auth.token,
-    isAuthenticated: auth.isAuthenticated,
-    isAuthLoading: isLoading,
-    login,
-    logout,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, token, isAuthenticated, isLoading, isCheckingAuth, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  )
 }
 
 export function useAuth() {

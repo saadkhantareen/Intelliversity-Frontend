@@ -12,6 +12,8 @@ import {
 import toast from "react-hot-toast";
 import { useNavigate, Link } from "react-router-dom";
 import PortalNotFound from "@/pages/errors/PortalNotFound";
+import { getRecaptchaToken } from '@/services/recaptcha.service'
+
 
 export default function LoginPage() {
   const { tenant, isTenantLoading, error } = useTenant();
@@ -39,11 +41,17 @@ export default function LoginPage() {
   const emailValid = emailRegex.test(email);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-
+    e.preventDefault()
     if (!emailValid) {
       toast.error("Enter a valid university email");
       return;
+    
+    try {
+      const recaptchaToken = await getRecaptchaToken('login')
+      await login({ email, password, recaptcha_token: recaptchaToken })
+      navigate('/dashboard')
+    } catch (error) {
+      // error already shown via toast in AuthContext
     }
 
     try {

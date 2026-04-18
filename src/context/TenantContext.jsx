@@ -4,6 +4,7 @@ import { applyThemeToCSS, applyFavicon } from "@/utils/tenantUtils";
 
 const TenantContext = createContext(null);
 
+
 export function TenantProvider({ children }) {
   const [tenant, setTenant] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
