@@ -6,20 +6,40 @@ const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [user, setUser]                       = useState(null)
-  const [token, setToken]                     = useState(localStorage.getItem('access_token') || null)
+  const [token, setToken]                     = useState(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [isLoading, setIsLoading]             = useState(false)
+  const [isLoading, setIsLoading]             = useState(false)   // login button
+  const [isCheckingAuth, setIsCheckingAuth]   = useState(true)    // initial check
 
   useEffect(() => {
-    const savedToken = localStorage.getItem('access_token')
-    const savedUser  = localStorage.getItem('user')
+  const savedToken = localStorage.getItem('access_token')
+  const savedUser  = localStorage.getItem('user')
 
-    if (savedToken && savedUser) {
+  if (savedToken && savedUser) {
+    try {
+      // decode JWT and check expiry
+      const payload = JSON.parse(atob(savedToken.split('.')[1]))
+      const isExpired = payload.exp * 1000 < Date.now()
+
+      if (isExpired) {
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('refresh_token')
+        localStorage.removeItem('user')
+        setIsCheckingAuth(false)
+        return
+      }
+
       setToken(savedToken)
       setUser(JSON.parse(savedUser))
       setIsAuthenticated(true)
+    } catch (err) {
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
+      localStorage.removeItem('user')
     }
-  }, [])
+  }
+  setIsCheckingAuth(false)
+}, [])
 
   const login = async (credentials) => {
     setIsLoading(true)
@@ -37,9 +57,10 @@ export function AuthProvider({ children }) {
       toast.success(`Welcome back, ${user.first_name}!`)
     } catch (err) {
       const errors = err.response?.data
-      // backend returns nested error objects
+      console.log('error response:', errors)
       const message =
         errors?.non_field_errors?.[0]?.detail ||
+        errors?.non_field_errors?.[0] ||
         errors?.detail ||
         errors?.email?.[0]?.detail ||
         errors?.password?.[0]?.detail ||
@@ -63,7 +84,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, isAuthenticated, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, token, isAuthenticated, isLoading, isCheckingAuth, login, logout }}>
       {children}
     </AuthContext.Provider>
   )

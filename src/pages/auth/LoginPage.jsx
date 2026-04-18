@@ -2,6 +2,7 @@ import { useTenant } from '../../context/TenantContext'
 import { useAuth } from '../../context/AuthContext'
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { getRecaptchaToken } from '../../services/recaptcha.service'
 
 function LoginPage() {
   const { config, university } = useTenant()
@@ -14,7 +15,8 @@ function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      await login({ email, password })
+      const recaptchaToken = await getRecaptchaToken('login')
+      await login({ email, password, recaptcha_token: recaptchaToken })
       navigate('/dashboard')
     } catch (error) {
       // error already shown via toast in AuthContext
@@ -73,10 +75,7 @@ function LoginPage() {
           </div>
 
           <div className="text-right">
-            <Link
-              to="/forgot-password"
-              className="text-sm text-gray-400 hover:underline"
-            >
+            <Link to="/forgot-password" className="text-sm text-gray-400 hover:underline">
               Forgot password?
             </Link>
           </div>
@@ -90,6 +89,13 @@ function LoginPage() {
             {isLoading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
+
+
+        // recaptcha part from here
+
+        <p className="text-xs text-gray-300 text-center mt-6">
+          Protected by reCAPTCHA
+        </p>
       </div>
     </div>
   )
