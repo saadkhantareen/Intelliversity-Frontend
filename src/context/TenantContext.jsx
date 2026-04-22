@@ -25,7 +25,6 @@ export function TenantProvider({ children }) {
 
         setTenant(data);
 
-        // theme_config alag field ho sakti hai — dono cases handle karo
         const theme = data.theme_config ?? data;
         applyThemeToCSS(theme);
         applyFavicon(data.favicon_url);
