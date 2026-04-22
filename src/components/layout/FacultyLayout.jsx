@@ -32,6 +32,6 @@ const FACULTY_CONFIG = {
   ],
 };
  
-export function FacultyLayout() {
+export default function FacultyLayout() {
   return <DashboardShell2 config={FACULTY_CONFIG} />;
 }

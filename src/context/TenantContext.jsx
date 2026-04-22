@@ -1,9 +1,9 @@
+// TenantContext.jsx
 import { createContext, useContext, useEffect, useState } from "react";
 import { globalService } from "@/services/global.service";
 import { applyThemeToCSS, applyFavicon } from "@/utils/tenantUtils";
 
 const TenantContext = createContext(null);
-
 
 export function TenantProvider({ children }) {
   const [tenant, setTenant] = useState(null);
@@ -18,19 +18,24 @@ export function TenantProvider({ children }) {
         const res = await globalService.getTenantBranding(domain);
 
         if (res.status !== 200 || !res.data) {
-          throw new Error("Invalid tenant");
+          throw new Error("Invalid tenant response");
         }
 
         const data = res.data;
 
         setTenant(data);
 
-        applyThemeToCSS(data.theme_config);
+        // theme_config alag field ho sakti hai — dono cases handle karo
+        const theme = data.theme_config ?? data;
+        applyThemeToCSS(theme);
         applyFavicon(data.favicon_url);
       } catch (err) {
-        console.log("Error!");
-        setError(true);
-      } finally {
+  console.log("message:", err?.message);
+  console.log("status:", err?.response?.status);
+  console.log("data:", err?.response?.data);
+
+  setError(err?.message || "Failed to load tenant");
+} finally {
         setIsLoading(false);
       }
     }
@@ -39,9 +44,7 @@ export function TenantProvider({ children }) {
   }, []);
 
   return (
-    <TenantContext.Provider
-      value={{ tenant, isTenantLoading: isLoading, error }}
-    >
+    <TenantContext.Provider value={{ tenant, isTenantLoading: isLoading, error }}>
       {children}
     </TenantContext.Provider>
   );

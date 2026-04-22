@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback } from "react";
 import { authService } from "@/services/auth.service";
 import toast from "react-hot-toast";
+import { useEffect } from "react";
 
 const AuthContext = createContext(null);
 
@@ -10,6 +11,7 @@ export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading]             = useState(false)   // login button
   const [isCheckingAuth, setIsCheckingAuth]   = useState(true)    // initial check
+  const [error, setError]                     = useState(null)
 
   useEffect(() => {
   const savedToken = localStorage.getItem('access_token')
@@ -51,22 +53,31 @@ export function AuthProvider({ children }) {
       localStorage.setItem("refresh_token", tokens.refresh);
       localStorage.setItem("user", JSON.stringify({ ...user, university }));
 
-      setAuth({
-        user: { ...user, university },
-        token: tokens.access,
-        isAuthenticated: true,
-      });
+       setToken(tokens.access);
+    setUser({ ...user, university });
+    setIsAuthenticated(true);
       toast.success(`Welcome back, ${user.first_name}!`);
     } catch (err) {
+      // Check for recaptcha or authentication errors - don't redirect
+      if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+        toast.error(err.response.data.detail);
+        return;
+      }
+
       const errors = err.response?.data
       console.log('error response:', errors)
       const message =
         errors?.non_field_errors?.[0]?.detail ||
         errors?.non_field_errors?.[0] ||
         errors?.detail ||
+        errors?.recaptcha_token?.[0] ||
         errors?.email?.[0]?.detail ||
+        errors?.email?.[0] ||
         errors?.password?.[0]?.detail ||
+        errors?.password?.[0] ||
         "Login failed";
+      setError(message);
       toast.error(message);
       throw err;
     } finally {
@@ -79,12 +90,17 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
 
-    setAuth({ token: null, user: null, isAuthenticated: false });
-    toast.success("Logged out successfully");
-  }, []);
+    setToken(null);
+  setUser(null);
+  setIsAuthenticated(false);
+  })
 
   return (
-    <AuthContext.Provider value={{ user, token, isAuthenticated, isLoading, isCheckingAuth, login, logout }}>
+    <AuthContext.Provider value={{ 
+  user, token, isAuthenticated, 
+  isLoading,
+  isAuthLoading: isLoading,  // 👈 alias add karo
+  isCheckingAuth, error, login, logout}}>
       {children}
     </AuthContext.Provider>
   )

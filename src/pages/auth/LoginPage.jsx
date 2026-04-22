@@ -45,6 +45,7 @@ export default function LoginPage() {
     if (!emailValid) {
       toast.error("Enter a valid university email");
       return;
+    }
     
     try {
       const recaptchaToken = await getRecaptchaToken('login')
@@ -54,10 +55,7 @@ export default function LoginPage() {
       // error already shown via toast in AuthContext
     }
 
-    try {
-      await login({ email, password });
-      navigate("/dashboard");
-    } catch (error) {}
+   
   };
 
   const bgImage = tenant?.page_asset?.background_image_url;
@@ -373,3 +371,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

@@ -31,7 +31,7 @@ const STUDENT_CONFIG = {
   ],
 };
  
-export function StudentLayout() {
+export default function StudentLayout() {
   return <DashboardShell config={STUDENT_CONFIG} />;
 }
  

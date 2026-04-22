@@ -34,6 +34,6 @@ const ADMIN_CONFIG = {
   ],
 };
  
-export function AdminLayout() {
+export default function AdminLayout() {
   return <DashboardShell3 config={ADMIN_CONFIG} />;
 }

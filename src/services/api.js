@@ -1,9 +1,10 @@
 import axios from "axios";
 const backendURL = `${window.location.protocol}//${window.location.hostname}:8000`;
 
-const globalURL = import.meta.env.VITE_GLOBAL_API_URL;
+// api.js
+const globalURL = import.meta.env.VITE_GLOBAL_API_URL 
+  || `${window.location.protocol}//${window.location.hostname}:8000`;
 
-// 1. GLOBAL API (No Auth, Used for fetching tenant branding, global configs, etc.
 export const globalApi = axios.create({
   baseURL: globalURL,
 });
