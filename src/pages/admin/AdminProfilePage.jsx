@@ -4,6 +4,54 @@ import { useProfile } from "../../context/ProfileContext";
 import SectionCard from "../../components/ui/SectionCard";
 import InfoField from "../../components/ui/InfoField";
 import toast from "react-hot-toast";
+import axios from "axios";                          // plain axios — only for Cloudinary direct upload
+import api from "../../services/api";
+
+// ─── Cloudinary upload helper ──────────────────────────────────────────────────
+// Step 1: Get signature from Django (uses `api` → sends Bearer token automatically)
+// Step 2: POST file directly to Cloudinary (uses plain axios — no auth header needed)
+// Step 3: Return public_id + resource_type to save in Django
+async function uploadToCloudinary(file, assetCategory) {
+  // Step 1 – get signed params from Django (authenticated)
+  const { data: sigData } = await api.get(`/api/v1/storage/uploads/signature/${assetCategory}/`);
+
+  // Step 2 – upload directly to Cloudinary
+  // ALL params that were signed on the backend (public_id, timestamp, asset_folder,
+  // type, context) MUST be sent here — Cloudinary rejects with 401 if any are missing.
+  const formData = new FormData();
+  formData.append("file",         file);
+  formData.append("api_key",      sigData.api_key);
+  formData.append("timestamp",    String(sigData.timestamp));
+  formData.append("signature",    sigData.signature);
+  formData.append("public_id",    sigData.public_id);
+  formData.append("type",         sigData.type);          // "upload" or "authenticated"
+  formData.append("asset_folder", sigData.asset_folder);
+  formData.append("context",      sigData.context);       // "university=x|portal=y|user_id=z"
+
+  // resource_type goes in the URL, not the form body
+  const resourceType = sigData.resource_type || "image";
+  const cloudRes = await axios.post(
+    `https://api.cloudinary.com/v1_1/${sigData.cloud_name}/${resourceType}/upload`,
+    formData
+  );
+
+  return {
+    public_id:     cloudRes.data.public_id,
+    resource_type: cloudRes.data.resource_type,
+    secure_url:    cloudRes.data.secure_url,
+  };
+}
+
+// ─── Get a signed private URL from Django (authenticated) ─────────────────────
+async function getPrivateUrl(publicId, resourceType) {
+  const { data } = await api.post(`/api/v1/storage/uploads/private-url/`, {
+    public_id:     publicId,
+    resource_type: resourceType,
+  });
+  return data.url;
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
 
 function AdminProfilePage() {
   const { config } = useTenant();
@@ -16,9 +64,14 @@ function AdminProfilePage() {
     deleteDocument,
   } = useProfile();
 
+
+
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+  const [isUploadingPic, setIsUploadingPic] = useState(false);
+  const [isUploadingDoc, setIsUploadingDoc] = useState(false);
+  const [privateUrls, setPrivateUrls] = useState({}); // { [docId]: url }
+  const [loadingUrlId, setLoadingUrlId] = useState(null);
 
   const [formData, setFormData] = useState({
     base_profile: {
@@ -46,20 +99,21 @@ function AdminProfilePage() {
 
   useEffect(() => {
     if (profile) {
+      const bp = profile.base_profile || {};
       setFormData({
         base_profile: {
-          phone_number: profile.base_profile?.phone_number || "",
-          emergency_contact: profile.base_profile?.emergency_contact || "",
-          father_name: profile.base_profile?.father_name || "",
-          date_of_birth: profile.base_profile?.date_of_birth || "",
-          gender: profile.base_profile?.gender || "",
-          nationality: profile.base_profile?.nationality || "",
-          cnic: profile.base_profile?.cnic || "",
-          religion: profile.base_profile?.religion || "",
-          address: profile.base_profile?.address || "",
-          city: profile.base_profile?.city || "",
-          country: profile.base_profile?.country || "",
-          bio: profile.base_profile?.bio || "",
+          phone_number: bp.phone_number || "",
+          emergency_contact: bp.emergency_contact || "",
+          father_name: bp.father_name || "",
+          date_of_birth: bp.date_of_birth || "",
+          gender: bp.gender || "",
+          nationality: bp.nationality || "",
+          cnic: bp.cnic || "",
+          religion: bp.religion || "",
+          address: bp.address || "",
+          city: bp.city || "",
+          country: bp.country || "",
+          bio: bp.bio || "",
         },
       });
     }
@@ -86,32 +140,85 @@ function AdminProfilePage() {
     }
   };
 
+  // ── Profile picture upload (two-step Cloudinary) ───────────────────────────
+  const handlePicUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingPic(true);
+    try {
+      const { public_id } = await uploadToCloudinary(file, "profile");
+      // Save public_id to Django — backend resolves the actual URL
+      await updateProfile({ base_profile: { profile_picture_public_id: public_id } });
+      toast.success("Profile picture updated!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update profile picture");
+    } finally {
+      setIsUploadingPic(false);
+    }
+  };
+
+  // ── Document upload (two-step Cloudinary → save public_id in Django) ────────
   const handleDocUpload = async (e) => {
     e.preventDefault();
     if (!docForm.file || !docForm.document_type || !docForm.title) {
       toast.error("Please fill all document fields");
       return;
     }
-    setIsUploading(true);
+    setIsUploadingDoc(true);
     try {
-      const data = new FormData();
-      data.append("document_type", docForm.document_type);
-      data.append("title", docForm.title);
-      data.append("file", docForm.file);
-      data.append("description", docForm.description);
-      await uploadDocument(data);
+      // Step 1 & 2: upload file to Cloudinary
+      const { public_id, resource_type } = await uploadToCloudinary(docForm.file, "document");
+
+      // Step 3: tell Django to save the record with public_id
+      // Send JSON (not FormData) — backend expects public_id/resource_type as plain fields
+      await uploadDocument({
+        document_type: docForm.document_type,
+        title:         docForm.title,
+        description:   docForm.description,
+        public_id,
+        resource_type,
+      });
+
       toast.success("Document uploaded successfully!");
       setDocForm({ document_type: "", title: "", file: null, description: "" });
     } catch (err) {
+      console.error(err);
       toast.error("Failed to upload document");
     } finally {
-      setIsUploading(false);
+      setIsUploadingDoc(false);
+    }
+  };
+
+  // ── View private document (get signed URL from Django) ────────────────────
+  const handleViewDoc = async (doc) => {
+    // If we already have a cached URL, just open it
+    if (privateUrls[doc.id]) {
+      window.open(privateUrls[doc.id], "_blank");
+      return;
+    }
+    setLoadingUrlId(doc.id);
+    try {
+      const url = await getPrivateUrl(doc.public_id, doc.resource_type);
+      setPrivateUrls((prev) => ({ ...prev, [doc.id]: url }));
+      window.open(url, "_blank");
+    } catch (err) {
+      console.error(err);
+      toast.error("Could not get document URL");
+    } finally {
+      setLoadingUrlId(null);
     }
   };
 
   const handleDocDelete = async (docId) => {
+    if (!window.confirm("Delete this document?")) return;
     try {
       await deleteDocument(docId);
+      setPrivateUrls((prev) => {
+        const copy = { ...prev };
+        delete copy[docId];
+        return copy;
+      });
       toast.success("Document deleted");
     } catch (err) {
       toast.error("Failed to delete document");
@@ -127,17 +234,18 @@ function AdminProfilePage() {
   }
 
   const bp = profile?.base_profile;
+  const themeColor = config?.color || "#4F46E5";
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Header */}
-      <div className="flex it ems-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-800">My Profile</h1>
         {!isEditing ? (
           <button
             onClick={() => setIsEditing(true)}
-            style={{ backgroundColor: config?.color }}
-            className="text-white px-4 py-2 rounded-lg text-sm hover:opacity-90"
+            style={{ backgroundColor: themeColor }}
+            className="text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 transition-opacity"
           >
             Edit Profile
           </button>
@@ -152,8 +260,8 @@ function AdminProfilePage() {
             <button
               onClick={handleSave}
               disabled={isSaving}
-              style={{ backgroundColor: config?.color }}
-              className="text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 disabled:opacity-50"
+              style={{ backgroundColor: themeColor }}
+              className="text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 disabled:opacity-50 transition-opacity"
             >
               {isSaving ? "Saving..." : "Save Changes"}
             </button>
@@ -164,51 +272,50 @@ function AdminProfilePage() {
       {/* Basic Info */}
       <SectionCard title="Basic Information">
         <div className="flex items-center gap-4 mb-4">
-
-            {/* Avatar with upload */}
+          {/* Avatar with upload */}
           <div className="relative w-16 h-16">
-            {bp?.profile_picture ? (
+            {isUploadingPic && (
+              <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center z-10">
+                <span className="text-white text-xs">...</span>
+              </div>
+            )}
+            {bp?.profile_picture_url ? (
               <img
-                src={bp.profile_picture}
+                src={bp.profile_picture_url}
                 alt="profile"
                 className="w-16 h-16 rounded-full object-cover"
               />
             ) : (
               <div
-                style={{ backgroundColor: config?.color }}
-                className="w-16 h-16 rounded-full flex items-center justify-center text-white text-xl font-bold"
+                style={{ backgroundColor: themeColor }}
+                className="w-16 h-16 rounded-full flex items-center justify-center text-white text-xl font-bold select-none"
               >
                 {bp?.first_name?.[0]}
                 {bp?.last_name?.[0]}
               </div>
             )}
-            <label className="absolute bottom-0 right-0 bg-white rounded-full p-0.5 cursor-pointer shadow">
+            <label className="absolute bottom-0 right-0 bg-white rounded-full p-0.5 cursor-pointer shadow hover:bg-gray-100 transition-colors">
               <span className="text-xs">📷</span>
               <input
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={async (e) => {
-                  if (e.target.files[0]) {
-                    await updateProfilePicture(e.target.files[0]);
-                    toast.success("Profile picture updated!");
-                  }
-                }}
+                onChange={handlePicUpload}
+                disabled={isUploadingPic}
               />
             </label>
           </div>
 
-          
           <div>
             <p className="text-lg font-semibold text-gray-800">
               {bp?.first_name} {bp?.last_name}
             </p>
             <p className="text-sm text-gray-400">{bp?.email}</p>
-            <div className="flex gap-1 mt-1">
+            <div className="flex gap-1 mt-1 flex-wrap">
               {bp?.roles?.map((r) => (
                 <span
                   key={r}
-                  style={{ backgroundColor: config?.color }}
+                  style={{ backgroundColor: themeColor }}
                   className="text-white px-2 py-0.5 rounded-full text-xs"
                 >
                   {r}
@@ -247,7 +354,8 @@ function AdminProfilePage() {
                   type={type || "text"}
                   value={formData.base_profile[field]}
                   onChange={(e) => handleChange(field, e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-offset-1"
+                  style={{ "--tw-ring-color": themeColor }}
                 />
               </div>
             ))}
@@ -316,10 +424,7 @@ function AdminProfilePage() {
         ) : (
           <div className="grid grid-cols-2 gap-4">
             <InfoField label="Phone Number" value={bp?.phone_number} />
-            <InfoField
-              label="Emergency Contact"
-              value={bp?.emergency_contact}
-            />
+            <InfoField label="Emergency Contact" value={bp?.emergency_contact} />
             <InfoField label="Address" value={bp?.address} />
             <InfoField label="City" value={bp?.city} />
             <InfoField label="Country" value={bp?.country} />
@@ -344,6 +449,7 @@ function AdminProfilePage() {
 
       {/* Documents */}
       <SectionCard title="Documents">
+        {/* Upload form */}
         <form
           onSubmit={handleDocUpload}
           className="grid grid-cols-2 gap-4 mb-6 pb-6 border-b border-gray-100"
@@ -355,10 +461,7 @@ function AdminProfilePage() {
             <select
               value={docForm.document_type}
               onChange={(e) =>
-                setDocForm((prev) => ({
-                  ...prev,
-                  document_type: e.target.value,
-                }))
+                setDocForm((prev) => ({ ...prev, document_type: e.target.value }))
               }
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none"
             >
@@ -368,6 +471,7 @@ function AdminProfilePage() {
               <option value="other">Other</option>
             </select>
           </div>
+
           <div>
             <label className="block text-xs text-gray-400 uppercase tracking-wide mb-1">
               Title
@@ -382,18 +486,21 @@ function AdminProfilePage() {
               placeholder="Document title"
             />
           </div>
+
           <div>
             <label className="block text-xs text-gray-400 uppercase tracking-wide mb-1">
               File
             </label>
             <input
               type="file"
+              key={docForm.title} // reset input when form clears
               onChange={(e) =>
-                setDocForm((prev) => ({ ...prev, file: e.target.files[0] }))
+                setDocForm((prev) => ({ ...prev, file: e.target.files[0] || null }))
               }
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none"
             />
           </div>
+
           <div>
             <label className="block text-xs text-gray-400 uppercase tracking-wide mb-1">
               Description (optional)
@@ -408,18 +515,20 @@ function AdminProfilePage() {
               placeholder="Optional description"
             />
           </div>
+
           <div className="col-span-2">
             <button
               type="submit"
-              disabled={isUploading}
-              style={{ backgroundColor: config?.color }}
-              className="text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 disabled:opacity-50"
+              disabled={isUploadingDoc}
+              style={{ backgroundColor: themeColor }}
+              className="text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 disabled:opacity-50 transition-opacity"
             >
-              {isUploading ? "Uploading..." : "Upload Document"}
+              {isUploadingDoc ? "Uploading…" : "Upload Document"}
             </button>
           </div>
         </form>
 
+        {/* Document list */}
         {documents.length === 0 ? (
           <p className="text-sm text-gray-400">No documents uploaded yet.</p>
         ) : (
@@ -430,25 +539,23 @@ function AdminProfilePage() {
                 className="flex items-center justify-between border border-gray-100 rounded-lg p-3"
               >
                 <div>
-                  <p className="text-sm font-medium text-gray-700">
-                    {doc.title}
-                  </p>
-                  <p className="text-xs text-gray-400">{doc.document_type}</p>
+                  <p className="text-sm font-medium text-gray-700">{doc.title}</p>
+                  <p className="text-xs text-gray-400 capitalize">{doc.document_type}</p>
+                  {doc.description && (
+                    <p className="text-xs text-gray-400 mt-0.5">{doc.description}</p>
+                  )}
                   {doc.is_verified && (
-                    <span className="text-xs text-green-500 font-medium">
-                      ✓ Verified
-                    </span>
+                    <span className="text-xs text-green-500 font-medium">✓ Verified</span>
                   )}
                 </div>
-                <div className="flex gap-3">
-                  <a
-                    href={doc.file}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-xs text-blue-500 hover:underline"
+                <div className="flex gap-3 items-center">
+                  <button
+                    onClick={() => handleViewDoc(doc)}
+                    disabled={loadingUrlId === doc.id}
+                    className="text-xs text-blue-500 hover:underline disabled:opacity-50"
                   >
-                    View
-                  </a>
+                    {loadingUrlId === doc.id ? "Loading…" : "View"}
+                  </button>
                   <button
                     onClick={() => handleDocDelete(doc.id)}
                     className="text-xs text-red-400 hover:underline"
