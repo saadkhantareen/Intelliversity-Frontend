@@ -4,54 +4,9 @@ import { useProfile } from "../../context/ProfileContext";
 import SectionCard from "../../components/ui/SectionCard";
 import InfoField from "../../components/ui/InfoField";
 import toast from "react-hot-toast";
-import axios from "axios";                          // plain axios — only for Cloudinary direct upload
-import api from "../../services/api";
+import uploadService from "../../services/upload.service";
 
-// ─── Cloudinary upload helper ──────────────────────────────────────────────────
-// Step 1: Get signature from Django (uses `api` → sends Bearer token automatically)
-// Step 2: POST file directly to Cloudinary (uses plain axios — no auth header needed)
-// Step 3: Return public_id + resource_type to save in Django
-async function uploadToCloudinary(file, assetCategory) {
-  // Step 1 – get signed params from Django (authenticated)
-  const { data: sigData } = await api.get(`/api/v1/storage/uploads/signature/${assetCategory}/`);
-
-  // Step 2 – upload directly to Cloudinary
-  // ALL params that were signed on the backend (public_id, timestamp, asset_folder,
-  // type, context) MUST be sent here — Cloudinary rejects with 401 if any are missing.
-  const formData = new FormData();
-  formData.append("file",         file);
-  formData.append("api_key",      sigData.api_key);
-  formData.append("timestamp",    String(sigData.timestamp));
-  formData.append("signature",    sigData.signature);
-  formData.append("public_id",    sigData.public_id);
-  formData.append("type",         sigData.type);          // "upload" or "authenticated"
-  formData.append("asset_folder", sigData.asset_folder);
-  formData.append("context",      sigData.context);       // "university=x|portal=y|user_id=z"
-
-  // resource_type goes in the URL, not the form body
-  const resourceType = sigData.resource_type || "image";
-  const cloudRes = await axios.post(
-    `https://api.cloudinary.com/v1_1/${sigData.cloud_name}/${resourceType}/upload`,
-    formData
-  );
-
-  return {
-    public_id:     cloudRes.data.public_id,
-    resource_type: cloudRes.data.resource_type,
-    secure_url:    cloudRes.data.secure_url,
-  };
-}
-
-// ─── Get a signed private URL from Django (authenticated) ─────────────────────
-async function getPrivateUrl(publicId, resourceType) {
-  const { data } = await api.post(`/api/v1/storage/uploads/private-url/`, {
-    public_id:     publicId,
-    resource_type: resourceType,
-  });
-  return data.url;
-}
-
-// ──────────────────────────────────────────────────────────────────────────────
+// Upload helpers moved to `services/upload.service.js`
 
 function AdminProfilePage() {
   const { config } = useTenant();
@@ -146,9 +101,7 @@ function AdminProfilePage() {
     if (!file) return;
     setIsUploadingPic(true);
     try {
-      const { public_id } = await uploadToCloudinary(file, "profile");
-      // Save public_id to Django — backend resolves the actual URL
-      await updateProfile({ base_profile: { profile_picture_public_id: public_id } });
+      await uploadService.uploadProfilePicture(file);
       toast.success("Profile picture updated!");
     } catch (err) {
       console.error(err);
@@ -167,17 +120,10 @@ function AdminProfilePage() {
     }
     setIsUploadingDoc(true);
     try {
-      // Step 1 & 2: upload file to Cloudinary
-      const { public_id, resource_type } = await uploadToCloudinary(docForm.file, "document");
-
-      // Step 3: tell Django to save the record with public_id
-      // Send JSON (not FormData) — backend expects public_id/resource_type as plain fields
-      await uploadDocument({
+      await uploadService.uploadDocument(docForm.file, {
         document_type: docForm.document_type,
-        title:         docForm.title,
-        description:   docForm.description,
-        public_id,
-        resource_type,
+        title: docForm.title,
+        description: docForm.description,
       });
 
       toast.success("Document uploaded successfully!");
@@ -199,7 +145,7 @@ function AdminProfilePage() {
     }
     setLoadingUrlId(doc.id);
     try {
-      const url = await getPrivateUrl(doc.public_id, doc.resource_type);
+      const url = await uploadService.getPrivateUrl(doc.public_id, doc.resource_type);
       setPrivateUrls((prev) => ({ ...prev, [doc.id]: url }));
       window.open(url, "_blank");
     } catch (err) {

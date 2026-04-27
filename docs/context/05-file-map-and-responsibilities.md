@@ -47,16 +47,22 @@
   - Faculty portal config wrapper around `DashboardShell`.
 
 - `src/components/layout/AdminLayout.jsx`:
-  - Admin portal config wrapper around `DashboardShell`.
+  - Admin portal config wrapper with 3-section sidebar (Academics, Management, System).
+  - Includes sidebar links to all 4 academic pages (Departments, Programs, Courses, Curriculum).
 
 - `src/components/layout/icons.jsx`:
   - Shared icon primitives used by shell and nav config.
 
 - `src/components/layout/PortalLayouts.jsx`:
-  - Portal layout switcher mapping portal keys to portal wrapper components (may be empty or extended to add portal-specific composition).
+  - Portal layout switcher mapping portal keys to portal wrapper components.
+
+- `src/components/shared/Modal.jsx`:
+  - Reusable modal component used across all academic pages for create/edit forms and delete confirmations.
+  - Props: `isOpen`, `onClose`, `title`, `children`.
 
 ## Pages
 
+### Auth Pages
 - `src/pages/auth/LoginPage.jsx`:
   - Login form and post-login redirect.
 
@@ -66,19 +72,78 @@
 - `src/pages/auth/ResetPasswordPage.jsx`:
   - Token-based reset form.
 
+### Dashboard Pages
 - `src/pages/student/DashboardPage.jsx`:
-  - Placeholder protected page.
+  - Student portal dashboard.
 
-- `src/pages/errors/NotFound.jsx`:
+- `src/pages/admin/DashboardPage.jsx`:
+  - Admin dashboard with stat cards and charts (monthly enrollments, department distribution, recent activity).
+  - Uses demo data, ready for API integration.
+
+### Admin Academic Pages (NEW)
+- `src/pages/admin/DepartmentsPage.jsx` (251 lines):
+  - CRUD interface for managing academic departments.
+  - Form fields: Name, Code, Description.
+  - Features: List with cards, create/edit/delete modals, loading/empty states, toast notifications.
+
+- `src/pages/admin/ProgramsPage.jsx` (341 lines):
+  - CRUD interface for managing degree programs.
+  - Form fields: Name, Code, Degree Level (dropdown), Department (dropdown), Total Credits, No. of Semesters.
+  - Features: 2-column form grid, FK resolution (displays department name), number conversion.
+
+- `src/pages/admin/CoursesPage.jsx` (336 lines):
+  - CRUD interface for managing courses.
+  - Form fields: Name, Code, Credits (1-10), Department (dropdown), Description.
+  - Features: Department filter dropdown, client-side filtering, FK resolution.
+
+- `src/pages/admin/CurriculumPage.jsx` (251 lines):
+  - CRUD interface for managing curriculum.
+  - Form fields: Name, Program (dropdown).
+  - Features: Simplest page (2 fields), FK resolution (displays program name).
+
+### Placeholder Pages
+- `src/pages/admin/ComingSoon.jsx`:
+  - Placeholder page for future features (Analytics, Settings).
+
+- `src/pages/errors/PageNotFound.jsx`:
   - Fallback 404 page.
+
+- `src/pages/errors/PortalNotFound.jsx`:
+  - Portal detection failure page.
 
 ## Services
 
+### API Infrastructure
 - `src/services/api.js`:
-  - Shared Axios instance with tenant-aware base URL.
+  - Shared Axios instance with tenant-aware base URL, port 8000.
+  - JWT request interceptor (adds Bearer token from localStorage).
+  - 401 response interceptor (clears token, redirects to /login).
+  - Exports: `export default api` and `export const api`.
 
+### Authentication Service
 - `src/services/auth.service.js`:
   - Authentication-related endpoint methods.
+
+### Academic Services (NEW)
+- `src/services/department.service.js`:
+  - CRUD functions for departments.
+  - Functions: `getDepartments()`, `getDepartment(id)`, `createDepartment(data)`, `updateDepartment(id, data)`, `deleteDepartment(id)`.
+  - Endpoint: `/api/v1/academics/departments/`
+
+- `src/services/program.service.js`:
+  - CRUD functions for programs.
+  - Functions: `getPrograms()`, `getProgram(id)`, `createProgram(data)`, `updateProgram(id, data)`, `deleteProgram(id)`.
+  - Endpoint: `/api/v1/academics/programs/`
+
+- `src/services/course.service.js`:
+  - CRUD functions for courses (includes prerequisites endpoint).
+  - Functions: `getCourses()`, `getCourse(id)`, `createCourse(data)`, `updateCourse(id, data)`, `deleteCourse(id)`, `getCoursePrereqs(id)`.
+  - Endpoint: `/api/v1/academics/courses/`
+
+- `src/services/curriculum.service.js`:
+  - CRUD functions for curriculum.
+  - Functions: `getCurriculums()`, `getCurriculum(id)`, `createCurriculum(data)`, `updateCurriculum(id, data)`, `deleteCurriculum(id)`.
+  - Endpoint: `/api/v1/academics/curriculum/`
 
 ## Styling
 

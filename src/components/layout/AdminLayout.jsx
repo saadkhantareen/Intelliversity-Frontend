@@ -13,13 +13,21 @@ const ADMIN_CONFIG = {
   badge:  { bg: "#fef3c7", text: "#92400e" },
   sections: [
     {
+      title: "Academics",
+      items: [
+        { label: "Departments",   to: "/departments",  Icon: IcArchive3 },
+        { label: "Programs",      to: "/programs",     Icon: IcBook3 },
+        { label: "Courses",       to: "/courses",      Icon: IcBook3 },
+        { label: "Curriculum",    to: "/curriculum",   Icon: IcBook3 },
+      ],
+    },
+    {
       title: "Management",
       items: [
         { label: "Dashboard",     to: "/dashboard",    Icon: IcGrid3 },
+        { label: "Profile",       to: "/profile",      Icon: IcUsers3 },
         { label: "Users",         to: "/users",        Icon: IcUsers3 },
         { label: "Bulk Upload",   to: "/users/bulk-upload", Icon: IcUpload },
-        { label: "Courses",       to: "/courses",      Icon: IcBook3 },
-        { label: "Departments",   to: "/departments",  Icon: IcArchive3 },
         { label: "Announcements", to: "/announcements",Icon: IcBell3 },
       ],
     },

@@ -1,7 +1,7 @@
 import DashboardShell from "./DashboardShell";
 import {
   IcGrid, IcBook, IcClipboard, IcChart,
-  IcCalendar, IcArchive, IcBell, IcGraduation,
+  IcCalendar, IcArchive, IcBell, IcGraduation, IcUsers,
 } from "./icons";
  
 const STUDENT_CONFIG = {
@@ -14,6 +14,7 @@ const STUDENT_CONFIG = {
       title: "Learning",
       items: [
         { label: "Dashboard",     to: "/dashboard",    Icon: IcGrid },
+        { label: "Profile",       to: "/profile",      Icon: IcUsers },
         { label: "My Courses",    to: "/courses",      Icon: IcBook },
         { label: "Assignments",   to: "/assignments",  Icon: IcClipboard },
         { label: "Grades",        to: "/grades",       Icon: IcChart },

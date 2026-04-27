@@ -13,6 +13,8 @@ This folder contains a complete context handoff for external LLMs to understand 
 7. [07-runtime-state-and-storage.md](./07-runtime-state-and-storage.md)
 8. [08-portal-ui-and-navigation.md](./08-portal-ui-and-navigation.md)
 9. [09-known-inconsistencies-and-risks.md](./09-known-inconsistencies-and-risks.md)
+10. [10-bulk-upload.md](./10-bulk-upload.md)
+11. [11-admin-academic-pages.md](./11-admin-academic-pages.md) ← **NEW: Complete Admin Academic Pages Feature**
 
 ## Scope
 

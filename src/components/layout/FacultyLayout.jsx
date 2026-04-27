@@ -15,6 +15,7 @@ const FACULTY_CONFIG = {
       title: "Teaching",
       items: [
         { label: "Dashboard",     to: "/dashboard",    Icon: IcGrid2 },
+        { label: "Profile",       to: "/profile",      Icon: IcUsers2 },
         { label: "My Courses",    to: "/courses",      Icon: IcBook2 },
         { label: "Students",      to: "/students",     Icon: IcUsers2 },
         { label: "Grading",       to: "/grading",      Icon: IcClipboard2 },

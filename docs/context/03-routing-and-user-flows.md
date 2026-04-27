@@ -8,13 +8,35 @@ Public routes:
 - `/forgot-password` -> `ForgotPasswordPage`
 - `/reset-password/:uidb64/:token` -> `ResetPasswordPage`
 
-Protected route wrapper:
+Protected route wrapper (tenant-aware):
 
-- `/dashboard` -> `DashboardPage` (inside `ProtectedRoute`)
+- `/dashboard` -> `DashboardRouter` (admin → AdminDashboardPage, student/faculty → StudentDashboardPage)
+- `/profile` -> `ProfileRouter` (admin → AdminProfilePage, student → StudentProfilePage, faculty → FacultyProfilePage)
+
+Protected admin academic routes (NEW):
+
+- `/departments` -> `DepartmentsPage` (CRUD for departments)
+- `/programs` -> `ProgramsPage` (CRUD for programs)
+- `/courses` -> `CoursesPage` (CRUD for courses, with department filter)
+- `/curriculum` -> `CurriculumPage` (CRUD for curriculum)
+
+Protected admin management routes:
+
+- `/users` -> `UsersPage`
+- `/users/bulk-upload` -> `BulkUploadPage`
+- `/users/:userId` -> `UserDetailPage`
+- `/announcements` -> (existing)
+
+Protected admin system routes:
+
+- `/analytics` -> `ComingSoon` (placeholder for future analytics page)
+- `/settings` -> `ComingSoon` (placeholder for future settings page)
+- `/tenants` -> (existing)
 
 Catch-all:
 
-- `*` -> `NotFound`
+- `/portal-not-found` -> `PortalNotFound`
+- `*` -> `PageNotFound`
 
 ## User Flow 1: Login
 
