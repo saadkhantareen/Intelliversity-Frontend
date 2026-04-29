@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
-import Modal from '@/components/shared/Modal';
 import {
   getCourses,
   createCourse,
@@ -66,6 +65,12 @@ const CoursesPage = () => {
     setShowForm(true);
   };
 
+  const cancelForm = () => {
+    setShowForm(false);
+    setEditTarget(null);
+    setForm(EMPTY_FORM);
+  };
+
   const set = (field) => (e) =>
     setForm((f) => ({ ...f, [field]: e.target.value }));
 
@@ -85,7 +90,7 @@ const CoursesPage = () => {
         await createCourse(payload);
         toast.success('Course created');
       }
-      setShowForm(false);
+      cancelForm();
       load();
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Save failed');
@@ -123,34 +128,165 @@ const CoursesPage = () => {
             {displayed.length !== 1 ? 's' : ''}
           </p>
         </div>
-        <button
-          onClick={openCreate}
-          className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-        >
-          + New Course
-        </button>
+        {!showForm && (
+          <button
+            onClick={openCreate}
+            className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+          >
+            + New Course
+          </button>
+        )}
       </div>
 
       {/* Department Filter */}
-      <div className="mb-4">
-        <select
-          value={filterDept}
-          onChange={(e) => setFilterDept(e.target.value)}
-          className="border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-        >
-          <option value="">All Departments</option>
-          {departments.map((d) => (
-            <option key={d.id} value={d.id}>
-              {d.name}
-            </option>
-          ))}
-        </select>
-      </div>
+      {!showForm && (
+        <div className="mb-4">
+          <select
+            value={filterDept}
+            onChange={(e) => setFilterDept(e.target.value)}
+            className="border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+          >
+            <option value="">All Departments</option>
+            {departments.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Inline Form */}
+      {showForm && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-amber-900 mb-4">
+            {editTarget ? 'Edit Course' : 'New Course'}
+          </h3>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={form.name}
+                  onChange={set('name')}
+                  placeholder="e.g. Data Structures"
+                  className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Code <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={form.code}
+                  onChange={set('code')}
+                  placeholder="e.g. CS201"
+                  className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Credits <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  required
+                  min={1}
+                  max={10}
+                  value={form.credits}
+                  onChange={set('credits')}
+                  placeholder="1–10"
+                  className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Department <span className="text-red-500">*</span>
+                </label>
+                <select
+                  required
+                  value={form.department}
+                  onChange={set('department')}
+                  className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                >
+                  <option value="">Select department</option>
+                  {departments.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      [{d.code}] {d.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  required
+                  value={form.description}
+                  onChange={set('description')}
+                  rows={3}
+                  placeholder="Course description"
+                  className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 pt-2 border-t border-amber-200">
+              <button
+                type="button"
+                onClick={cancelForm}
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={saving}
+                className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-md text-sm font-medium disabled:opacity-60"
+              >
+                {saving ? 'Saving...' : editTarget ? 'Update' : 'Create'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Delete Confirmation Banner */}
+      {deleteTarget && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-center justify-between shadow-sm">
+          <div>
+            <p className="text-sm text-red-800">
+              Delete <strong>{deleteTarget.name}</strong>? Any curriculum
+              entries referencing this course will also be removed.
+            </p>
+          </div>
+          <div className="flex gap-2 shrink-0 ml-4">
+            <button
+              onClick={() => setDeleteTarget(null)}
+              className="px-3 py-1.5 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDelete}
+              className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium"
+            >
+              Confirm Delete
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Loading State */}
       {loading ? (
         <div className="text-center py-16 text-gray-400">Loading...</div>
-      ) : displayed.length === 0 ? (
+      ) : displayed.length === 0 && !showForm ? (
         /* Empty State */
         <div className="text-center py-16 text-gray-400">
           No courses found.
@@ -177,13 +313,19 @@ const CoursesPage = () => {
               </div>
               <div className="flex gap-2 ml-4 shrink-0">
                 <button
-                  onClick={() => openEdit(course)}
+                  onClick={() => {
+                    setDeleteTarget(null);
+                    openEdit(course);
+                  }}
                   className="text-sm text-indigo-600 hover:text-indigo-800 border border-indigo-200 hover:border-indigo-400 px-3 py-1 rounded transition-colors"
                 >
                   Edit
                 </button>
                 <button
-                  onClick={() => setDeleteTarget(course)}
+                  onClick={() => {
+                    setDeleteTarget(course);
+                    setShowForm(false);
+                  }}
                   className="text-sm text-red-600 hover:text-red-800 border border-red-200 hover:border-red-400 px-3 py-1 rounded transition-colors"
                 >
                   Delete
@@ -193,141 +335,6 @@ const CoursesPage = () => {
           ))}
         </div>
       )}
-
-      {/* Create / Edit Modal */}
-      <Modal
-        isOpen={showForm}
-        onClose={() => setShowForm(false)}
-        title={editTarget ? 'Edit Course' : 'New Course'}
-      >
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            {/* Name */}
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                value={form.name}
-                onChange={set('name')}
-                placeholder="e.g. Data Structures"
-                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-              />
-            </div>
-
-            {/* Code + Credits */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Code <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                value={form.code}
-                onChange={set('code')}
-                placeholder="e.g. CS201"
-                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Credits <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                required
-                min={1}
-                max={10}
-                value={form.credits}
-                onChange={set('credits')}
-                placeholder="1–10"
-                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-              />
-            </div>
-
-            {/* Department */}
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Department <span className="text-red-500">*</span>
-              </label>
-              <select
-                required
-                value={form.department}
-                onChange={set('department')}
-                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-              >
-                <option value="">Select department</option>
-                {departments.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    [{d.code}] {d.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Description */}
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                required
-                value={form.description}
-                onChange={set('description')}
-                rows={3}
-                placeholder="Course description"
-                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-              />
-            </div>
-          </div>
-
-          {/* Buttons */}
-          <div className="flex justify-end gap-2 pt-2">
-            <button
-              type="button"
-              onClick={() => setShowForm(false)}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={saving}
-              className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-md text-sm font-medium disabled:opacity-60"
-            >
-              {saving ? 'Saving...' : editTarget ? 'Update' : 'Create'}
-            </button>
-          </div>
-        </form>
-      </Modal>
-
-      {/* Delete Confirmation Modal */}
-      <Modal
-        isOpen={!!deleteTarget}
-        onClose={() => setDeleteTarget(null)}
-        title="Delete Course"
-      >
-        <p className="text-gray-600 mb-5">
-          Delete <strong>{deleteTarget?.name}</strong>? Any curriculum entries
-          referencing this course will also be removed.
-        </p>
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={() => setDeleteTarget(null)}
-            className="px-4 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleDelete}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium"
-          >
-            Delete
-          </button>
-        </div>
-      </Modal>
     </div>
   );
 };
