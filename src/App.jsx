@@ -29,6 +29,7 @@ const SoSPage = lazy(() => import("@/pages/student/SoSPage"));
 const AdminProfilePage = lazy(() => import("@/pages/admin/AdminProfilePage"));
 const UsersPage = lazy(() => import("@/pages/admin/UserPage"));
 const UserDetailPage = lazy(() => import("@/pages/admin/UserDetailPage"));
+const FacultyProfilePage = lazy(() => import("@/pages/faculty/FacultyProfilePage"));
 
 
 // New Admin Pages from image
@@ -51,16 +52,6 @@ const StudentForm = lazy(() => import("@/pages/admin/StudentForm"));
 const FacultyForm = lazy(() => import("@/pages/admin/FacultyForm"));
 const StudentsPage = lazy(() => import("@/pages/admin/StudentsPage"));
 const FacultyPage = lazy(() => import("@/pages/admin/FacultyPage"));
-
-
-
-import FacultyProfilePage from "@/pages/faculty/FacultyProfilePage";
-
-
-
-
-
-
 
 
 const CourseDetailLayout = lazy(() => import("@/components/layout/CourseDetailLayout"));
@@ -162,6 +153,9 @@ function ProtectedAppRoutes() {
 
         <Route path="/users/students" element={<StudentsPage />} />
         <Route path="/users/faculty" element={<FacultyPage />} />
+
+
+        <Route path="/my-profile" element={<FacultyProfilePage />} />
 
         
       </Route>
