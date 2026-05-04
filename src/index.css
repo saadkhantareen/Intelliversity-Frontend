@@ -3,6 +3,6 @@
 @tailwind utilities;
 
 /* Google ReCAPTCHA badge ko gayab karne ke liye */
-/* .grecaptcha-badge { 
-  visibility: hidden !important;
-} */
+.grecaptcha-badge { 
+  z-index: 9999 !important;
+}

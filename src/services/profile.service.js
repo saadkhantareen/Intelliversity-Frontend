@@ -1,29 +1,98 @@
-import api from './api'
+import api from "./api"; // adjust path to your api.js
 
-export const profileService = {
-  // ── Own profile ────────────────────────────────────────────────
-  getMyProfile:    ()               => api.get('/api/v1/profiles/me/'),
+const ProfileService = {
+  // ── Admin: Create profiles ─────────────────────────────────────────────
 
-  // Sends JSON — works for both regular fields and profile_picture_public_id
-  updateMyProfile: (data)           => api.put('/api/v1/profiles/me/', data),
+  createStudent: async (studentData) => {
+    const response = await api.post("/api/v1/profiles/students/", studentData);
+    return response.data;
+  },
 
-  // ── Own documents ──────────────────────────────────────────────
-  getMyDocuments:  ()               => api.get('/api/v1/profiles/documents/'),
+  createFaculty: async (facultyData) => {
+    const response = await api.post("/api/v1/profiles/faculty/", facultyData);
+    return response.data;
+  },
 
-  // Sends JSON: { public_id, resource_type, document_type, title, description }
-  // Do NOT send multipart/form-data — backend expects plain JSON fields, not a file
-  uploadDocument:  (data)           => api.post('/api/v1/profiles/documents/', data),
+  createAdmin: async (adminData) => {
+    const response = await api.post("/api/v1/profiles/admin/", adminData);
+    return response.data;
+  },
 
-  deleteDocument:  (docId)          => api.delete(`/api/v1/profiles/documents/${docId}/`),
+  // ── My Profile ─────────────────────────────────────────────────────────
 
-  // ── Admin — manage any user ────────────────────────────────────
-  getAllUsers:        ()             => api.get('/api/v1/profiles/users/'),
-  getUserProfile:    (userId)       => api.get(`/api/v1/profiles/users/${userId}/`),
-  updateUserProfile: (userId, data) => api.put(`/api/v1/profiles/users/${userId}/`, data),
+  // Returns { role: "student"|"faculty"|"admin", profile: {...} }
+  getMyProfile: async () => {
+    const response = await api.get("/api/v1/profiles/me/");
+    return response.data;
+  },
 
-  // ── Admin — manage any user's documents ───────────────────────
-  getUserDocuments:   (userId)       => api.get(`/api/v1/profiles/documents/admin/${userId}/`),
+  // ── Update profiles (PATCH — send only changed fields) ─────────────────
 
-  // Also JSON — same pattern as uploadDocument
-  uploadUserDocument: (userId, data) => api.post(`/api/v1/profiles/documents/admin/${userId}/`, data),
-}
+  updateStudent: async (id, data) => {
+    const response = await api.patch(`/api/v1/profiles/students/${id}/`, data);
+    return response.data;
+  },
+
+  updateFaculty: async (id, data) => {
+    const response = await api.patch(`/api/v1/profiles/faculty/${id}/`, data);
+    return response.data;
+  },
+
+  updateAdmin: async (id, data) => {
+    const response = await api.patch(`/api/v1/profiles/admin/${id}/`, data);
+    return response.data;
+  },
+
+  // ── List (Admin Dashboard) ─────────────────────────────────────────────
+
+  getStudents: async (params) => {
+    const response = await api.get("/api/v1/profiles/students/", { params });
+    return response.data;
+  },
+
+  getFaculty: async (params) => {
+    const response = await api.get("/api/v1/profiles/faculty/", { params });
+    return response.data;
+  },
+
+  // ── Documents (own user) ───────────────────────────────────────────────
+
+  getMyDocuments: async () => {
+    const response = await api.get("/api/v1/profiles/documents/");
+    return response.data;
+  },
+
+  saveDocument: async (data) => {
+    const response = await api.post("/api/v1/profiles/documents/", data);
+    return response.data;
+  },
+
+  deleteDocument: async (docId) => {
+    const response = await api.delete("/api/v1/profiles/documents/", {
+      params: { doc_id: docId },
+    });
+    return response.data;
+  },
+
+  // ── Documents (admin — any user) ───────────────────────────────────────
+
+  getUserDocuments: async (userId) => {
+    const response = await api.get(`/api/v1/profiles/documents/admin/${userId}/`);
+    return response.data;
+  },
+
+  saveUserDocument: async (userId, data) => {
+    const response = await api.post(`/api/v1/profiles/documents/admin/${userId}/`, data);
+    return response.data;
+  },
+
+  verifyDocument: async (userId, documentId, isVerified) => {
+    const response = await api.patch(`/api/v1/profiles/documents/admin/${userId}/`, {
+      id: documentId,
+      is_verified: isVerified,
+    });
+    return response.data;
+  },
+};
+
+export default ProfileService;

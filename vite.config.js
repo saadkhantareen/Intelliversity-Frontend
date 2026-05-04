@@ -15,6 +15,13 @@ export default defineConfig({
     allowedHosts: true,
     
     port: 5173,
-    hmr: true
+    hmr: true,
+
+    proxy: {
+      "/api": {
+        target: "http://localhost:8000", // your Django port
+        changeOrigin: true,
+      },
   },
+}
 });

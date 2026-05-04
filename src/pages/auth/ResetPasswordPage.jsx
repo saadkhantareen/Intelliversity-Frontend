@@ -8,6 +8,7 @@ function ResetPasswordPage() {
   const { config, university } = useTenant()
   const { uidb64, token } = useParams()
   const navigate = useNavigate()
+  const primary = config?.color || "#4f46e5"; // fallback (indigo)
 
   const [newPassword, setNewPassword]         = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -36,79 +37,112 @@ function ResetPasswordPage() {
     }
   }
 
-  return (
-    <div className="flex h-screen items-center justify-center bg-gray-100">
-      <div className="bg-white rounded-xl shadow-lg p-10 w-full max-w-md">
+ return (
+  <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+    <div className="w-full max-w-md">
+      
+      <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
 
-        <p
-          style={{ color: config?.color }}
-          className="text-center uppercase tracking-widest text-sm font-semibold mb-1"
-        >
-          {university}
-        </p>
+        {/* Header */}
+        <div className="text-center mb-6">
+          <p
+            style={{ color: primary }}
+            className="uppercase tracking-widest text-xs font-semibold mb-2"
+          >
+            {university}
+          </p>
 
-        <h1
-          style={{ color: config?.color }}
-          className="text-3xl font-bold text-center mb-2"
-        >
-          Reset Password
-        </h1>
+          <h1 className="text-2xl font-bold text-gray-800">
+            Reset Password
+          </h1>
 
-        <p className="text-gray-400 text-center mb-8">
-          Enter your new password below.
-        </p>
+          <p className="text-gray-400 text-sm mt-1">
+            Create a new secure password
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-5">
+
+          {/* New Password */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-600 mb-1">
               New Password
             </label>
             <input
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none"
-              placeholder="Min 8 chars, uppercase, number, special char"
+              className="w-full border border-gray-300 rounded-xl px-4 py-2.5 
+                         focus:outline-none focus:ring-2 transition"
+              style={{ 
+                borderColor: "#e5e7eb",
+                outlineColor: primary,
+                boxShadow: `0 0 0 2px ${primary}20`
+              }}
+              placeholder="Enter new password"
               required
             />
           </div>
 
+          {/* Confirm Password */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-600 mb-1">
               Confirm Password
             </label>
             <input
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none"
-              placeholder="Repeat your new password"
+              className="w-full border border-gray-300 rounded-xl px-4 py-2.5 
+                         focus:outline-none focus:ring-2 transition"
+              style={{ 
+                boxShadow: `0 0 0 2px ${primary}20`
+              }}
+              placeholder="Re-enter password"
               required
             />
           </div>
 
+          {/* Button */}
           <button
             type="submit"
             disabled={isLoading}
-            style={{ backgroundColor: config?.color }}
-            className="w-full text-white py-2 rounded-lg transition disabled:opacity-50 hover:opacity-90"
+            style={{ backgroundColor: primary }}
+            className="w-full text-white py-2.5 rounded-xl font-medium 
+                       shadow-md hover:opacity-90 transition-all duration-200 
+                       disabled:opacity-50"
           >
-            {isLoading ? 'Resetting...' : 'Reset Password'}
+            {isLoading ? "Resetting..." : "Reset Password"}
           </button>
 
+          {/* Divider */}
+          <div className="flex items-center gap-3 text-xs text-gray-400">
+            <div className="flex-1 h-px bg-gray-200"></div>
+            OR
+            <div className="flex-1 h-px bg-gray-200"></div>
+          </div>
+
+          {/* Back link */}
           <div className="text-center">
             <Link
               to="/login"
-              style={{ color: config?.color }}
-              className="text-sm hover:underline"
+              style={{ color: primary }}
+              className="text-sm font-medium hover:underline"
             >
               ← Back to Login
             </Link>
           </div>
         </form>
       </div>
+
+      {/* Footer */}
+      <p className="text-center text-xs text-gray-400 mt-4">
+        Use at least 8 characters with a mix of letters, numbers & symbols.
+      </p>
     </div>
-  )
+  </div>
+)
 }
 
 export default ResetPasswordPage
