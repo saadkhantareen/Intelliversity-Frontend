@@ -1,6 +1,6 @@
 import api from "./api"; // adjust path to your api.js
 
-const ProfileService = {
+export const ProfileService  = {
   // ── Admin: Create profiles ─────────────────────────────────────────────
 
   createStudent: async (studentData) => {
@@ -77,22 +77,30 @@ const ProfileService = {
   // ── Documents (admin — any user) ───────────────────────────────────────
 
   getUserDocuments: async (userId) => {
-    const response = await api.get(`/api/v1/profiles/documents/admin/${userId}/`);
+    const response = await api.get(
+      `/api/v1/profiles/documents/admin/${userId}/`,
+    );
     return response.data;
   },
 
   saveUserDocument: async (userId, data) => {
-    const response = await api.post(`/api/v1/profiles/documents/admin/${userId}/`, data);
+    const response = await api.post(
+      `/api/v1/profiles/documents/admin/${userId}/`,
+      data,
+    );
     return response.data;
   },
 
   verifyDocument: async (userId, documentId, isVerified) => {
-    const response = await api.patch(`/api/v1/profiles/documents/admin/${userId}/`, {
-      id: documentId,
-      is_verified: isVerified,
-    });
+    const response = await api.patch(
+      `/api/v1/profiles/documents/admin/${userId}/`,
+      {
+        id: documentId,
+        is_verified: isVerified,
+      },
+    );
     return response.data;
   },
 };
 
-export default ProfileService;
+// export default ProfileService;

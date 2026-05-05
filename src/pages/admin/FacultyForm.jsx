@@ -1,22 +1,42 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import ProfileService from "@/services/profile.service";
+import { ProfileService } from "@/services/profile.service";
 import api from "@/services/api";
+import { useCloudinary } from "@/hooks/useCloudinary"; // Make sure this path is correct for your project
 
 const EMPTY_FORM = {
   // Account
-  email: "", password: "", first_name: "", last_name: "",
+  email: "",
+  password: "",
+  first_name: "",
+  last_name: "",
+  // Profile Picture
+  profile_picture_public_id: "",
+  profile_picture_url: "", // Used strictly for frontend preview
   // Faculty-specific
-  registration_id: "", designation: "", qualification: "",
-  specialization: "", experience_years: "", office_number: "",
-  office_location: "", department: "",
+  registration_id: "",
+  designation: "",
+  qualification: "",
+  specialization: "",
+  experience_years: "",
+  office_number: "",
+  office_location: "",
+  department: "",
   // Personal
-  father_name: "", date_of_birth: "", gender: "",
-  nationality: "", cnic: "", religion: "",
+  father_name: "",
+  date_of_birth: "",
+  gender: "",
+  nationality: "",
+  cnic: "",
+  religion: "",
   // Contact
-  phone_number: "", emergency_contact: "",
+  phone_number: "",
+  emergency_contact: "",
   // Address
-  address: "", city: "", country: "", bio: "",
+  address: "",
+  city: "",
+  country: "",
+  bio: "",
 };
 
 export default function FacultyForm({ onSuccess, onCancel }) {
@@ -24,6 +44,9 @@ export default function FacultyForm({ onSuccess, onCancel }) {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [form, setForm] = useState(EMPTY_FORM);
+
+  // Initialize Cloudinary Hook
+  const { uploadToCloudinary, isUploading } = useCloudinary();
 
   useEffect(() => {
     api
@@ -38,6 +61,39 @@ export default function FacultyForm({ onSuccess, onCancel }) {
   const set = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
     setErrors((prev) => ({ ...prev, [field]: null }));
+  };
+
+  // ── Image Upload Handler ───────────────────────────────────────────────
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Invalid file type. Please upload an image (JPG, PNG).");
+      e.target.value = null;
+      return;
+    }
+
+    try {
+      // Asset category passed as "profile" (adjust if your backend expects a different string)
+      const { public_id, secure_url } = await uploadToCloudinary(
+        file,
+        "profile",
+      );
+
+      setForm((prev) => ({
+        ...prev,
+        profile_picture_public_id: public_id,
+        profile_picture_url: secure_url,
+      }));
+
+      toast.success("Profile picture uploaded!");
+    } catch (error) {
+      console.error("Upload Error:", error);
+      // The useCloudinary hook already fires an error toast, so we just catch it here
+    } finally {
+      e.target.value = null; // Reset input so the user can upload a new one if they change their mind
+    }
   };
 
   function flattenErrors(data) {
@@ -66,6 +122,9 @@ export default function FacultyForm({ onSuccess, onCancel }) {
     if (bp.city) flat.city = bp.city[0];
     if (bp.country) flat.country = bp.country[0];
     if (bp.bio) flat.bio = bp.bio[0];
+    // Adding picture error flattening just in case the backend validates it
+    if (bp.profile_picture_public_id)
+      flat.profile_picture_public_id = bp.profile_picture_public_id[0];
 
     const u = bp.user ?? {};
     if (u.email) flat.email = u.email[0];
@@ -77,7 +136,10 @@ export default function FacultyForm({ onSuccess, onCancel }) {
   }
 
   function firstError(flat) {
-    return Object.values(flat).find(Boolean) ?? "Please fix the errors and try again.";
+    return (
+      Object.values(flat).find(Boolean) ??
+      "Please fix the errors and try again."
+    );
   }
 
   function buildPayload() {
@@ -86,11 +148,14 @@ export default function FacultyForm({ onSuccess, onCancel }) {
       designation: form.designation.trim() || null,
       qualification: form.qualification.trim() || null,
       specialization: form.specialization.trim() || null,
-      experience_years: form.experience_years ? Number(form.experience_years) : null,
+      experience_years: form.experience_years
+        ? Number(form.experience_years)
+        : null,
       office_number: form.office_number.trim() || null,
       office_location: form.office_location.trim() || null,
       department: form.department || null,
       base_profile: {
+        profile_picture_public_id: form.profile_picture_public_id || null, // Appended to payload here
         user: {
           email: form.email.trim(),
           first_name: form.first_name.trim(),
@@ -126,13 +191,12 @@ export default function FacultyForm({ onSuccess, onCancel }) {
 
       toast.success(
         `${form.first_name} ${form.last_name} (${form.registration_id}) registered successfully!`,
-        { id: toastId, duration: 4000 }
+        { id: toastId, duration: 4000 },
       );
 
       setForm(EMPTY_FORM);
       setErrors({});
       onSuccess?.(data);
-
     } catch (err) {
       const errData = err.response?.data ?? {};
       const flat = flattenErrors(errData);
@@ -144,10 +208,17 @@ export default function FacultyForm({ onSuccess, onCancel }) {
   }
 
   // ── Field helpers ──────────────────────────────────────────────────────
-  const inp = (id, label, type = "text", placeholder = "", required = false) => (
+  const inp = (
+    id,
+    label,
+    type = "text",
+    placeholder = "",
+    required = false,
+  ) => (
     <div className="flex flex-col gap-1">
       <label className="text-sm font-medium text-gray-700">
-        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+        {label}
+        {required && <span className="text-red-500 ml-0.5">*</span>}
       </label>
       <input
         type={type}
@@ -165,7 +236,8 @@ export default function FacultyForm({ onSuccess, onCancel }) {
   const sel = (id, label, options, required = false) => (
     <div className="flex flex-col gap-1">
       <label className="text-sm font-medium text-gray-700">
-        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+        {label}
+        {required && <span className="text-red-500 ml-0.5">*</span>}
       </label>
       <select
         value={form[id]}
@@ -176,7 +248,9 @@ export default function FacultyForm({ onSuccess, onCancel }) {
       >
         <option value="">— select —</option>
         {options.map((o) => (
-          <option key={o.value} value={o.value}>{o.label}</option>
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
         ))}
       </select>
       {errors[id] && <p className="text-xs text-red-500">{errors[id]}</p>}
@@ -191,12 +265,75 @@ export default function FacultyForm({ onSuccess, onCancel }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-2 max-w-3xl">
+      {/* ── Header Area: Account + Profile Picture ── */}
+      <div className="flex justify-between items-end border-b pb-1 mt-6 mb-3">
+        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 m-0">
+          Account
+        </p>
 
-      {/* ── Account ── */}
-      {heading("Account")}
+        {/* Profile Picture Uploader aligned to Top Right */}
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-full border border-gray-300 bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
+            {form.profile_picture_url ? (
+              <img
+                src={form.profile_picture_url}
+                alt="Profile Preview"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <svg
+                className="w-8 h-8 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
+              </svg>
+            )}
+          </div>
+
+          <div className="flex flex-col items-start gap-1">
+            <label
+              htmlFor="profile-upload"
+              className={`cursor-pointer text-sm font-medium px-3 py-1.5 rounded-md border transition-colors ${
+                isUploading
+                  ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                  : "bg-white text-blue-600 border-blue-200 hover:bg-blue-50"
+              }`}
+            >
+              {isUploading ? "Uploading..." : "Upload Photo"}
+            </label>
+            <input
+              type="file"
+              id="profile-upload"
+              className="hidden"
+              accept="image/*"
+              onChange={handleImageChange}
+              disabled={isUploading}
+            />
+            {errors.profile_picture_public_id && (
+              <p className="text-xs text-red-500 m-0">
+                {errors.profile_picture_public_id}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {inp("email", "University email", "email", "dr.ali@fast.edu.pk", true)}
-        {inp("password", "Password", "password", "Min 8 chars, 1 upper, 1 number, 1 symbol", true)}
+        {inp(
+          "password",
+          "Password",
+          "password",
+          "Min 8 chars, 1 upper, 1 number, 1 symbol",
+          true,
+        )}
         {inp("first_name", "First name", "text", "Ali", true)}
         {inp("last_name", "Last name", "text", "Hassan", true)}
       </div>
@@ -208,7 +345,9 @@ export default function FacultyForm({ onSuccess, onCancel }) {
 
         {/* Department — populated from API */}
         <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium text-gray-700">Department</label>
+          <label className="text-sm font-medium text-gray-700">
+            Department
+          </label>
           <select
             value={form.department}
             onChange={set("department")}
@@ -218,10 +357,14 @@ export default function FacultyForm({ onSuccess, onCancel }) {
           >
             <option value="">— select department —</option>
             {departments.map((d) => (
-              <option key={d.id} value={d.id}>{d.name ?? d.id}</option>
+              <option key={d.id} value={d.id}>
+                {d.name ?? d.id}
+              </option>
             ))}
           </select>
-          {errors.department && <p className="text-xs text-red-500">{errors.department}</p>}
+          {errors.department && (
+            <p className="text-xs text-red-500">{errors.department}</p>
+          )}
         </div>
 
         {inp("designation", "Designation", "text", "Assistant Professor")}
@@ -281,20 +424,20 @@ export default function FacultyForm({ onSuccess, onCancel }) {
           <button
             type="button"
             onClick={onCancel}
-            className="px-5 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
+            disabled={loading || isUploading}
+            className="px-5 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-60"
           >
             Cancel
           </button>
         )}
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || isUploading}
           className="px-5 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-60"
         >
           {loading ? "Registering…" : "Register faculty"}
         </button>
       </div>
-
     </form>
   );
 }

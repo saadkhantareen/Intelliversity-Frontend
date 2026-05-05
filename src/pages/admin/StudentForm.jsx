@@ -1,15 +1,37 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import ProfileService from "@/services/profile.service";
+import { ProfileService } from "@/services/profile.service";
 import api from "@/services/api";
+import { useCloudinary } from "@/hooks/useCloudinary"; // Make sure path is correct
 
 const EMPTY_FORM = {
-  email: "", password: "", first_name: "", last_name: "",
-  registration_id: "", section: "", cgpa: "",
-  father_name: "", date_of_birth: "", gender: "",
-  nationality: "", cnic: "", religion: "",
-  phone_number: "", emergency_contact: "",
-  address: "", city: "", country: "", bio: "",
+  // Account
+  email: "",
+  password: "",
+  first_name: "",
+  last_name: "",
+  // Profile Picture
+  profile_picture_public_id: "",
+  profile_picture_url: "", // Strictly for frontend preview
+  // Student-specific
+  registration_id: "",
+  section: "",
+  cgpa: "",
+  // Personal
+  father_name: "",
+  date_of_birth: "",
+  gender: "",
+  nationality: "",
+  cnic: "",
+  religion: "",
+  // Contact
+  phone_number: "",
+  emergency_contact: "",
+  // Address
+  address: "",
+  city: "",
+  country: "",
+  bio: "",
 };
 
 export default function StudentForm({ onSuccess, onCancel }) {
@@ -17,6 +39,9 @@ export default function StudentForm({ onSuccess, onCancel }) {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [form, setForm] = useState(EMPTY_FORM);
+
+  // Initialize Cloudinary Hook
+  const { uploadToCloudinary, isUploading } = useCloudinary();
 
   useEffect(() => {
     api
@@ -31,6 +56,39 @@ export default function StudentForm({ onSuccess, onCancel }) {
   const set = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
     setErrors((prev) => ({ ...prev, [field]: null }));
+  };
+
+  // ── Image Upload Handler ───────────────────────────────────────────────
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Invalid file type. Please upload an image (JPG, PNG).");
+      e.target.value = null;
+      return;
+    }
+
+    try {
+      // Pass "profile" as the asset category
+      const { public_id, secure_url } = await uploadToCloudinary(
+        file,
+        "profile",
+      );
+
+      setForm((prev) => ({
+        ...prev,
+        profile_picture_public_id: public_id,
+        profile_picture_url: secure_url,
+      }));
+
+      toast.success("Profile picture uploaded!");
+    } catch (error) {
+      console.error("Upload Error:", error);
+      // The hook handles throwing the error toast, so we just catch to prevent crashes
+    } finally {
+      e.target.value = null; // Reset input
+    }
   };
 
   function flattenErrors(data) {
@@ -55,6 +113,10 @@ export default function StudentForm({ onSuccess, onCancel }) {
     if (bp.country) flat.country = bp.country[0];
     if (bp.bio) flat.bio = bp.bio[0];
 
+    // Add flattening for profile picture if backend validates it
+    if (bp.profile_picture_public_id)
+      flat.profile_picture_public_id = bp.profile_picture_public_id[0];
+
     const u = bp.user ?? {};
     if (u.email) flat.email = u.email[0];
     if (u.password) flat.password = u.password[0];
@@ -66,7 +128,10 @@ export default function StudentForm({ onSuccess, onCancel }) {
 
   // Returns first error message found across all fields — shown in toast summary
   function firstError(flat) {
-    return Object.values(flat).find(Boolean) ?? "Please fix the errors and try again.";
+    return (
+      Object.values(flat).find(Boolean) ??
+      "Please fix the errors and try again."
+    );
   }
 
   function buildPayload() {
@@ -75,6 +140,7 @@ export default function StudentForm({ onSuccess, onCancel }) {
       section: form.section,
       cgpa: form.cgpa || null,
       base_profile: {
+        profile_picture_public_id: form.profile_picture_public_id || null, // Appended to payload here
         user: {
           email: form.email.trim(),
           first_name: form.first_name.trim(),
@@ -110,13 +176,12 @@ export default function StudentForm({ onSuccess, onCancel }) {
 
       toast.success(
         `${form.first_name} ${form.last_name} (${form.registration_id}) registered successfully!`,
-        { id: toastId, duration: 4000 }
+        { id: toastId, duration: 4000 },
       );
 
       setForm(EMPTY_FORM);
       setErrors({});
       onSuccess?.(data);
-
     } catch (err) {
       const errData = err.response?.data ?? {};
       const flat = flattenErrors(errData);
@@ -129,10 +194,17 @@ export default function StudentForm({ onSuccess, onCancel }) {
   }
 
   // ── Field helpers ──────────────────────────────────────────────────────
-  const inp = (id, label, type = "text", placeholder = "", required = false) => (
+  const inp = (
+    id,
+    label,
+    type = "text",
+    placeholder = "",
+    required = false,
+  ) => (
     <div className="flex flex-col gap-1">
       <label className="text-sm font-medium text-gray-700">
-        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+        {label}
+        {required && <span className="text-red-500 ml-0.5">*</span>}
       </label>
       <input
         type={type}
@@ -150,7 +222,8 @@ export default function StudentForm({ onSuccess, onCancel }) {
   const sel = (id, label, options, required = false) => (
     <div className="flex flex-col gap-1">
       <label className="text-sm font-medium text-gray-700">
-        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+        {label}
+        {required && <span className="text-red-500 ml-0.5">*</span>}
       </label>
       <select
         value={form[id]}
@@ -161,7 +234,9 @@ export default function StudentForm({ onSuccess, onCancel }) {
       >
         <option value="">— select —</option>
         {options.map((o) => (
-          <option key={o.value} value={o.value}>{o.label}</option>
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
         ))}
       </select>
       {errors[id] && <p className="text-xs text-red-500">{errors[id]}</p>}
@@ -176,12 +251,75 @@ export default function StudentForm({ onSuccess, onCancel }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-2 max-w-3xl">
+      {/* ── Header Area: Account + Profile Picture ── */}
+      <div className="flex justify-between items-end border-b pb-1 mt-6 mb-3">
+        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 m-0">
+          Account
+        </p>
 
-      {/* ── Account ── */}
-      {heading("Account")}
+        {/* Profile Picture Uploader aligned to Top Right */}
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-full border border-gray-300 bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
+            {form.profile_picture_url ? (
+              <img
+                src={form.profile_picture_url}
+                alt="Profile Preview"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <svg
+                className="w-8 h-8 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
+              </svg>
+            )}
+          </div>
+
+          <div className="flex flex-col items-start gap-1">
+            <label
+              htmlFor="profile-upload"
+              className={`cursor-pointer text-sm font-medium px-3 py-1.5 rounded-md border transition-colors ${
+                isUploading
+                  ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                  : "bg-white text-blue-600 border-blue-200 hover:bg-blue-50"
+              }`}
+            >
+              {isUploading ? "Uploading..." : "Upload Photo"}
+            </label>
+            <input
+              type="file"
+              id="profile-upload"
+              className="hidden"
+              accept="image/*"
+              onChange={handleImageChange}
+              disabled={isUploading}
+            />
+            {errors.profile_picture_public_id && (
+              <p className="text-xs text-red-500 m-0">
+                {errors.profile_picture_public_id}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {inp("email", "University email", "email", "zaid@fast.edu.pk", true)}
-        {inp("password", "Password", "password", "Min 8 chars, 1 upper, 1 number, 1 symbol", true)}
+        {inp(
+          "password",
+          "Password",
+          "password",
+          "Min 8 chars, 1 upper, 1 number, 1 symbol",
+          true,
+        )}
         {inp("first_name", "First name", "text", "Zaid", true)}
         {inp("last_name", "Last name", "text", "Amjad", true)}
       </div>
@@ -189,7 +327,13 @@ export default function StudentForm({ onSuccess, onCancel }) {
       {/* ── Enrollment ── */}
       {heading("Enrollment")}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {inp("registration_id", "Registration ID", "text", "FA26-BSE-001", true)}
+        {inp(
+          "registration_id",
+          "Registration ID",
+          "text",
+          "FA26-BSE-001",
+          true,
+        )}
 
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium text-gray-700">
@@ -204,10 +348,14 @@ export default function StudentForm({ onSuccess, onCancel }) {
           >
             <option value="">— select section —</option>
             {sections.map((s) => (
-              <option key={s.id} value={s.id}>{s.name ?? s.id}</option>
+              <option key={s.id} value={s.id}>
+                {s.name ?? s.id}
+              </option>
             ))}
           </select>
-          {errors.section && <p className="text-xs text-red-500">{errors.section}</p>}
+          {errors.section && (
+            <p className="text-xs text-red-500">{errors.section}</p>
+          )}
         </div>
 
         {inp("cgpa", "CGPA", "number", "0.00 – 4.00")}
@@ -262,20 +410,20 @@ export default function StudentForm({ onSuccess, onCancel }) {
           <button
             type="button"
             onClick={onCancel}
-            className="px-5 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
+            disabled={loading || isUploading}
+            className="px-5 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-60"
           >
             Cancel
           </button>
         )}
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || isUploading}
           className="px-5 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-60"
         >
           {loading ? "Registering…" : "Register student"}
         </button>
       </div>
-
     </form>
   );
 }

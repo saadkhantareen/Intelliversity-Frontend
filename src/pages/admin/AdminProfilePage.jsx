@@ -1,57 +1,10 @@
 import { useState, useEffect } from "react";
 import { useTenant } from "../../context/TenantContext";
 import { useProfile } from "../../context/ProfileContext";
+import { useCloudinary } from "../../hooks/useCloudinary";
 import SectionCard from "../../components/ui/SectionCard";
 import InfoField from "../../components/ui/InfoField";
 import toast from "react-hot-toast";
-import axios from "axios";                          // plain axios — only for Cloudinary direct upload
-import api from "../../services/api";
-
-// ─── Cloudinary upload helper ──────────────────────────────────────────────────
-// Step 1: Get signature from Django (uses `api` → sends Bearer token automatically)
-// Step 2: POST file directly to Cloudinary (uses plain axios — no auth header needed)
-// Step 3: Return public_id + resource_type to save in Django
-async function uploadToCloudinary(file, assetCategory) {
-  // Step 1 – get signed params from Django (authenticated)
-  const { data: sigData } = await api.get(`/api/v1/storage/uploads/signature/${assetCategory}/`);
-
-  // Step 2 – upload directly to Cloudinary
-  // ALL params that were signed on the backend (public_id, timestamp, asset_folder,
-  // type, context) MUST be sent here — Cloudinary rejects with 401 if any are missing.
-  const formData = new FormData();
-  formData.append("file",         file);
-  formData.append("api_key",      sigData.api_key);
-  formData.append("timestamp",    String(sigData.timestamp));
-  formData.append("signature",    sigData.signature);
-  formData.append("public_id",    sigData.public_id);
-  formData.append("type",         sigData.type);          // "upload" or "authenticated"
-  formData.append("asset_folder", sigData.asset_folder);
-  formData.append("context",      sigData.context);       // "university=x|portal=y|user_id=z"
-
-  // resource_type goes in the URL, not the form body
-  const resourceType = sigData.resource_type || "image";
-  const cloudRes = await axios.post(
-    `https://api.cloudinary.com/v1_1/${sigData.cloud_name}/${resourceType}/upload`,
-    formData
-  );
-
-  return {
-    public_id:     cloudRes.data.public_id,
-    resource_type: cloudRes.data.resource_type,
-    secure_url:    cloudRes.data.secure_url,
-  };
-}
-
-// ─── Get a signed private URL from Django (authenticated) ─────────────────────
-async function getPrivateUrl(publicId, resourceType) {
-  const { data } = await api.post(`/api/v1/storage/uploads/private-url/`, {
-    public_id:     publicId,
-    resource_type: resourceType,
-  });
-  return data.url;
-}
-
-// ──────────────────────────────────────────────────────────────────────────────
 
 function AdminProfilePage() {
   const { config } = useTenant();
@@ -64,12 +17,11 @@ function AdminProfilePage() {
     deleteDocument,
   } = useProfile();
 
-
+  // Bring in our reusable Cloudinary logic
+  const { uploadToCloudinary, getPrivateUrl, isUploading } = useCloudinary();
 
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isUploadingPic, setIsUploadingPic] = useState(false);
-  const [isUploadingDoc, setIsUploadingDoc] = useState(false);
   const [privateUrls, setPrivateUrls] = useState({}); // { [docId]: url }
   const [loadingUrlId, setLoadingUrlId] = useState(null);
 
@@ -140,43 +92,45 @@ function AdminProfilePage() {
     }
   };
 
-  // ── Profile picture upload (two-step Cloudinary) ───────────────────────────
+  // ── Profile picture upload ────────────────────────────────────────────────
   const handlePicUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setIsUploadingPic(true);
+
     try {
       const { public_id } = await uploadToCloudinary(file, "profile");
       // Save public_id to Django — backend resolves the actual URL
-      await updateProfile({ base_profile: { profile_picture_public_id: public_id } });
+      await updateProfile({
+        base_profile: { profile_picture_public_id: public_id },
+      });
       toast.success("Profile picture updated!");
     } catch (err) {
       console.error(err);
       toast.error("Failed to update profile picture");
-    } finally {
-      setIsUploadingPic(false);
     }
   };
 
-  // ── Document upload (two-step Cloudinary → save public_id in Django) ────────
+  // ── Document upload ───────────────────────────────────────────────────────
   const handleDocUpload = async (e) => {
     e.preventDefault();
     if (!docForm.file || !docForm.document_type || !docForm.title) {
       toast.error("Please fill all document fields");
       return;
     }
-    setIsUploadingDoc(true);
+
     try {
-      // Step 1 & 2: upload file to Cloudinary
-      const { public_id, resource_type } = await uploadToCloudinary(docForm.file, "document");
+      // Step 1 & 2: upload file to Cloudinary via hook
+      const { public_id, resource_type } = await uploadToCloudinary(
+        docForm.file,
+        "document",
+      );
 
       // Step 3: tell Django to save the record with public_id
-      // Send JSON (not FormData) — backend expects public_id/resource_type as plain fields
       await uploadDocument({
         document_type: docForm.document_type,
-        title:         docForm.title,
-        description:   docForm.description,
-        public_id,
+        title: docForm.title,
+        description: docForm.description,
+        document_public_id: public_id,
         resource_type,
       });
 
@@ -185,14 +139,11 @@ function AdminProfilePage() {
     } catch (err) {
       console.error(err);
       toast.error("Failed to upload document");
-    } finally {
-      setIsUploadingDoc(false);
     }
   };
 
-  // ── View private document (get signed URL from Django) ────────────────────
+  // ── View private document ─────────────────────────────────────────────────
   const handleViewDoc = async (doc) => {
-    // If we already have a cached URL, just open it
     if (privateUrls[doc.id]) {
       window.open(privateUrls[doc.id], "_blank");
       return;
@@ -274,7 +225,7 @@ function AdminProfilePage() {
         <div className="flex items-center gap-4 mb-4">
           {/* Avatar with upload */}
           <div className="relative w-16 h-16">
-            {isUploadingPic && (
+            {isUploading && (
               <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center z-10">
                 <span className="text-white text-xs">...</span>
               </div>
@@ -301,7 +252,7 @@ function AdminProfilePage() {
                 accept="image/*"
                 className="hidden"
                 onChange={handlePicUpload}
-                disabled={isUploadingPic}
+                disabled={isUploading}
               />
             </label>
           </div>
@@ -424,7 +375,10 @@ function AdminProfilePage() {
         ) : (
           <div className="grid grid-cols-2 gap-4">
             <InfoField label="Phone Number" value={bp?.phone_number} />
-            <InfoField label="Emergency Contact" value={bp?.emergency_contact} />
+            <InfoField
+              label="Emergency Contact"
+              value={bp?.emergency_contact}
+            />
             <InfoField label="Address" value={bp?.address} />
             <InfoField label="City" value={bp?.city} />
             <InfoField label="Country" value={bp?.country} />
@@ -461,7 +415,10 @@ function AdminProfilePage() {
             <select
               value={docForm.document_type}
               onChange={(e) =>
-                setDocForm((prev) => ({ ...prev, document_type: e.target.value }))
+                setDocForm((prev) => ({
+                  ...prev,
+                  document_type: e.target.value,
+                }))
               }
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none"
             >
@@ -495,7 +452,10 @@ function AdminProfilePage() {
               type="file"
               key={docForm.title} // reset input when form clears
               onChange={(e) =>
-                setDocForm((prev) => ({ ...prev, file: e.target.files[0] || null }))
+                setDocForm((prev) => ({
+                  ...prev,
+                  file: e.target.files[0] || null,
+                }))
               }
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none"
             />
@@ -519,11 +479,11 @@ function AdminProfilePage() {
           <div className="col-span-2">
             <button
               type="submit"
-              disabled={isUploadingDoc}
+              disabled={isUploading}
               style={{ backgroundColor: themeColor }}
               className="text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 disabled:opacity-50 transition-opacity"
             >
-              {isUploadingDoc ? "Uploading…" : "Upload Document"}
+              {isUploading ? "Uploading…" : "Upload Document"}
             </button>
           </div>
         </form>
@@ -539,13 +499,21 @@ function AdminProfilePage() {
                 className="flex items-center justify-between border border-gray-100 rounded-lg p-3"
               >
                 <div>
-                  <p className="text-sm font-medium text-gray-700">{doc.title}</p>
-                  <p className="text-xs text-gray-400 capitalize">{doc.document_type}</p>
+                  <p className="text-sm font-medium text-gray-700">
+                    {doc.title}
+                  </p>
+                  <p className="text-xs text-gray-400 capitalize">
+                    {doc.document_type}
+                  </p>
                   {doc.description && (
-                    <p className="text-xs text-gray-400 mt-0.5">{doc.description}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      {doc.description}
+                    </p>
                   )}
                   {doc.is_verified && (
-                    <span className="text-xs text-green-500 font-medium">✓ Verified</span>
+                    <span className="text-xs text-green-500 font-medium">
+                      ✓ Verified
+                    </span>
                   )}
                 </div>
                 <div className="flex gap-3 items-center">
