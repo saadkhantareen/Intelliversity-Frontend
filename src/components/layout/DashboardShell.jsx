@@ -151,7 +151,7 @@ export function DashboardShell({ config }) {
     <>
       <style>{css(accentColor)}</style>
 
-      <div className="iv-root">
+      <div className="iv-root" data-portal={config.portal || "default"}>
         <aside className={`iv-sidebar iv-sidebar--desk${collapsed ? " iv-sidebar--col" : ""}`}>
           <SidebarContent />
         </aside>
@@ -243,7 +243,18 @@ const css = (accent) => `
     height: 100vh;
     overflow: hidden;
     background: var(--shell-bg);
+    font-family: var(--brand-font);
   }
+
+  .iv-root h1,
+  .iv-root h2,
+  .iv-root h3,
+  .iv-root h4,
+  .iv-root h5,
+  .iv-root h6 {
+    font-family: var(--brand-font-heading);
+  }
+
 
   /* ── Dark mode ── */
   @media (prefers-color-scheme: dark) {
@@ -614,21 +625,17 @@ const css = (accent) => `
   /* ── Brand overrides for inner content ── */
   .iv-page .bg-white { 
     background-color: var(--brand-surface) !important;
-    border: 2px solid #000 !important;
   }
   .iv-page .bg-gray-50 { 
     background-color: var(--brand-page-bg) !important;
-    border: 2px solid #000 !important;
   }
   .iv-page .bg-gray-100 {
     background-color: color-mix(in srgb, var(--brand-text) 6%, transparent) !important;
-    border: 2px solid #000 !important;
   }
   .iv-page .border-gray-100,
   .iv-page .border-gray-200,
   .iv-page .border-gray-300 {
-    border-color: #000 !important;
-    border-width: 2px !important;
+    border-color: var(--sb-border) !important;
   }
   .iv-page .text-gray-900,
   .iv-page .text-gray-800,
@@ -644,7 +651,6 @@ const css = (accent) => `
   .iv-page .bg-indigo-600,
   .iv-page .bg-green-600 {
     background-color: var(--brand-primary) !important;
-    border: 2px solid #000 !important;
   }
   .iv-page .hover\:bg-blue-700:hover,
   .iv-page .hover\:bg-indigo-700:hover,
@@ -669,11 +675,9 @@ const css = (accent) => `
   .iv-page .bg-amber-100,
   .iv-page .bg-purple-100 {
     background-color: color-mix(in srgb, var(--brand-accent) 18%, transparent) !important;
-    border: 2px solid #000 !important;
   }
   .iv-page .bg-red-100 {
     background-color: color-mix(in srgb, var(--brand-danger) 18%, transparent) !important;
-    border: 2px solid #000 !important;
   }
   .iv-page .text-indigo-700,
   .iv-page .text-amber-600,
@@ -682,22 +686,31 @@ const css = (accent) => `
     color: var(--brand-accent) !important;
   }
 
-  /* Add borders to common table and card components */
-  .iv-page table,
-  .iv-page [role="grid"],
-  .iv-page .card,
-  .iv-page [class*="card"],
-  .iv-page [class*="panel"],
-  .iv-page [class*="component"] {
-    border: 2px solid #000 !important;
-  }
-
   .iv-page tr {
-    border-bottom: 1px solid #000 !important;
+    border-bottom: 1px solid var(--sb-border) !important;
   }
 
   .iv-page th {
-    border-bottom: 2px solid #000 !important;
+    border-bottom: 2px solid var(--sb-border) !important;
+  }
+
+  /* Remove inner borders in Documents section (keep card border) */
+  .iv-page .doc-section input,
+  .iv-page .doc-section select,
+  .iv-page .doc-section textarea,
+  .iv-page .doc-section button,
+  .iv-page .doc-section [role="button"],
+  .iv-page .doc-section .border {
+    border: none !important;
+  }
+
+  /* Form controls and buttons */
+  .iv-page input,
+  .iv-page select,
+  .iv-page textarea,
+  .iv-page button,
+  .iv-page [role="button"] {
+    border: 1px solid var(--sb-border) !important;
   }
 
   @media (max-width: 640px) {

@@ -150,7 +150,7 @@ const FacultyProfilePage = () => {
 
       {/* ── PERSONAL DETAILS GRID ── */}
       <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-gray-100">
-        <h2 className="text-xl font-bold text-gray-900 border-b border-gray-100 pb-3 mb-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">
           Personal Details
         </h2>
 
@@ -228,7 +228,7 @@ const FacultyProfilePage = () => {
 
       {/* ── DOCUMENT MANAGEMENT ── */}
       <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-gray-100">
-        <h2 className="text-xl font-bold text-gray-900 border-b border-gray-100 pb-3 mb-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">
           Documents & Certificates
         </h2>
 
