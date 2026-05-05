@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "@/components/shared/ProtectedRoute";
 import { useTenant } from "./context/TenantContext";
+import { useBrandingEffects } from "@/hooks/useBrandingEffects";
 
 // Auth Pages
 const LoginPage = lazy(() => import("@/pages/auth/LoginPage"));
@@ -170,6 +171,8 @@ function ProtectedAppRoutes() {
 }
 
 export default function App() {
+  useBrandingEffects();
+
   return (
     <Suspense fallback={<FullScreenLoader />}>
       <Routes>

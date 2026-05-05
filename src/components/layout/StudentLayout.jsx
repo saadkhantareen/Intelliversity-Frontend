@@ -1,4 +1,5 @@
 import DashboardShell from "./DashboardShell";
+import { useTenant } from "@/context/TenantContext";
 import {
   IcGrid,      // For Dashboard
   IcClipboard, // For Registration Card
@@ -9,10 +10,10 @@ import {
 } from "./icons";
 
 const STUDENT_CONFIG = {
-  accent: "#00a191",                         // Matching the teal color in your image
+  accent: "var(--brand-primary)",
   portal: "student",
   label:  "Student Portal",
-  badge:  { bg: "#dbeafe", text: "#1e40af" },
+  badge:  { bg: "var(--brand-accent)", text: "var(--brand-surface)" },
   sections: [
     {
       title: "Main Menu",
@@ -30,5 +31,12 @@ const STUDENT_CONFIG = {
 };
 
 export default function StudentLayout() {
-  return <DashboardShell config={STUDENT_CONFIG} />;
+  const { branding } = useTenant();
+
+  const resolvedConfig = {
+    ...STUDENT_CONFIG,
+    accent: branding?.theme_config?.colors?.primary || STUDENT_CONFIG.accent,
+  };
+
+  return <DashboardShell config={resolvedConfig} />;
 }

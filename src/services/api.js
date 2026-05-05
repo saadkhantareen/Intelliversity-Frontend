@@ -1,9 +1,29 @@
 import axios from "axios";
-const backendURL = `${window.location.protocol}//${window.location.hostname}:8000`;
 
-// api.js
-const globalURL = import.meta.env.VITE_GLOBAL_API_URL 
-  || `${window.location.protocol}//${window.location.hostname}:8000`;
+const currentHost = window.location.hostname;
+const currentOrigin = `${window.location.protocol}//${currentHost}`;
+
+const resolveApiBaseUrl = (explicitUrl) => {
+  if (!explicitUrl) {
+    return `${currentOrigin}:8000`;
+  }
+
+  try {
+    const parsed = new URL(explicitUrl);
+    if (parsed.hostname === currentHost) {
+      return explicitUrl;
+    }
+  } catch (error) {
+    // Fall back to current host if the provided URL is invalid.
+  }
+
+  return `${currentOrigin}:8000`;
+};
+
+const backendURL = resolveApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
+const globalURL = resolveApiBaseUrl(
+  import.meta.env.VITE_GLOBAL_API_URL || import.meta.env.VITE_API_BASE_URL,
+);
 
 export const globalApi = axios.create({
   baseURL: globalURL,
@@ -13,27 +33,17 @@ export const api = axios.create({
   baseURL: backendURL,
 });
 
-// Attach auth token to every outgoing request
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access_token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-// Handle 401 responses — clear stale session and redirect to login
 // Request interceptor — attach token to every request automatically
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access_token')
+    const token = localStorage.getItem("access_token");
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+      config.headers.Authorization = `Bearer ${token}`;
     }
-    return config
+    return config;
   },
-  (error) => Promise.reject(error)
-)
+  (error) => Promise.reject(error),
+);
 
 // Response interceptor — handle expired token
 api.interceptors.response.use(
@@ -49,4 +59,4 @@ api.interceptors.response.use(
   },
 );
 
-export default api
+export default api;

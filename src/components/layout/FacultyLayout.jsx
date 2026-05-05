@@ -1,4 +1,5 @@
 import DashboardShell2 from "./DashboardShell";
+import { useTenant } from "@/context/TenantContext";
 import {
   IcGrid as IcGrid2, IcBook as IcBook2, IcClipboard as IcClipboard2,
   IcCalendar as IcCalendar2, IcUsers as IcUsers2, IcBell as IcBell2,
@@ -6,10 +7,10 @@ import {
 } from "./icons";
  
 const FACULTY_CONFIG = {
-  accent: "#16a34a",                        // green
+  accent: "var(--brand-primary)",
   portal: "faculty",
   label:  "Faculty Portal",
-  badge:  { bg: "#dcfce7", text: "#166534" },
+  badge:  { bg: "var(--brand-accent)", text: "var(--brand-surface)" },
   sections: [
     {
       title: "Teaching",
@@ -33,5 +34,12 @@ const FACULTY_CONFIG = {
 };
  
 export default function FacultyLayout() {
-  return <DashboardShell2 config={FACULTY_CONFIG} />;
+  const { branding } = useTenant();
+
+  const resolvedConfig = {
+    ...FACULTY_CONFIG,
+    accent: branding?.theme_config?.colors?.primary || FACULTY_CONFIG.accent,
+  };
+
+  return <DashboardShell2 config={resolvedConfig} />;
 }
