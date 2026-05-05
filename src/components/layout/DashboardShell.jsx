@@ -612,15 +612,23 @@ const css = (accent) => `
   }
 
   /* ── Brand overrides for inner content ── */
-  .iv-page .bg-white { background-color: var(--brand-surface) !important; }
-  .iv-page .bg-gray-50 { background-color: var(--brand-page-bg) !important; }
+  .iv-page .bg-white { 
+    background-color: var(--brand-surface) !important;
+    border: 2px solid #000 !important;
+  }
+  .iv-page .bg-gray-50 { 
+    background-color: var(--brand-page-bg) !important;
+    border: 2px solid #000 !important;
+  }
   .iv-page .bg-gray-100 {
     background-color: color-mix(in srgb, var(--brand-text) 6%, transparent) !important;
+    border: 2px solid #000 !important;
   }
   .iv-page .border-gray-100,
   .iv-page .border-gray-200,
   .iv-page .border-gray-300 {
-    border-color: color-mix(in srgb, var(--brand-text) 10%, transparent) !important;
+    border-color: #000 !important;
+    border-width: 2px !important;
   }
   .iv-page .text-gray-900,
   .iv-page .text-gray-800,
@@ -636,6 +644,7 @@ const css = (accent) => `
   .iv-page .bg-indigo-600,
   .iv-page .bg-green-600 {
     background-color: var(--brand-primary) !important;
+    border: 2px solid #000 !important;
   }
   .iv-page .hover\:bg-blue-700:hover,
   .iv-page .hover\:bg-indigo-700:hover,
@@ -660,15 +669,35 @@ const css = (accent) => `
   .iv-page .bg-amber-100,
   .iv-page .bg-purple-100 {
     background-color: color-mix(in srgb, var(--brand-accent) 18%, transparent) !important;
+    border: 2px solid #000 !important;
   }
   .iv-page .bg-red-100 {
     background-color: color-mix(in srgb, var(--brand-danger) 18%, transparent) !important;
+    border: 2px solid #000 !important;
   }
   .iv-page .text-indigo-700,
   .iv-page .text-amber-600,
   .iv-page .text-amber-700,
   .iv-page .text-purple-600 {
     color: var(--brand-accent) !important;
+  }
+
+  /* Add borders to common table and card components */
+  .iv-page table,
+  .iv-page [role="grid"],
+  .iv-page .card,
+  .iv-page [class*="card"],
+  .iv-page [class*="panel"],
+  .iv-page [class*="component"] {
+    border: 2px solid #000 !important;
+  }
+
+  .iv-page tr {
+    border-bottom: 1px solid #000 !important;
+  }
+
+  .iv-page th {
+    border-bottom: 2px solid #000 !important;
   }
 
   @media (max-width: 640px) {
