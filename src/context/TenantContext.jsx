@@ -1,12 +1,14 @@
 // TenantContext.jsx
 import { createContext, useContext, useEffect, useState } from "react";
-import { globalService } from "@/services/global.service";
-import { applyThemeToCSS, applyFavicon } from "@/utils/tenantUtils";
+import { getPortalBranding } from "@/services/branding.service";
+import { applyFavicon } from "@/utils/tenantUtils";
+import { applyBrandingToCSSVariables } from "@/utils/applyBranding";
 
 const TenantContext = createContext(null);
 
 export function TenantProvider({ children }) {
   const [tenant, setTenant] = useState(null);
+  const [branding, setBranding] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -15,7 +17,7 @@ export function TenantProvider({ children }) {
       try {
         const domain = window.location.hostname;
 
-        const res = await globalService.getTenantBranding(domain);
+        const res = await getPortalBranding(domain);
 
         if (res.status !== 200 || !res.data) {
           throw new Error("Invalid tenant response");
@@ -24,9 +26,10 @@ export function TenantProvider({ children }) {
         const data = res.data;
 
         setTenant(data);
+        setBranding(data);
 
         const theme = data.theme_config ?? data;
-        applyThemeToCSS(theme);
+        applyBrandingToCSSVariables(theme);
         applyFavicon(data.favicon_url);
       } catch (err) {
   console.log("message:", err?.message);
@@ -43,7 +46,15 @@ export function TenantProvider({ children }) {
   }, []);
 
   return (
-    <TenantContext.Provider value={{ tenant, isTenantLoading: isLoading, error }}>
+    <TenantContext.Provider
+      value={{
+        tenant,
+        branding,
+        isTenantLoading: isLoading,
+        brandingLoading: isLoading,
+        error,
+      }}
+    >
       {children}
     </TenantContext.Provider>
   );

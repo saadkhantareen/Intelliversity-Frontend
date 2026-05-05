@@ -1,4 +1,5 @@
 import DashboardShell3 from "./DashboardShell";
+import { useTenant } from "@/context/TenantContext";
 import {
   IcGrid as IcGrid3, 
   IcUsers as IcUsers3, 
@@ -12,10 +13,10 @@ import {
 } from "./icons";
 
 const ADMIN_CONFIG = {
-  accent: "#d97706",                         // amber
+  accent: "var(--brand-primary)",
   portal: "admin",
   label:  "Admin Portal",
-  badge:  { bg: "#fef3c7", text: "#92400e" },
+  badge:  { bg: "var(--brand-accent)", text: "var(--brand-surface)" },
   sections: [
     {
       title: "Management",
@@ -43,5 +44,12 @@ const ADMIN_CONFIG = {
 };
 
 export default function AdminLayout() {
-  return <DashboardShell3 config={ADMIN_CONFIG} />;
+  const { branding } = useTenant();
+
+  const resolvedConfig = {
+    ...ADMIN_CONFIG,
+    accent: branding?.theme_config?.colors?.primary || ADMIN_CONFIG.accent,
+  };
+
+  return <DashboardShell3 config={resolvedConfig} />;
 }

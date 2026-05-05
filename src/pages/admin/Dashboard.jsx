@@ -45,11 +45,19 @@ function MiniBarChart({ data, maxHeight = 120 }) {
       {data.map((item) => (
         <div key={item.month} className="flex flex-col items-center flex-1">
           <div
-            className="w-full bg-amber-400 rounded-t-md transition-all duration-500 hover:bg-amber-500 min-h-[4px]"
-            style={{ height: `${(item.students / max) * maxHeight}px` }}
+            className="w-full rounded-t-md transition-all duration-500 min-h-[4px]"
+            style={{
+              backgroundColor: "var(--brand-accent)",
+              height: `${(item.students / max) * maxHeight}px`,
+            }}
             title={`${item.students} students`}
           />
-          <span className="text-xs text-gray-500 mt-1">{item.month}</span>
+          <span
+            className="text-xs mt-1"
+            style={{ color: "var(--brand-text-muted)" }}
+          >
+            {item.month}
+          </span>
         </div>
       ))}
     </div>
@@ -66,14 +74,23 @@ function HorizontalBarChart({ data }) {
     <div className="space-y-3">
       {data.map((item) => (
         <div key={item.name}>
-          <div className="flex justify-between text-xs text-gray-600 mb-1">
+          <div
+            className="flex justify-between text-xs mb-1"
+            style={{ color: "var(--brand-text-muted)" }}
+          >
             <span>{item.name}</span>
             <span className="font-medium">{item.students}</span>
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-2.5">
+          <div
+            className="w-full rounded-full h-2.5"
+            style={{ backgroundColor: "var(--brand-background)" }}
+          >
             <div
-              className="bg-amber-500 h-2.5 rounded-full transition-all duration-700"
-              style={{ width: `${(item.students / max) * 100}%` }}
+              className="h-2.5 rounded-full transition-all duration-700"
+              style={{
+                backgroundColor: "var(--brand-accent)",
+                width: `${(item.students / max) * 100}%`,
+              }}
             />
           </div>
         </div>
@@ -85,15 +102,34 @@ function HorizontalBarChart({ data }) {
 // ──────────────────────────────────────
 // Stat card component
 // ──────────────────────────────────────
-function StatCard({ label, value, icon, color }) {
+function StatCard({ label, value, icon, tone }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+    <div
+      className="border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow"
+      style={{
+        backgroundColor: "var(--brand-surface)",
+        borderColor: "rgba(0, 0, 0, 0.08)",
+      }}
+    >
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-gray-500 mb-1">{label}</p>
-          <p className="text-2xl font-bold text-gray-900">{value.toLocaleString()}</p>
+          <p
+            className="text-sm mb-1"
+            style={{ color: "var(--brand-text-muted)" }}
+          >
+            {label}
+          </p>
+          <p
+            className="text-2xl font-bold"
+            style={{ color: "var(--brand-text)" }}
+          >
+            {value.toLocaleString()}
+          </p>
         </div>
-        <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg ${color}`}>
+        <div
+          className="w-10 h-10 rounded-lg flex items-center justify-center text-lg"
+          style={tone}
+        >
           {icon}
         </div>
       </div>
@@ -130,8 +166,16 @@ const DashboardPage = () => {
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1
+          className="text-2xl font-bold"
+          style={{ color: "var(--brand-text)" }}
+        >
+          Dashboard
+        </h1>
+        <p
+          className="text-sm mt-1"
+          style={{ color: "var(--brand-text-muted)" }}
+        >
           Welcome back, Admin. Here's what's happening today.
         </p>
       </div>
@@ -142,39 +186,64 @@ const DashboardPage = () => {
           label="Total Students"
           value={data.totalStudents}
           icon="👨‍🎓"
-          color="bg-blue-100 text-blue-600"
+          tone={{
+            backgroundColor: "color-mix(in srgb, var(--brand-primary) 15%, transparent)",
+            color: "var(--brand-primary)",
+          }}
         />
         <StatCard
           label="Faculty Members"
           value={data.totalFaculty}
           icon="👩‍🏫"
-          color="bg-green-100 text-green-600"
+          tone={{
+            backgroundColor: "color-mix(in srgb, var(--brand-accent) 15%, transparent)",
+            color: "var(--brand-accent)",
+          }}
         />
         <StatCard
           label="Total Courses"
           value={data.totalCourses}
           icon="📚"
-          color="bg-purple-100 text-purple-600"
+          tone={{
+            backgroundColor: "color-mix(in srgb, var(--brand-secondary) 12%, transparent)",
+            color: "var(--brand-secondary)",
+          }}
         />
         <StatCard
           label="Departments"
           value={data.totalDepartments}
           icon="🏛️"
-          color="bg-amber-100 text-amber-600"
+          tone={{
+            backgroundColor: "color-mix(in srgb, var(--brand-accent) 20%, transparent)",
+            color: "var(--brand-accent)",
+          }}
         />
       </div>
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Enrollment Trend */}
-        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-          <h3 className="text-base font-semibold text-gray-800 mb-4">
+        <div
+          className="border rounded-xl p-6 shadow-sm"
+          style={{
+            backgroundColor: "var(--brand-surface)",
+            borderColor: "rgba(0, 0, 0, 0.08)",
+          }}
+        >
+          <h3
+            className="text-base font-semibold mb-4"
+            style={{ color: "var(--brand-text)" }}
+          >
             📈 Monthly Enrollments
           </h3>
           <MiniBarChart data={data.recentEnrollments} />
           <div className="flex justify-between mt-3">
             {data.recentEnrollments.map((item) => (
-              <span key={item.month} className="text-xs text-gray-400 text-center">
+              <span
+                key={item.month}
+                className="text-xs text-center"
+                style={{ color: "var(--brand-text-muted)" }}
+              >
                 {item.students}
               </span>
             ))}
@@ -182,8 +251,17 @@ const DashboardPage = () => {
         </div>
 
         {/* Department Distribution */}
-        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-          <h3 className="text-base font-semibold text-gray-800 mb-4">
+        <div
+          className="border rounded-xl p-6 shadow-sm"
+          style={{
+            backgroundColor: "var(--brand-surface)",
+            borderColor: "rgba(0, 0, 0, 0.08)",
+          }}
+        >
+          <h3
+            className="text-base font-semibold mb-4"
+            style={{ color: "var(--brand-text)" }}
+          >
             🏛️ Students by Department
           </h3>
           <HorizontalBarChart data={data.departmentDistribution} />

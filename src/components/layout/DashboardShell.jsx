@@ -1,10 +1,10 @@
 // src/components/layout/DashboardShell.jsx
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useTenant } from "../../context/TenantContext";
 import {
-  IcBell, IcSearch, IcMenu, IcChevronLeft, IcLogout,
+  IcBell, IcMenu, IcChevronLeft, IcLogout,
 } from "./icons";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -21,24 +21,22 @@ function initials(name) {
 
 export function DashboardShell({ config }) {
   const { user, logout } = useAuth();
-  const { university } = useTenant();
+  const { tenant, branding } = useTenant();
   const navigate = useNavigate();
 
   const [collapsed, setCollapsed]     = useState(false);
   const [mobileOpen, setMobileOpen]   = useState(false);
-  const [search, setSearch]           = useState("");
-  const [searchFocused, setSearchFocused] = useState(false);
-  const searchRef = useRef(null);
 
   const { accent, label, badge, sections } = config;
+  const accentColor = accent || "var(--brand-primary)";
 
   const userName = user?.first_name
     ? `${user.first_name}${user.last_name ? " " + user.last_name : ""}`
     : "User";
 
-  const uniLabel = typeof university === "string"
-    ? university
-    : university?.name || "";
+  const uniLabel =
+    tenant?.university_name || tenant?.university?.name || "Intelliversity";
+  const logoUrl = branding?.logo_url;
 
   useEffect(() => { setMobileOpen(false); }, [navigate]);
 
@@ -53,11 +51,19 @@ export function DashboardShell({ config }) {
   // ── Sidebar content (reused for desktop + mobile drawer) ─────────────────
 
   const SidebarContent = () => (
-    <div className="iv-sb-inner" style={{ "--accent": accent }}>
+    <div className="iv-sb-inner" style={{ "--accent": accentColor }}>
       <div className="iv-sb-head">
         <div className="iv-sb-brand">
-          <div className="iv-sb-icon" style={{ background: accent }}>
-            {uniLabel ? uniLabel[0].toUpperCase() : "I"}
+          <div className="iv-sb-icon" style={{ background: accentColor }}>
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt={`${uniLabel} logo`}
+                className="iv-sb-logo"
+              />
+            ) : (
+              (uniLabel || "I")[0].toUpperCase()
+            )}
           </div>
           {!collapsed && (
             <div className="iv-sb-brandtext">
@@ -114,7 +120,7 @@ export function DashboardShell({ config }) {
         <div className="iv-user-row">
           <div
             className="iv-user-av"
-            style={{ background: accent + "20", color: accent }}
+            style={{ background: accentColor + "20", color: accentColor }}
           >
             {initials(userName)}
           </div>
@@ -143,7 +149,7 @@ export function DashboardShell({ config }) {
 
   return (
     <>
-      <style>{css(accent)}</style>
+      <style>{css(accentColor)}</style>
 
       <div className="iv-root">
         <aside className={`iv-sidebar iv-sidebar--desk${collapsed ? " iv-sidebar--col" : ""}`}>
@@ -163,7 +169,7 @@ export function DashboardShell({ config }) {
         </aside>
 
         <div className={`iv-main${collapsed ? " iv-main--col" : ""}`}>
-          <header className="iv-topbar" style={{ "--accent": accent }}>
+          <header className="iv-topbar" style={{ "--accent": accentColor }}>
             <div className="iv-topbar-l">
               <button
                 className="iv-hamburger iv-mob-only"
@@ -172,26 +178,6 @@ export function DashboardShell({ config }) {
               >
                 <IcMenu s={20} />
               </button>
-
-              <div className={`iv-search${searchFocused ? " iv-search--on" : ""}`}>
-                <span className="iv-search-ic"><IcSearch s={15} /></span>
-                <input
-                  ref={searchRef}
-                  className="iv-search-inp"
-                  type="text"
-                  placeholder="Search…"
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  onFocus={() => setSearchFocused(true)}
-                  onBlur={() => setSearchFocused(false)}
-                />
-                {search && (
-                  <button
-                    className="iv-search-clr"
-                    onClick={() => { setSearch(""); searchRef.current?.focus(); }}
-                  >×</button>
-                )}
-              </div>
             </div>
 
             <div className="iv-topbar-r">
@@ -205,7 +191,7 @@ export function DashboardShell({ config }) {
               <div className="iv-topbar-user">
                 <div
                   className="iv-topbar-av"
-                  style={{ background: accent + "18", color: accent }}
+                  style={{ background: accentColor + "18", color: accentColor }}
                 >
                   {initials(userName)}
                 </div>
@@ -217,9 +203,11 @@ export function DashboardShell({ config }) {
             </div>
           </header>
 
-          <main className="iv-page">
-            <Outlet />
-          </main>
+          <div className="iv-page-wrapper">
+            <main className="iv-page">
+              <Outlet />
+            </main>
+          </div>
         </div>
       </div>
     </>
@@ -235,20 +223,20 @@ const css = (accent) => `
     --bar-h: 54px;
 
     /* Sidebar + Topbar = warm off-white */
-    --shell-bg: #f5f3ef;
-    --sb-bg: #f5f3ef;
-    --top-bg: #f5f3ef;
+    --shell-bg: var(--brand-background);
+    --sb-bg: var(--brand-sidebar-bg, var(--brand-surface));
+    --top-bg: var(--brand-topbar-bg, var(--brand-surface));
 
     /* Page content = clean white */
-    --page-bg: #ffffff;
+    --page-bg: var(--brand-page-bg, var(--brand-background));
 
-    --sb-border: rgba(0,0,0,0.07);
-    --sb-text: #8a8a8e;
-    --sb-text-hi: #1a1a1a;
-    --sb-hover: rgba(0,0,0,0.04);
-    --sb-active-bg: #ffffff;
+    --sb-border: color-mix(in srgb, var(--brand-text) 12%, transparent);
+    --sb-text: color-mix(in srgb, var(--brand-surface) 72%, var(--brand-text));
+    --sb-text-hi: var(--brand-surface);
+    --sb-hover: color-mix(in srgb, var(--brand-surface) 12%, transparent);
+    --sb-active-bg: color-mix(in srgb, var(--brand-accent) 22%, transparent);
     --sb-active-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 0.5px 1px rgba(0,0,0,0.04);
-    --top-border: rgba(0,0,0,0.07);
+    --top-border: color-mix(in srgb, var(--brand-text) 10%, transparent);
     --accent: ${accent};
     --ease: cubic-bezier(.4,0,.2,1);
     display: flex;
@@ -353,6 +341,12 @@ const css = (accent) => `
     display: flex; align-items: center; justify-content: center;
     font-weight: 700; font-size: 13px; color: #fff;
   }
+  .iv-sb-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 4px;
+  }
   .iv-sb-brandtext {
     display: flex; flex-direction: column; gap: 2px;
     min-width: 0;
@@ -404,7 +398,7 @@ const css = (accent) => `
     font-size: 10px; font-weight: 600;
     letter-spacing: .7px;
     text-transform: uppercase;
-    color: #b0b0b4;
+    color: var(--sb-text);
     padding: 4px 14px 5px;
     margin: 0;
   }
@@ -485,7 +479,10 @@ const css = (accent) => `
     transition: background .14s, color .14s;
     padding: 0;
   }
-  .iv-logout:hover { background: #fef2f2; color: #ef4444; }
+  .iv-logout:hover {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--accent);
+  }
   @media (prefers-color-scheme: dark) {
     .iv-logout:hover { background: rgba(239,68,68,.12); color: #f87171; }
   }
@@ -519,54 +516,16 @@ const css = (accent) => `
     flex-shrink: 0;
     width: 34px; height: 34px;
     background: transparent; border: none;
-    color: #6b7280; cursor: pointer;
+    color: var(--sb-text); cursor: pointer;
     border-radius: 6px;
     display: flex; align-items: center; justify-content: center;
     padding: 0;
     transition: background .14s;
   }
-  .iv-hamburger:hover { background: rgba(0,0,0,.05); }
+  .iv-hamburger:hover { background: var(--sb-hover); }
 
   /* Search */
-  .iv-search {
-    display: flex; align-items: center; gap: 7px;
-    background: rgba(255,255,255,.6);
-    border: 1px solid rgba(0,0,0,0.06);
-    border-radius: 9px;
-    padding: 0 10px;
-    height: 34px;
-    width: 100%; max-width: 340px;
-    transition: border-color .16s, background .16s, box-shadow .16s;
-  }
-  .iv-search--on {
-    background: #ffffff;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
-  }
-  @media (prefers-color-scheme: dark) {
-    .iv-search { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,0.06); }
-    .iv-search--on { background: rgba(255,255,255,.09); }
-  }
-  .iv-search-ic { color: #b0b0b4; display: flex; align-items: center; flex-shrink: 0; }
-  .iv-search--on .iv-search-ic { color: var(--accent); }
-  .iv-search-inp {
-    flex: 1; background: transparent; border: none; outline: none;
-    font-size: 13px; color: #1a1a1a; padding: 0;
-  }
-  @media (prefers-color-scheme: dark) {
-    .iv-search-inp { color: #f9fafb; }
-    .iv-search-inp::placeholder { color: #6b7280; }
-  }
-  .iv-search-inp::placeholder { color: #b0b0b4; }
-  .iv-search-clr {
-    background: none; border: none; color: #9ca3af;
-    cursor: pointer; font-size: 15px; line-height: 1;
-    padding: 0; width: 16px; height: 16px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 50%;
-    transition: background .14s;
-  }
-  .iv-search-clr:hover { background: rgba(0,0,0,.08); }
+  /* Search removed */
 
   /* Topbar right */
   .iv-topbar-r {
@@ -576,14 +535,14 @@ const css = (accent) => `
   .iv-topbar-btn {
     width: 34px; height: 34px;
     background: transparent; border: none;
-    color: #8a8a8e; cursor: pointer;
+    color: var(--sb-text); cursor: pointer;
     border-radius: 6px;
     display: flex; align-items: center; justify-content: center;
     position: relative;
     transition: background .14s;
     padding: 0;
   }
-  .iv-topbar-btn:hover { background: rgba(0,0,0,.05); }
+  .iv-topbar-btn:hover { background: var(--sb-hover); }
   @media (prefers-color-scheme: dark) {
     .iv-topbar-btn:hover { background: rgba(255,255,255,.06); }
     .iv-hamburger:hover  { background: rgba(255,255,255,.06); }
@@ -592,7 +551,7 @@ const css = (accent) => `
     position: absolute; top: 7px; right: 7px;
     width: 6px; height: 6px;
     border-radius: 50%;
-    background: #ef4444;
+    background: var(--brand-accent);
     border: 2px solid var(--top-bg);
   }
   .iv-divider {
@@ -620,31 +579,104 @@ const css = (accent) => `
     white-space: nowrap; text-transform: capitalize;
   }
 
-  /* ── Page content — Floating Card Style ── */
+  /* ── Page wrapper (parent with shell background as margin color) ── */
+  .iv-page-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--shell-bg);
+    padding: 16px;
+    overflow: hidden;
+  }
+
+/* ── Page content — Floating Card Style ── */
   .iv-page {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
     padding: 24px;
+    position: relative;
+    isolation: isolate;
     background: var(--page-bg);
     
-    /* All four corners rounded */
-    border-radius: 16px;
-    
-    /* Margin to create the floating effect */
-    margin: 16px 16px 16px 0;
+    /* Rounded corners - parent background creates the margin effect */
+    border-radius: 16px 0 0 16px;
     
     /* Subtle shadow to lift it off the background */
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   }
 
+  .iv-page > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Brand overrides for inner content ── */
+  .iv-page .bg-white { background-color: var(--brand-surface) !important; }
+  .iv-page .bg-gray-50 { background-color: var(--brand-page-bg) !important; }
+  .iv-page .bg-gray-100 {
+    background-color: color-mix(in srgb, var(--brand-text) 6%, transparent) !important;
+  }
+  .iv-page .border-gray-100,
+  .iv-page .border-gray-200,
+  .iv-page .border-gray-300 {
+    border-color: color-mix(in srgb, var(--brand-text) 10%, transparent) !important;
+  }
+  .iv-page .text-gray-900,
+  .iv-page .text-gray-800,
+  .iv-page .text-gray-700 {
+    color: var(--brand-text) !important;
+  }
+  .iv-page .text-gray-600,
+  .iv-page .text-gray-500,
+  .iv-page .text-gray-400 {
+    color: var(--brand-text-muted) !important;
+  }
+  .iv-page .bg-blue-600,
+  .iv-page .bg-indigo-600,
+  .iv-page .bg-green-600 {
+    background-color: var(--brand-primary) !important;
+  }
+  .iv-page .hover\:bg-blue-700:hover,
+  .iv-page .hover\:bg-indigo-700:hover,
+  .iv-page .hover\:bg-green-700:hover {
+    background-color: color-mix(in srgb, var(--brand-primary) 88%, var(--brand-secondary)) !important;
+  }
+  .iv-page .text-blue-700,
+  .iv-page .text-blue-600,
+  .iv-page .text-indigo-600,
+  .iv-page .text-green-600 {
+    color: var(--brand-primary) !important;
+  }
+  .iv-page .text-red-500,
+  .iv-page .text-red-600,
+  .iv-page .text-red-700 {
+    color: var(--brand-danger) !important;
+  }
+  .iv-page .bg-blue-100,
+  .iv-page .bg-indigo-50,
+  .iv-page .bg-indigo-100,
+  .iv-page .bg-green-100,
+  .iv-page .bg-amber-100,
+  .iv-page .bg-purple-100 {
+    background-color: color-mix(in srgb, var(--brand-accent) 18%, transparent) !important;
+  }
+  .iv-page .bg-red-100 {
+    background-color: color-mix(in srgb, var(--brand-danger) 18%, transparent) !important;
+  }
+  .iv-page .text-indigo-700,
+  .iv-page .text-amber-600,
+  .iv-page .text-amber-700,
+  .iv-page .text-purple-600 {
+    color: var(--brand-accent) !important;
+  }
+
   @media (max-width: 640px) {
+    .iv-page-wrapper { padding: 12px; }
     .iv-page { 
       padding: 16px; 
       border-radius: 12px; 
-      margin: 12px 12px 12px 0;
     }
-    .iv-search { max-width: 180px; }
   }
 `;
 

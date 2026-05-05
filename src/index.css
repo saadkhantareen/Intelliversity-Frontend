@@ -2,6 +2,52 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-primary: #1a73e8;
+  --color-secondary: #ffa000;
+  --color-accent: #00bcd4;
+  --color-background: #f5f5f5;
+  --color-surface: #ffffff;
+  --color-text: #212121;
+  --color-text-muted: #757575;
+
+  --brand-primary: #1a73e8;
+  --brand-secondary: #ffa000;
+  --brand-accent: #00bcd4;
+  --brand-background: #f5f5f5;
+  --brand-surface: #ffffff;
+  --brand-text: #212121;
+  --brand-text-muted: #757575;
+
+  --font-main: "Inter", sans-serif;
+  --font-heading: "Poppins", sans-serif;
+  --brand-font: "Inter", sans-serif;
+  --brand-font-heading: "Poppins", sans-serif;
+  --brand-font-size: 16px;
+  --border-radius: 8px;
+  --brand-radius: 8px;
+  --brand-sidebar-bg: var(--brand-surface);
+  --brand-topbar-bg: var(--brand-surface);
+  --brand-page-bg: var(--brand-background);
+  --brand-danger: #dc2626;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-size: var(--brand-font-size);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+}
+
 /* Google ReCAPTCHA badge ko gayab karne ke liye */
 .grecaptcha-badge { 
   z-index: 9999 !important;
