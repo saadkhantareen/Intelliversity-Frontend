@@ -176,7 +176,7 @@ function AdminProfilePage() {
         document_type: docForm.document_type,
         title:         docForm.title,
         description:   docForm.description,
-        public_id,
+        document_public_id,
         resource_type,
       });
 

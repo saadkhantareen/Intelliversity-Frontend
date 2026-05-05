@@ -54,6 +54,11 @@ const StudentsPage = lazy(() => import("@/pages/admin/StudentsPage"));
 const FacultyPage = lazy(() => import("@/pages/admin/FacultyPage"));
 
 
+const CourseRegistration = lazy(() => import("@/pages/student/CourseRegistration"));
+const FacultyAssignment = lazy(() => import("@/pages/admin/FacultyAssignment"));
+const FacultyPortal = lazy(() => import("@/pages/faculty/FacultyPortal"))
+
+
 const CourseDetailLayout = lazy(() => import("@/components/layout/CourseDetailLayout"));
 
 
@@ -156,6 +161,12 @@ function ProtectedAppRoutes() {
 
 
         <Route path="/my-profile" element={<FacultyProfilePage />} />
+
+
+        
+          <Route path="/enrollments" element={<FacultyAssignment />} />
+          <Route path="/student/registration" element={<CourseRegistration />} />
+          <Route path="/faculty/teaching-load" element={<FacultyPortal />} />
 
         
       </Route>
