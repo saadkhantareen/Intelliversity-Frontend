@@ -12,8 +12,7 @@ import {
 import toast from "react-hot-toast";
 import { useNavigate, Link } from "react-router-dom";
 import PortalNotFound from "@/pages/errors/PortalNotFound";
-import { getRecaptchaToken } from '@/services/recaptcha.service'
-
+import { getRecaptchaToken } from "@/services/recaptcha.service";
 
 export default function LoginPage() {
   const { tenant, isTenantLoading, error } = useTenant();
@@ -41,21 +40,19 @@ export default function LoginPage() {
   const emailValid = emailRegex.test(email);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!emailValid) {
       toast.error("Enter a valid university email");
       return;
     }
-    
+
     try {
-      const recaptchaToken = await getRecaptchaToken('login')
-      await login({ email, password, recaptcha_token: recaptchaToken })
-      navigate('/dashboard')
+      const recaptchaToken = await getRecaptchaToken("login");
+      await login({ email, password, recaptcha_token: recaptchaToken });
+      navigate("/dashboard");
     } catch (error) {
       // error already shown via toast in AuthContext
     }
-
-   
   };
 
   const bgImage = tenant?.page_asset?.background_image_url;
@@ -71,7 +68,7 @@ export default function LoginPage() {
     tenant?.page_asset?.metadata?.tagline_color || "var(--brand-surface)";
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-6 sm:p-12 lg:p-[4rem] relative bg-background">
+    <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-8 relative bg-background">
       {/* Background Image with Overlay */}
       <div
         className="absolute inset-0 z-0"
@@ -86,7 +83,7 @@ export default function LoginPage() {
 
       {/* Main Card */}
       <div
-        className="relative z-10 w-full max-w-6xl h-full min-h-[600px] flex flex-col md:flex-row bg-white shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden"
+        className="relative z-10 w-full max-w-6xl min-h-[600px] h-auto max-h-[95vh] flex flex-col md:flex-row bg-white shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden"
         style={{ borderRadius: "var(--border-radius)" }}
       >
         {/* Left Side - University Info & Branding */}
@@ -110,20 +107,30 @@ export default function LoginPage() {
           ></div>
 
           <div className="relative z-10 flex items-center gap-4">
-            <div className="w-14 h-14 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden">
+            {/* 1. Solid white background for the container to blend with JPG/solid logos */}
+            <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-lg overflow-hidden flex-shrink-0">
               {logoUrl ? (
                 <img
                   src={logoUrl}
-                  alt="University Logo"
-                  className="w-full h-full object-contain p-2"
+                  alt={`${universityName} Logo`}
+                  /* 2. Removed p-2 so the logo fills the space and blends perfectly */
+                  className="w-full h-full object-contain"
                 />
               ) : (
-                <GraduationCap className="w-8 h-8 text-white" />
+                /* Fallback styling if no logo exists */
+                <div
+                  className="w-full h-full bg-white/10 backdrop-blur-md flex items-center justify-center"
+                  style={{ backgroundColor: "var(--brand-primary)" }}
+                >
+                  <GraduationCap className="w-8 h-8 text-white" />
+                </div>
               )}
             </div>
+
             <div>
               <h2
-                className="text-2xl font-bold tracking-tight text-white"
+                /* 3. Added 'uppercase' to force COMSATS */
+                className="text-5xl font-bold tracking-tight text-white uppercase"
                 style={{ fontFamily: "var(--brand-font-heading)" }}
               >
                 {universityName}
@@ -132,17 +139,6 @@ export default function LoginPage() {
           </div>
 
           <div className="relative z-10 my-auto">
-            <div
-              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-sm mb-6 backdrop-blur-md"
-              style={{ color: "var(--brand-surface)" }}
-            >
-              <ShieldCheck
-                className="w-4 h-4"
-                style={{ color: "var(--brand-accent)" }}
-              />
-              <span>Secure Authentication</span>
-            </div>
-
             <h1
               className="text-4xl lg:text-5xl font-extrabold leading-tight mb-6 text-white"
               style={{ fontFamily: "var(--brand-font-heading)" }}
@@ -218,7 +214,7 @@ export default function LoginPage() {
 
         {/* Right Side - Login Form */}
         <div
-          className="w-full md:w-1/2 p-8 sm:p-12 lg:p-16 flex flex-col justify-center relative"
+          className="w-full md:w-1/2 p-8 sm:p-12 lg:p-16 flex flex-col justify-center relative overflow-y-auto"
           style={{ backgroundColor: "var(--brand-surface)" }}
         >
           {/* Mobile Header (only visible on small screens) */}
@@ -294,7 +290,7 @@ export default function LoginPage() {
                   <input
                     type="text"
                     required
-                    className="block w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all"
+                    className="block w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-400 shadow-md rounded-xl placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all"
                     style={{ color: "var(--brand-text)" }}
                     placeholder="student@university.edu"
                     value={email}
@@ -329,29 +325,13 @@ export default function LoginPage() {
                   <input
                     type="password"
                     required
-                    className="block w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all"
+                    className="block w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-400 border-size shadow-md rounded-xl placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all"
                     style={{ color: "var(--brand-text)" }}
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
-              </div>
-
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 border-slate-300 rounded cursor-pointer"
-                  style={{ accentColor: "var(--brand-primary)" }}
-                />
-                <label
-                  htmlFor="remember-me"
-                  className="ml-2 block text-sm cursor-pointer"
-                  style={{ color: "var(--brand-text-muted)" }}
-                >
-                  Remember me on this device
-                </label>
               </div>
 
               <button
@@ -393,4 +373,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

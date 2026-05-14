@@ -1,6 +1,6 @@
 import api from "./api"; // adjust path to your api.js
 
-export const ProfileService  = {
+export const ProfileService = {
   // ── Admin: Create profiles ─────────────────────────────────────────────
 
   createStudent: async (studentData) => {
@@ -101,6 +101,20 @@ export const ProfileService  = {
     );
     return response.data;
   },
-};
 
-// export default ProfileService;
+  // Delete Profile APIs
+  deleteStudent: async (id) => {
+    const response = await api.delete(`/api/v1/profiles/students/${id}/`);
+    return response.data;
+  },
+
+  deleteFaculty: async (id) => {
+    const response = await api.delete(`/api/v1/profiles/faculty/${id}/`);
+    return response.data;
+  },
+
+  deleteAdmin: async (id) => {
+    const response = await api.delete(`/api/v1/profiles/admin/${id}/`);
+    return response.data;
+  },
+};

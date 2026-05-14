@@ -464,7 +464,7 @@ export default function FacultyPage() {
                       <td className="px-5 py-3 text-gray-500">{getEmail(f)}</td>
                       <td className="px-5 py-3">
                         <span className="inline-block px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs font-medium">
-                          {getDept(f)}
+                          {f.department_name}
                         </span>
                       </td>
                       <td className="px-5 py-3 text-gray-600">
