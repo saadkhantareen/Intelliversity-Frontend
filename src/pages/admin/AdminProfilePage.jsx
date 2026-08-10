@@ -1,21 +1,15 @@
-import { useState, useEffect } from "react";
-import { useTenant } from "../../context/TenantContext";
-import { useProfile } from "../../context/ProfileContext";
-import { useCloudinary } from "../../hooks/useCloudinary";
-import SectionCard from "../../components/ui/SectionCard";
-import InfoField from "../../components/ui/InfoField";
-import toast from "react-hot-toast";
+import { useState, useEffect } from 'react';
+import { useTenant } from '../../context/TenantContext';
+import { useProfile } from '../../context/ProfileContext';
+import { useCloudinary } from '../../hooks/useCloudinary';
+import SectionCard from '../../components/ui/SectionCard';
+import InfoField from '../../components/ui/InfoField';
+import toast from 'react-hot-toast';
 
 function AdminProfilePage() {
   const { config } = useTenant();
-  const {
-    profile,
-    documents,
-    isLoading,
-    updateProfile,
-    uploadDocument,
-    deleteDocument,
-  } = useProfile();
+  const { profile, documents, isLoading, updateProfile, uploadDocument, deleteDocument } =
+    useProfile();
 
   // Bring in our reusable Cloudinary logic
   const { uploadToCloudinary, getPrivateUrl, isUploading } = useCloudinary();
@@ -27,26 +21,26 @@ function AdminProfilePage() {
 
   const [formData, setFormData] = useState({
     base_profile: {
-      phone_number: "",
-      emergency_contact: "",
-      father_name: "",
-      date_of_birth: "",
-      gender: "",
-      nationality: "",
-      cnic: "",
-      religion: "",
-      address: "",
-      city: "",
-      country: "",
-      bio: "",
+      phone_number: '',
+      emergency_contact: '',
+      father_name: '',
+      date_of_birth: '',
+      gender: '',
+      nationality: '',
+      cnic: '',
+      religion: '',
+      address: '',
+      city: '',
+      country: '',
+      bio: '',
     },
   });
 
   const [docForm, setDocForm] = useState({
-    document_type: "",
-    title: "",
+    document_type: '',
+    title: '',
     file: null,
-    description: "",
+    description: '',
   });
 
   useEffect(() => {
@@ -54,18 +48,18 @@ function AdminProfilePage() {
       const bp = profile.base_profile || {};
       setFormData({
         base_profile: {
-          phone_number: bp.phone_number || "",
-          emergency_contact: bp.emergency_contact || "",
-          father_name: bp.father_name || "",
-          date_of_birth: bp.date_of_birth || "",
-          gender: bp.gender || "",
-          nationality: bp.nationality || "",
-          cnic: bp.cnic || "",
-          religion: bp.religion || "",
-          address: bp.address || "",
-          city: bp.city || "",
-          country: bp.country || "",
-          bio: bp.bio || "",
+          phone_number: bp.phone_number || '',
+          emergency_contact: bp.emergency_contact || '',
+          father_name: bp.father_name || '',
+          date_of_birth: bp.date_of_birth || '',
+          gender: bp.gender || '',
+          nationality: bp.nationality || '',
+          cnic: bp.cnic || '',
+          religion: bp.religion || '',
+          address: bp.address || '',
+          city: bp.city || '',
+          country: bp.country || '',
+          bio: bp.bio || '',
         },
       });
     }
@@ -83,10 +77,10 @@ function AdminProfilePage() {
     try {
       await updateProfile(formData);
       setIsEditing(false);
-      toast.success("Profile updated successfully!");
+      toast.success('Profile updated successfully!');
     } catch (err) {
       const errors = err.response?.data;
-      toast.error(errors?.detail || "Failed to update profile");
+      toast.error(errors?.detail || 'Failed to update profile');
     } finally {
       setIsSaving(false);
     }
@@ -98,15 +92,15 @@ function AdminProfilePage() {
     if (!file) return;
 
     try {
-      const { public_id } = await uploadToCloudinary(file, "profile");
+      const { public_id } = await uploadToCloudinary(file, 'profile');
       // Save public_id to Django — backend resolves the actual URL
       await updateProfile({
         base_profile: { profile_picture_public_id: public_id },
       });
-      toast.success("Profile picture updated!");
+      toast.success('Profile picture updated!');
     } catch (err) {
       console.error(err);
-      toast.error("Failed to update profile picture");
+      toast.error('Failed to update profile picture');
     }
   };
 
@@ -114,16 +108,13 @@ function AdminProfilePage() {
   const handleDocUpload = async (e) => {
     e.preventDefault();
     if (!docForm.file || !docForm.document_type || !docForm.title) {
-      toast.error("Please fill all document fields");
+      toast.error('Please fill all document fields');
       return;
     }
 
     try {
       // Step 1 & 2: upload file to Cloudinary via hook
-      const { public_id, resource_type } = await uploadToCloudinary(
-        docForm.file,
-        "document",
-      );
+      const { public_id, resource_type } = await uploadToCloudinary(docForm.file, 'document');
 
       // Step 3: tell Django to save the record with public_id
       await uploadDocument({
@@ -134,35 +125,35 @@ function AdminProfilePage() {
         resource_type,
       });
 
-      toast.success("Document uploaded successfully!");
-      setDocForm({ document_type: "", title: "", file: null, description: "" });
+      toast.success('Document uploaded successfully!');
+      setDocForm({ document_type: '', title: '', file: null, description: '' });
     } catch (err) {
       console.error(err);
-      toast.error("Failed to upload document");
+      toast.error('Failed to upload document');
     }
   };
 
   // ── View private document ─────────────────────────────────────────────────
   const handleViewDoc = async (doc) => {
     if (privateUrls[doc.id]) {
-      window.open(privateUrls[doc.id], "_blank");
+      window.open(privateUrls[doc.id], '_blank');
       return;
     }
     setLoadingUrlId(doc.id);
     try {
       const url = await getPrivateUrl(doc.public_id, doc.resource_type);
       setPrivateUrls((prev) => ({ ...prev, [doc.id]: url }));
-      window.open(url, "_blank");
+      window.open(url, '_blank');
     } catch (err) {
       console.error(err);
-      toast.error("Could not get document URL");
+      toast.error('Could not get document URL');
     } finally {
       setLoadingUrlId(null);
     }
   };
 
   const handleDocDelete = async (docId) => {
-    if (!window.confirm("Delete this document?")) return;
+    if (!window.confirm('Delete this document?')) return;
     try {
       await deleteDocument(docId);
       setPrivateUrls((prev) => {
@@ -170,9 +161,9 @@ function AdminProfilePage() {
         delete copy[docId];
         return copy;
       });
-      toast.success("Document deleted");
+      toast.success('Document deleted');
     } catch (err) {
-      toast.error("Failed to delete document");
+      toast.error('Failed to delete document');
     }
   };
 
@@ -185,7 +176,7 @@ function AdminProfilePage() {
   }
 
   const bp = profile?.base_profile;
-  const themeColor = config?.color || "#4F46E5";
+  const themeColor = config?.color || '#4F46E5';
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -214,7 +205,7 @@ function AdminProfilePage() {
               style={{ backgroundColor: themeColor }}
               className="text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 disabled:opacity-50 transition-opacity"
             >
-              {isSaving ? "Saving..." : "Save Changes"}
+              {isSaving ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         )}
@@ -291,22 +282,22 @@ function AdminProfilePage() {
         {isEditing ? (
           <div className="grid grid-cols-2 gap-4">
             {[
-              { label: "Father Name", field: "father_name" },
-              { label: "Date of Birth", field: "date_of_birth", type: "date" },
-              { label: "CNIC", field: "cnic" },
-              { label: "Religion", field: "religion" },
-              { label: "Nationality", field: "nationality" },
+              { label: 'Father Name', field: 'father_name' },
+              { label: 'Date of Birth', field: 'date_of_birth', type: 'date' },
+              { label: 'CNIC', field: 'cnic' },
+              { label: 'Religion', field: 'religion' },
+              { label: 'Nationality', field: 'nationality' },
             ].map(({ label, field, type }) => (
               <div key={field}>
                 <label className="block text-xs text-gray-400 uppercase tracking-wide mb-1">
                   {label}
                 </label>
                 <input
-                  type={type || "text"}
+                  type={type || 'text'}
                   value={formData.base_profile[field]}
                   onChange={(e) => handleChange(field, e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-offset-1"
-                  style={{ "--tw-ring-color": themeColor }}
+                  style={{ '--tw-ring-color': themeColor }}
                 />
               </div>
             ))}
@@ -316,7 +307,7 @@ function AdminProfilePage() {
               </label>
               <select
                 value={formData.base_profile.gender}
-                onChange={(e) => handleChange("gender", e.target.value)}
+                onChange={(e) => handleChange('gender', e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none"
               >
                 <option value="">Select</option>
@@ -343,10 +334,10 @@ function AdminProfilePage() {
         {isEditing ? (
           <div className="grid grid-cols-2 gap-4">
             {[
-              { label: "Phone Number", field: "phone_number" },
-              { label: "Emergency Contact", field: "emergency_contact" },
-              { label: "City", field: "city" },
-              { label: "Country", field: "country" },
+              { label: 'Phone Number', field: 'phone_number' },
+              { label: 'Emergency Contact', field: 'emergency_contact' },
+              { label: 'City', field: 'city' },
+              { label: 'Country', field: 'country' },
             ].map(({ label, field }) => (
               <div key={field}>
                 <label className="block text-xs text-gray-400 uppercase tracking-wide mb-1">
@@ -366,7 +357,7 @@ function AdminProfilePage() {
               </label>
               <textarea
                 value={formData.base_profile.address}
-                onChange={(e) => handleChange("address", e.target.value)}
+                onChange={(e) => handleChange('address', e.target.value)}
                 rows={2}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none"
               />
@@ -375,10 +366,7 @@ function AdminProfilePage() {
         ) : (
           <div className="grid grid-cols-2 gap-4">
             <InfoField label="Phone Number" value={bp?.phone_number} />
-            <InfoField
-              label="Emergency Contact"
-              value={bp?.emergency_contact}
-            />
+            <InfoField label="Emergency Contact" value={bp?.emergency_contact} />
             <InfoField label="Address" value={bp?.address} />
             <InfoField label="City" value={bp?.city} />
             <InfoField label="Country" value={bp?.country} />
@@ -391,13 +379,13 @@ function AdminProfilePage() {
         {isEditing ? (
           <textarea
             value={formData.base_profile.bio}
-            onChange={(e) => handleChange("bio", e.target.value)}
+            onChange={(e) => handleChange('bio', e.target.value)}
             rows={3}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none"
             placeholder="Write something about yourself..."
           />
         ) : (
-          <p className="text-sm text-gray-600">{bp?.bio || "—"}</p>
+          <p className="text-sm text-gray-600">{bp?.bio || '—'}</p>
         )}
       </SectionCard>
 
@@ -436,18 +424,14 @@ function AdminProfilePage() {
             <input
               type="text"
               value={docForm.title}
-              onChange={(e) =>
-                setDocForm((prev) => ({ ...prev, title: e.target.value }))
-              }
+              onChange={(e) => setDocForm((prev) => ({ ...prev, title: e.target.value }))}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none"
               placeholder="Document title"
             />
           </div>
 
           <div>
-            <label className="block text-xs text-gray-400 uppercase tracking-wide mb-1">
-              File
-            </label>
+            <label className="block text-xs text-gray-400 uppercase tracking-wide mb-1">File</label>
             <input
               type="file"
               key={docForm.title} // reset input when form clears
@@ -468,9 +452,7 @@ function AdminProfilePage() {
             <input
               type="text"
               value={docForm.description}
-              onChange={(e) =>
-                setDocForm((prev) => ({ ...prev, description: e.target.value }))
-              }
+              onChange={(e) => setDocForm((prev) => ({ ...prev, description: e.target.value }))}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none"
               placeholder="Optional description"
             />
@@ -483,7 +465,7 @@ function AdminProfilePage() {
               style={{ backgroundColor: themeColor }}
               className="text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 disabled:opacity-50 transition-opacity"
             >
-              {isUploading ? "Uploading…" : "Upload Document"}
+              {isUploading ? 'Uploading…' : 'Upload Document'}
             </button>
           </div>
         </form>
@@ -499,21 +481,13 @@ function AdminProfilePage() {
                 className="flex items-center justify-between border border-gray-100 rounded-lg p-3"
               >
                 <div>
-                  <p className="text-sm font-medium text-gray-700">
-                    {doc.title}
-                  </p>
-                  <p className="text-xs text-gray-400 capitalize">
-                    {doc.document_type}
-                  </p>
+                  <p className="text-sm font-medium text-gray-700">{doc.title}</p>
+                  <p className="text-xs text-gray-400 capitalize">{doc.document_type}</p>
                   {doc.description && (
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      {doc.description}
-                    </p>
+                    <p className="text-xs text-gray-400 mt-0.5">{doc.description}</p>
                   )}
                   {doc.is_verified && (
-                    <span className="text-xs text-green-500 font-medium">
-                      ✓ Verified
-                    </span>
+                    <span className="text-xs text-green-500 font-medium">✓ Verified</span>
                   )}
                 </div>
                 <div className="flex gap-3 items-center">
@@ -522,7 +496,7 @@ function AdminProfilePage() {
                     disabled={loadingUrlId === doc.id}
                     className="text-xs text-blue-500 hover:underline disabled:opacity-50"
                   >
-                    {loadingUrlId === doc.id ? "Loading…" : "View"}
+                    {loadingUrlId === doc.id ? 'Loading…' : 'View'}
                   </button>
                   <button
                     onClick={() => handleDocDelete(doc.id)}

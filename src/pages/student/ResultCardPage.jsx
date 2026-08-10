@@ -1,11 +1,7 @@
-import React from 'react'
+import React from 'react';
 
 function ResultCardPage() {
-  return (
-    <div>
-      ResultCardPage
-    </div>
-  )
+  return <div>ResultCardPage</div>;
 }
 
-export default ResultCardPage
+export default ResultCardPage;

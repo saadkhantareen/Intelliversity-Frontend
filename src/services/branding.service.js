@@ -1,11 +1,11 @@
-import { globalApi } from "./api";
+import { globalApi } from './api';
 
 /**
  * Fetch portal branding for the current tenant.
  * When domain is omitted, backend resolves tenant from the request host.
  */
 export const getPortalBranding = (domain) =>
-  globalApi.get("/api/v1/tenants/branding/", {
+  globalApi.get('/api/v1/tenants/branding/', {
     params: domain ? { domain } : undefined,
   });
 

@@ -1,4 +1,4 @@
-import { applyThemeToCSS } from "./tenantUtils";
+import { applyThemeToCSS } from './tenantUtils';
 
 /**
  * Writes branding values as CSS custom properties on :root.

@@ -26,11 +26,41 @@ const DEMO_DATA = {
     { name: 'Biology', students: 0 },
   ],
   recentActivity: [
-    { id: 1, action: 'New student enrolled', detail: 'Ahmed Khan — BSCS', time: '10 min ago', color: 'bg-green-100 text-green-700' },
-    { id: 2, action: 'Course updated', detail: 'CS301 — Data Structures', time: '1 hour ago', color: 'bg-blue-100 text-blue-700' },
-    { id: 3, action: 'Faculty profile updated', detail: 'Dr. Fatima — CS Dept', time: '3 hours ago', color: 'bg-purple-100 text-purple-700' },
-    { id: 4, action: 'New department created', detail: 'Artificial Intelligence', time: '5 hours ago', color: 'bg-amber-100 text-amber-700' },
-    { id: 5, action: 'Bulk upload completed', detail: '150 students imported', time: 'Yesterday', color: 'bg-indigo-100 text-indigo-700' },
+    {
+      id: 1,
+      action: 'New student enrolled',
+      detail: 'Ahmed Khan — BSCS',
+      time: '10 min ago',
+      color: 'bg-green-100 text-green-700',
+    },
+    {
+      id: 2,
+      action: 'Course updated',
+      detail: 'CS301 — Data Structures',
+      time: '1 hour ago',
+      color: 'bg-blue-100 text-blue-700',
+    },
+    {
+      id: 3,
+      action: 'Faculty profile updated',
+      detail: 'Dr. Fatima — CS Dept',
+      time: '3 hours ago',
+      color: 'bg-purple-100 text-purple-700',
+    },
+    {
+      id: 4,
+      action: 'New department created',
+      detail: 'Artificial Intelligence',
+      time: '5 hours ago',
+      color: 'bg-amber-100 text-amber-700',
+    },
+    {
+      id: 5,
+      action: 'Bulk upload completed',
+      detail: '150 students imported',
+      time: 'Yesterday',
+      color: 'bg-indigo-100 text-indigo-700',
+    },
   ],
 };
 
@@ -47,15 +77,12 @@ function MiniBarChart({ data, maxHeight = 120 }) {
           <div
             className="w-full rounded-t-md transition-all duration-500 min-h-[4px]"
             style={{
-              backgroundColor: "var(--brand-accent)",
+              backgroundColor: 'var(--brand-accent)',
               height: `${(item.students / max) * maxHeight}px`,
             }}
             title={`${item.students} students`}
           />
-          <span
-            className="text-xs mt-1"
-            style={{ color: "var(--brand-text-muted)" }}
-          >
+          <span className="text-xs mt-1" style={{ color: 'var(--brand-text-muted)' }}>
             {item.month}
           </span>
         </div>
@@ -76,19 +103,19 @@ function HorizontalBarChart({ data }) {
         <div key={item.name}>
           <div
             className="flex justify-between text-xs mb-1"
-            style={{ color: "var(--brand-text-muted)" }}
+            style={{ color: 'var(--brand-text-muted)' }}
           >
             <span>{item.name}</span>
             <span className="font-medium">{item.students}</span>
           </div>
           <div
             className="w-full rounded-full h-2.5"
-            style={{ backgroundColor: "var(--brand-background)" }}
+            style={{ backgroundColor: 'var(--brand-background)' }}
           >
             <div
               className="h-2.5 rounded-full transition-all duration-700"
               style={{
-                backgroundColor: "var(--brand-accent)",
+                backgroundColor: 'var(--brand-accent)',
                 width: `${(item.students / max) * 100}%`,
               }}
             />
@@ -107,29 +134,20 @@ function StatCard({ label, value, icon, tone }) {
     <div
       className="border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow"
       style={{
-        backgroundColor: "var(--brand-surface)",
-        borderColor: "rgba(0, 0, 0, 0.08)",
+        backgroundColor: 'var(--brand-surface)',
+        borderColor: 'rgba(0, 0, 0, 0.08)',
       }}
     >
       <div className="flex items-center justify-between">
         <div>
-          <p
-            className="text-sm mb-1"
-            style={{ color: "var(--brand-text-muted)" }}
-          >
+          <p className="text-sm mb-1" style={{ color: 'var(--brand-text-muted)' }}>
             {label}
           </p>
-          <p
-            className="text-2xl font-bold"
-            style={{ color: "var(--brand-text)" }}
-          >
+          <p className="text-2xl font-bold" style={{ color: 'var(--brand-text)' }}>
             {value.toLocaleString()}
           </p>
         </div>
-        <div
-          className="w-10 h-10 rounded-lg flex items-center justify-center text-lg"
-          style={tone}
-        >
+        <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg" style={tone}>
           {icon}
         </div>
       </div>
@@ -166,16 +184,10 @@ const DashboardPage = () => {
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1
-          className="text-2xl font-bold"
-          style={{ color: "var(--brand-text)" }}
-        >
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--brand-text)' }}>
           Dashboard
         </h1>
-        <p
-          className="text-sm mt-1"
-          style={{ color: "var(--brand-text-muted)" }}
-        >
+        <p className="text-sm mt-1" style={{ color: 'var(--brand-text-muted)' }}>
           Welcome back, Admin. Here's what's happening today.
         </p>
       </div>
@@ -187,8 +199,8 @@ const DashboardPage = () => {
           value={data.totalStudents}
           icon="👨‍🎓"
           tone={{
-            backgroundColor: "color-mix(in srgb, var(--brand-primary) 15%, transparent)",
-            color: "var(--brand-primary)",
+            backgroundColor: 'color-mix(in srgb, var(--brand-primary) 15%, transparent)',
+            color: 'var(--brand-primary)',
           }}
         />
         <StatCard
@@ -196,8 +208,8 @@ const DashboardPage = () => {
           value={data.totalFaculty}
           icon="👩‍🏫"
           tone={{
-            backgroundColor: "color-mix(in srgb, var(--brand-accent) 15%, transparent)",
-            color: "var(--brand-accent)",
+            backgroundColor: 'color-mix(in srgb, var(--brand-accent) 15%, transparent)',
+            color: 'var(--brand-accent)',
           }}
         />
         <StatCard
@@ -205,8 +217,8 @@ const DashboardPage = () => {
           value={data.totalCourses}
           icon="📚"
           tone={{
-            backgroundColor: "color-mix(in srgb, var(--brand-secondary) 12%, transparent)",
-            color: "var(--brand-secondary)",
+            backgroundColor: 'color-mix(in srgb, var(--brand-secondary) 12%, transparent)',
+            color: 'var(--brand-secondary)',
           }}
         />
         <StatCard
@@ -214,8 +226,8 @@ const DashboardPage = () => {
           value={data.totalDepartments}
           icon="🏛️"
           tone={{
-            backgroundColor: "color-mix(in srgb, var(--brand-accent) 20%, transparent)",
-            color: "var(--brand-accent)",
+            backgroundColor: 'color-mix(in srgb, var(--brand-accent) 20%, transparent)',
+            color: 'var(--brand-accent)',
           }}
         />
       </div>
@@ -226,14 +238,11 @@ const DashboardPage = () => {
         <div
           className="border rounded-xl p-6 shadow-sm"
           style={{
-            backgroundColor: "var(--brand-surface)",
-            borderColor: "rgba(0, 0, 0, 0.08)",
+            backgroundColor: 'var(--brand-surface)',
+            borderColor: 'rgba(0, 0, 0, 0.08)',
           }}
         >
-          <h3
-            className="text-base font-semibold mb-4"
-            style={{ color: "var(--brand-text)" }}
-          >
+          <h3 className="text-base font-semibold mb-4" style={{ color: 'var(--brand-text)' }}>
             📈 Monthly Enrollments
           </h3>
           <MiniBarChart data={data.recentEnrollments} />
@@ -242,7 +251,7 @@ const DashboardPage = () => {
               <span
                 key={item.month}
                 className="text-xs text-center"
-                style={{ color: "var(--brand-text-muted)" }}
+                style={{ color: 'var(--brand-text-muted)' }}
               >
                 {item.students}
               </span>
@@ -254,14 +263,11 @@ const DashboardPage = () => {
         <div
           className="border rounded-xl p-6 shadow-sm"
           style={{
-            backgroundColor: "var(--brand-surface)",
-            borderColor: "rgba(0, 0, 0, 0.08)",
+            backgroundColor: 'var(--brand-surface)',
+            borderColor: 'rgba(0, 0, 0, 0.08)',
           }}
         >
-          <h3
-            className="text-base font-semibold mb-4"
-            style={{ color: "var(--brand-text)" }}
-          >
+          <h3 className="text-base font-semibold mb-4" style={{ color: 'var(--brand-text)' }}>
             🏛️ Students by Department
           </h3>
           <HorizontalBarChart data={data.departmentDistribution} />

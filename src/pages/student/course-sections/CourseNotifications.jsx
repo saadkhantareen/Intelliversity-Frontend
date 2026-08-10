@@ -1,11 +1,7 @@
-import React from 'react'
+import React from 'react';
 
 function CourseNotifications() {
-  return (
-    <div>
-      CourseNotifications
-    </div>
-  )
+  return <div>CourseNotifications</div>;
 }
 
-export default CourseNotifications
+export default CourseNotifications;

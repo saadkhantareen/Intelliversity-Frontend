@@ -8,7 +8,7 @@ import { courseService } from '@/services/courseService';
  */
 const AttendanceBar = ({ value }) => (
   <div className="relative w-24 h-6 bg-red-500 rounded overflow-hidden border border-gray-400">
-    <div 
+    <div
       className="h-full bg-green-500 flex items-center justify-center text-[10px] text-white font-bold"
       style={{ width: `${value}%` }}
     >
@@ -23,13 +23,14 @@ export default function RegisteredCourses() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    courseService.getRegisteredCourses()
+    courseService
+      .getRegisteredCourses()
       .then((data) => {
         setCourses(data);
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Failed to load courses:", err);
+        console.error('Failed to load courses:', err);
         setLoading(false);
       });
   }, []);
@@ -60,11 +61,11 @@ export default function RegisteredCourses() {
           <tbody>
             {courses.length > 0 ? (
               courses.map((course) => (
-                <tr 
-                  key={course.course_no} 
+                <tr
+                  key={course.course_no}
                   // Navigates to the detail page (e.g., /courses/CSE357)
                   onClick={() => navigate(`/courses/${course.course_no}/notifications`)}
-          className="border-b hover:bg-teal-50 cursor-pointer transition-colors group"
+                  className="border-b hover:bg-teal-50 cursor-pointer transition-colors group"
                 >
                   <td className="p-3 border border-gray-200 font-bold text-gray-600">
                     {course.course_no}
@@ -84,9 +85,7 @@ export default function RegisteredCourses() {
                   <td className="p-3 border border-gray-200">
                     <div className="flex gap-2 justify-center">
                       {course.attendance && course.attendance.length > 0 ? (
-                        course.attendance.map((val, idx) => (
-                          <AttendanceBar key={idx} value={val} />
-                        ))
+                        course.attendance.map((val, idx) => <AttendanceBar key={idx} value={val} />)
                       ) : (
                         <span className="text-gray-400 italic text-xs">No Attendance</span>
                       )}

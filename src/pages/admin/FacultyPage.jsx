@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
-import toast from "react-hot-toast";
-import { ProfileService } from "../../services/profile.service";
-import FacultyForm from "./FacultyForm";
+import { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
+import { ProfileService } from '../../services/profile.service';
+import FacultyForm from './FacultyForm';
 
 const SearchIcon = () => (
   <svg
@@ -66,7 +66,7 @@ const PlusIcon = () => (
     <line x1="5" y1="12" x2="19" y2="12" />
   </svg>
 );
-const ChevronIcon = ({ dir = "right" }) => (
+const ChevronIcon = ({ dir = 'right' }) => (
   <svg
     width="16"
     height="16"
@@ -76,7 +76,7 @@ const ChevronIcon = ({ dir = "right" }) => (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    style={{ transform: dir === "left" ? "rotate(180deg)" : "none" }}
+    style={{ transform: dir === 'left' ? 'rotate(180deg)' : 'none' }}
   >
     <polyline points="9 18 15 12 9 6" />
   </svg>
@@ -100,16 +100,13 @@ const CloseIcon = () => (
 function DeleteModal({ faculty, onConfirm, onCancel, loading }) {
   if (!faculty) return null;
   const name =
-    `${faculty.base_profile?.user?.first_name ?? ""} ${faculty.base_profile?.user?.last_name ?? ""}`.trim();
+    `${faculty.base_profile?.user?.first_name ?? ''} ${faculty.base_profile?.user?.last_name ?? ''}`.trim();
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
-          Delete faculty member?
-        </h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete faculty member?</h3>
         <p className="text-sm text-gray-500 mb-6">
-          This will permanently delete{" "}
-          <span className="font-medium text-gray-800">{name}</span> (
+          This will permanently delete <span className="font-medium text-gray-800">{name}</span> (
           {faculty.registration_id}). This action cannot be undone.
         </p>
         <div className="flex justify-end gap-3">
@@ -124,7 +121,7 @@ function DeleteModal({ faculty, onConfirm, onCancel, loading }) {
             disabled={loading}
             className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-60"
           >
-            {loading ? "Deleting…" : "Yes, delete"}
+            {loading ? 'Deleting…' : 'Yes, delete'}
           </button>
         </div>
       </div>
@@ -134,33 +131,31 @@ function DeleteModal({ faculty, onConfirm, onCancel, loading }) {
 
 function EditModal({ faculty, onClose, onSaved }) {
   const [form, setForm] = useState({
-    first_name: faculty?.base_profile?.user?.first_name ?? "",
-    last_name: faculty?.base_profile?.user?.last_name ?? "",
-    designation: faculty?.designation ?? "",
-    qualification: faculty?.qualification ?? "",
-    specialization: faculty?.specialization ?? "",
-    experience_years: faculty?.experience_years ?? "",
-    office_number: faculty?.office_number ?? "",
-    office_location: faculty?.office_location ?? "",
-    phone_number: faculty?.base_profile?.phone_number ?? "",
-    city: faculty?.base_profile?.city ?? "",
-    country: faculty?.base_profile?.country ?? "",
-    bio: faculty?.base_profile?.bio ?? "",
+    first_name: faculty?.base_profile?.user?.first_name ?? '',
+    last_name: faculty?.base_profile?.user?.last_name ?? '',
+    designation: faculty?.designation ?? '',
+    qualification: faculty?.qualification ?? '',
+    specialization: faculty?.specialization ?? '',
+    experience_years: faculty?.experience_years ?? '',
+    office_number: faculty?.office_number ?? '',
+    office_location: faculty?.office_location ?? '',
+    phone_number: faculty?.base_profile?.phone_number ?? '',
+    city: faculty?.base_profile?.city ?? '',
+    country: faculty?.base_profile?.country ?? '',
+    bio: faculty?.base_profile?.bio ?? '',
   });
   const [saving, setSaving] = useState(false);
   const set = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
 
   async function handleSave() {
     setSaving(true);
-    const toastId = toast.loading("Saving changes…");
+    const toastId = toast.loading('Saving changes…');
     try {
       const payload = {
         designation: form.designation || null,
         qualification: form.qualification || null,
         specialization: form.specialization || null,
-        experience_years: form.experience_years
-          ? Number(form.experience_years)
-          : null,
+        experience_years: form.experience_years ? Number(form.experience_years) : null,
         office_number: form.office_number || null,
         office_location: form.office_location || null,
         base_profile: {
@@ -172,13 +167,13 @@ function EditModal({ faculty, onClose, onSaved }) {
         },
       };
       const updated = await ProfileService.updateFaculty(faculty.id, payload);
-      toast.success("Faculty updated successfully!", {
+      toast.success('Faculty updated successfully!', {
         id: toastId,
         duration: 3000,
       });
       onSaved(updated);
     } catch (err) {
-      toast.error(err.response?.data?.detail ?? "Failed to update.", {
+      toast.error(err.response?.data?.detail ?? 'Failed to update.', {
         id: toastId,
         duration: 4000,
       });
@@ -187,11 +182,9 @@ function EditModal({ faculty, onClose, onSaved }) {
     }
   }
 
-  const inp = (id, label, type = "text") => (
+  const inp = (id, label, type = 'text') => (
     <div className="flex flex-col gap-1">
-      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-        {label}
-      </label>
+      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</label>
       <input
         type={type}
         value={form[id]}
@@ -205,45 +198,38 @@ function EditModal({ faculty, onClose, onSaved }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h3 className="text-base font-semibold text-gray-900">
-            Edit faculty member
-          </h3>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
+          <h3 className="text-base font-semibold text-gray-900">Edit faculty member</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <CloseIcon />
           </button>
         </div>
         <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
           <div className="grid grid-cols-2 gap-4">
-            {inp("first_name", "First name")}
-            {inp("last_name", "Last name")}
+            {inp('first_name', 'First name')}
+            {inp('last_name', 'Last name')}
           </div>
           <div className="grid grid-cols-2 gap-4">
-            {inp("designation", "Designation")}
-            {inp("qualification", "Qualification")}
+            {inp('designation', 'Designation')}
+            {inp('qualification', 'Qualification')}
           </div>
           <div className="grid grid-cols-2 gap-4">
-            {inp("specialization", "Specialization")}
-            {inp("experience_years", "Experience (yrs)", "number")}
+            {inp('specialization', 'Specialization')}
+            {inp('experience_years', 'Experience (yrs)', 'number')}
           </div>
           <div className="grid grid-cols-2 gap-4">
-            {inp("office_number", "Office no.")}
-            {inp("office_location", "Office location")}
+            {inp('office_number', 'Office no.')}
+            {inp('office_location', 'Office location')}
           </div>
           <div className="grid grid-cols-2 gap-4">
-            {inp("phone_number", "Phone")}
-            {inp("city", "City")}
+            {inp('phone_number', 'Phone')}
+            {inp('city', 'City')}
           </div>
-          {inp("country", "Country")}
+          {inp('country', 'Country')}
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-              Bio
-            </label>
+            <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Bio</label>
             <textarea
               value={form.bio}
-              onChange={set("bio")}
+              onChange={set('bio')}
               rows={3}
               className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
             />
@@ -261,7 +247,7 @@ function EditModal({ faculty, onClose, onSaved }) {
             disabled={saving}
             className="px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-60"
           >
-            {saving ? "Saving…" : "Save changes"}
+            {saving ? 'Saving…' : 'Save changes'}
           </button>
         </div>
       </div>
@@ -273,8 +259,8 @@ export default function FacultyPage() {
   const [faculty, setFaculty] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [fetching, setFetching] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
@@ -307,7 +293,7 @@ export default function FacultyPage() {
         setTotal(res.count ?? 0);
       }
     } catch {
-      toast.error("Failed to load faculty.");
+      toast.error('Failed to load faculty.');
     } finally {
       setFetching(false);
     }
@@ -319,14 +305,14 @@ export default function FacultyPage() {
 
   async function handleDelete() {
     setDeleting(true);
-    const toastId = toast.loading("Deleting…");
+    const toastId = toast.loading('Deleting…');
     try {
       await ProfileService.deleteFaculty(deleteTarget.id);
-      toast.success("Faculty member deleted.", { id: toastId, duration: 3000 });
+      toast.success('Faculty member deleted.', { id: toastId, duration: 3000 });
       setDeleteTarget(null);
       fetchFaculty();
     } catch {
-      toast.error("Failed to delete.", { id: toastId, duration: 4000 });
+      toast.error('Failed to delete.', { id: toastId, duration: 4000 });
     } finally {
       setDeleting(false);
     }
@@ -339,10 +325,10 @@ export default function FacultyPage() {
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
   const getName = (f) =>
-    `${f.base_profile?.user?.first_name ?? ""} ${f.base_profile?.user?.last_name ?? ""}`.trim() ||
-    "—";
-  const getEmail = (f) => f.base_profile?.user?.email ?? "—";
-  const getDept = (f) => f.department?.name ?? f.department ?? "—";
+    `${f.base_profile?.user?.first_name ?? ''} ${f.base_profile?.user?.last_name ?? ''}`.trim() ||
+    '—';
+  const getEmail = (f) => f.base_profile?.user?.email ?? '—';
+  const getDept = (f) => f.department?.name ?? f.department ?? '—';
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -350,9 +336,7 @@ export default function FacultyPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Faculty</h1>
-            <p className="text-sm text-gray-500 mt-0.5">
-              {total} total members
-            </p>
+            <p className="text-sm text-gray-500 mt-0.5">{total} total members</p>
           </div>
           <button
             onClick={() => setShowCreate(true)}
@@ -365,9 +349,7 @@ export default function FacultyPage() {
         {showCreate && (
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-semibold text-gray-800">
-                Register new faculty member
-              </h2>
+              <h2 className="text-base font-semibold text-gray-800">Register new faculty member</h2>
               <button
                 onClick={() => setShowCreate(false)}
                 className="text-gray-400 hover:text-gray-600"
@@ -426,36 +408,25 @@ export default function FacultyPage() {
               <tbody className="divide-y divide-gray-50">
                 {fetching ? (
                   <tr>
-                    <td
-                      colSpan={6}
-                      className="text-center py-16 text-gray-400 text-sm"
-                    >
+                    <td colSpan={6} className="text-center py-16 text-gray-400 text-sm">
                       Loading…
                     </td>
                   </tr>
                 ) : faculty.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={6}
-                      className="text-center py-16 text-gray-400 text-sm"
-                    >
+                    <td colSpan={6} className="text-center py-16 text-gray-400 text-sm">
                       No faculty members found.
                     </td>
                   </tr>
                 ) : (
                   faculty.map((f) => (
-                    <tr
-                      key={f.id}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
+                    <tr key={f.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-green-100 text-green-700 flex items-center justify-center text-xs font-bold shrink-0">
                             {getName(f).charAt(0).toUpperCase()}
                           </div>
-                          <span className="font-medium text-gray-900">
-                            {getName(f)}
-                          </span>
+                          <span className="font-medium text-gray-900">{getName(f)}</span>
                         </div>
                       </td>
                       <td className="px-5 py-3 text-gray-600 font-mono text-xs">
@@ -467,9 +438,7 @@ export default function FacultyPage() {
                           {f.department_name}
                         </span>
                       </td>
-                      <td className="px-5 py-3 text-gray-600">
-                        {f.designation ?? "—"}
-                      </td>
+                      <td className="px-5 py-3 text-gray-600">{f.designation ?? '—'}</td>
                       <td className="px-5 py-3">
                         <div className="flex items-center justify-end gap-2">
                           <button
@@ -520,11 +489,7 @@ export default function FacultyPage() {
       </div>
 
       {editTarget && (
-        <EditModal
-          faculty={editTarget}
-          onClose={() => setEditTarget(null)}
-          onSaved={handleSaved}
-        />
+        <EditModal faculty={editTarget} onClose={() => setEditTarget(null)} onSaved={handleSaved} />
       )}
       <DeleteModal
         faculty={deleteTarget}

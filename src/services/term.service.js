@@ -11,12 +11,12 @@ const TermService = {
     const response = await api.get(`${BASE}/${id}/`);
     return response.data;
   },
-  // Note: Terms are usually created/updated via Academic Year, 
+  // Note: Terms are usually created/updated via Academic Year,
   // but these endpoints are here if your API supports standalone term management.
   updateTerm: async (id, data) => {
     const response = await api.patch(`${BASE}/${id}/`, data);
     return response.data;
-  }
+  },
 };
 
 export default TermService;

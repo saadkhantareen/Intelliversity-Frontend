@@ -38,6 +38,7 @@ Expected response shape consumed by frontend:
 ```
 
 Frontend side-effects:
+
 - Stores `tokens.access` -> `access_token`
 - Stores `tokens.refresh` -> `refresh_token`
 - Stores merged `user + university` -> `user`
@@ -55,6 +56,7 @@ Frontend side-effects:
 ```
 
 Frontend expectation:
+
 - Success does not require payload parsing.
 - UI switches to generic success confirmation message.
 
@@ -72,6 +74,7 @@ Frontend expectation:
 ```
 
 Frontend expectation:
+
 - Success triggers toast + navigation to `/login`.
 
 ## Error Contract Patterns Assumed by Frontend
@@ -85,6 +88,7 @@ Error extraction patterns used across auth pages/context:
 - `errors.new_password[0].detail`
 
 Implication:
+
 - Backend often returns nested objects/arrays with `detail` field.
 - If none match, frontend falls back to a generic message.
 
@@ -97,5 +101,6 @@ Client persistence in `localStorage`:
 - `user`: stringified JSON user object (contains merged `university`)
 
 Current limitations:
+
 - No automatic token refresh or expiry handling in Axios interceptors.
 - No centralized auth header injection shown in current code.

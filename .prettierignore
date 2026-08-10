@@ -1,0 +1,15 @@
+node_modules
+dist
+coverage
+.vite
+*.min.js
+*.min.css
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Generated files
+*.generated.js
+*.generated.jsx

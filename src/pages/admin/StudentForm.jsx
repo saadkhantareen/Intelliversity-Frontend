@@ -1,37 +1,37 @@
-import { useState, useEffect } from "react";
-import toast from "react-hot-toast";
-import { ProfileService } from "@/services/profile.service";
-import api from "@/services/api";
-import { useCloudinary } from "@/hooks/useCloudinary"; // Make sure path is correct
+import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+import { ProfileService } from '@/services/profile.service';
+import api from '@/services/api';
+import { useCloudinary } from '@/hooks/useCloudinary'; // Make sure path is correct
 
 const EMPTY_FORM = {
   // Account
-  email: "",
-  password: "",
-  first_name: "",
-  last_name: "",
+  email: '',
+  password: '',
+  first_name: '',
+  last_name: '',
   // Profile Picture
-  profile_picture_public_id: "",
-  profile_picture_url: "", // Strictly for frontend preview
+  profile_picture_public_id: '',
+  profile_picture_url: '', // Strictly for frontend preview
   // Student-specific
-  registration_id: "",
-  section: "",
-  cgpa: "",
+  registration_id: '',
+  section: '',
+  cgpa: '',
   // Personal
-  father_name: "",
-  date_of_birth: "",
-  gender: "",
-  nationality: "",
-  cnic: "",
-  religion: "",
+  father_name: '',
+  date_of_birth: '',
+  gender: '',
+  nationality: '',
+  cnic: '',
+  religion: '',
   // Contact
-  phone_number: "",
-  emergency_contact: "",
+  phone_number: '',
+  emergency_contact: '',
   // Address
-  address: "",
-  city: "",
-  country: "",
-  bio: "",
+  address: '',
+  city: '',
+  country: '',
+  bio: '',
 };
 
 export default function StudentForm({ onSuccess, onCancel }) {
@@ -45,11 +45,11 @@ export default function StudentForm({ onSuccess, onCancel }) {
 
   useEffect(() => {
     api
-      .get("/api/v1/academics/sections/")
+      .get('/api/v1/academics/sections/')
       .then((res) => setSections(res.data?.results ?? res.data ?? []))
       .catch(() => {
         setSections([]);
-        toast.error("Failed to load sections. Please refresh.");
+        toast.error('Failed to load sections. Please refresh.');
       });
   }, []);
 
@@ -63,18 +63,15 @@ export default function StudentForm({ onSuccess, onCancel }) {
     const file = e.target.files[0];
     if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-      toast.error("Invalid file type. Please upload an image (JPG, PNG).");
+    if (!file.type.startsWith('image/')) {
+      toast.error('Invalid file type. Please upload an image (JPG, PNG).');
       e.target.value = null;
       return;
     }
 
     try {
       // Pass "profile" as the asset category
-      const { public_id, secure_url } = await uploadToCloudinary(
-        file,
-        "profile",
-      );
+      const { public_id, secure_url } = await uploadToCloudinary(file, 'profile');
 
       setForm((prev) => ({
         ...prev,
@@ -82,9 +79,9 @@ export default function StudentForm({ onSuccess, onCancel }) {
         profile_picture_url: secure_url,
       }));
 
-      toast.success("Profile picture uploaded!");
+      toast.success('Profile picture uploaded!');
     } catch (error) {
-      console.error("Upload Error:", error);
+      console.error('Upload Error:', error);
       // The hook handles throwing the error toast, so we just catch to prevent crashes
     } finally {
       e.target.value = null; // Reset input
@@ -128,10 +125,7 @@ export default function StudentForm({ onSuccess, onCancel }) {
 
   // Returns first error message found across all fields — shown in toast summary
   function firstError(flat) {
-    return (
-      Object.values(flat).find(Boolean) ??
-      "Please fix the errors and try again."
-    );
+    return Object.values(flat).find(Boolean) ?? 'Please fix the errors and try again.';
   }
 
   function buildPayload() {
@@ -146,7 +140,7 @@ export default function StudentForm({ onSuccess, onCancel }) {
           first_name: form.first_name.trim(),
           last_name: form.last_name.trim(),
           password: form.password,
-          role: "student",
+          role: 'student',
         },
         father_name: form.father_name.trim() || null,
         date_of_birth: form.date_of_birth || null,
@@ -169,14 +163,14 @@ export default function StudentForm({ onSuccess, onCancel }) {
     setErrors({});
     setLoading(true);
 
-    const toastId = toast.loading("Registering student…");
+    const toastId = toast.loading('Registering student…');
 
     try {
       const data = await ProfileService.createStudent(buildPayload());
 
       toast.success(
         `${form.first_name} ${form.last_name} (${form.registration_id}) registered successfully!`,
-        { id: toastId, duration: 4000 },
+        { id: toastId, duration: 4000 }
       );
 
       setForm(EMPTY_FORM);
@@ -194,13 +188,7 @@ export default function StudentForm({ onSuccess, onCancel }) {
   }
 
   // ── Field helpers ──────────────────────────────────────────────────────
-  const inp = (
-    id,
-    label,
-    type = "text",
-    placeholder = "",
-    required = false,
-  ) => (
+  const inp = (id, label, type = 'text', placeholder = '', required = false) => (
     <div className="flex flex-col gap-1">
       <label className="text-sm font-medium text-gray-700">
         {label}
@@ -212,7 +200,7 @@ export default function StudentForm({ onSuccess, onCancel }) {
         onChange={set(id)}
         placeholder={placeholder}
         className={`border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-          errors[id] ? "border-red-400 bg-red-50" : "border-gray-300"
+          errors[id] ? 'border-red-400 bg-red-50' : 'border-gray-300'
         }`}
       />
       {errors[id] && <p className="text-xs text-red-500">{errors[id]}</p>}
@@ -229,7 +217,7 @@ export default function StudentForm({ onSuccess, onCancel }) {
         value={form[id]}
         onChange={set(id)}
         className={`border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-          errors[id] ? "border-red-400 bg-red-50" : "border-gray-300"
+          errors[id] ? 'border-red-400 bg-red-50' : 'border-gray-300'
         }`}
       >
         <option value="">— select —</option>
@@ -253,9 +241,7 @@ export default function StudentForm({ onSuccess, onCancel }) {
     <form onSubmit={handleSubmit} className="space-y-2 max-w-3xl">
       {/* ── Header Area: Account + Profile Picture ── */}
       <div className="flex justify-between items-end border-b pb-1 mt-6 mb-3">
-        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 m-0">
-          Account
-        </p>
+        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 m-0">Account</p>
 
         {/* Profile Picture Uploader aligned to Top Right */}
         <div className="flex items-center gap-4">
@@ -288,11 +274,11 @@ export default function StudentForm({ onSuccess, onCancel }) {
               htmlFor="profile-upload"
               className={`cursor-pointer text-sm font-medium px-3 py-1.5 rounded-md border transition-colors ${
                 isUploading
-                  ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
-                  : "bg-white text-blue-600 border-blue-200 hover:bg-blue-50"
+                  ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                  : 'bg-white text-blue-600 border-blue-200 hover:bg-blue-50'
               }`}
             >
-              {isUploading ? "Uploading..." : "Upload Photo"}
+              {isUploading ? 'Uploading...' : 'Upload Photo'}
             </label>
             <input
               type="file"
@@ -303,37 +289,23 @@ export default function StudentForm({ onSuccess, onCancel }) {
               disabled={isUploading}
             />
             {errors.profile_picture_public_id && (
-              <p className="text-xs text-red-500 m-0">
-                {errors.profile_picture_public_id}
-              </p>
+              <p className="text-xs text-red-500 m-0">{errors.profile_picture_public_id}</p>
             )}
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {inp("email", "University email", "email", "zaid@fast.edu.pk", true)}
-        {inp(
-          "password",
-          "Password",
-          "password",
-          "Min 8 chars, 1 upper, 1 number, 1 symbol",
-          true,
-        )}
-        {inp("first_name", "First name", "text", "Zaid", true)}
-        {inp("last_name", "Last name", "text", "Amjad", true)}
+        {inp('email', 'University email', 'email', 'zaid@fast.edu.pk', true)}
+        {inp('password', 'Password', 'password', 'Min 8 chars, 1 upper, 1 number, 1 symbol', true)}
+        {inp('first_name', 'First name', 'text', 'Zaid', true)}
+        {inp('last_name', 'Last name', 'text', 'Amjad', true)}
       </div>
 
       {/* ── Enrollment ── */}
-      {heading("Enrollment")}
+      {heading('Enrollment')}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {inp(
-          "registration_id",
-          "Registration ID",
-          "text",
-          "FA26-BSE-001",
-          true,
-        )}
+        {inp('registration_id', 'Registration ID', 'text', 'FA26-BSE-001', true)}
 
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium text-gray-700">
@@ -341,9 +313,9 @@ export default function StudentForm({ onSuccess, onCancel }) {
           </label>
           <select
             value={form.section}
-            onChange={set("section")}
+            onChange={set('section')}
             className={`border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.section ? "border-red-400 bg-red-50" : "border-gray-300"
+              errors.section ? 'border-red-400 bg-red-50' : 'border-gray-300'
             }`}
           >
             <option value="">— select section —</option>
@@ -353,51 +325,49 @@ export default function StudentForm({ onSuccess, onCancel }) {
               </option>
             ))}
           </select>
-          {errors.section && (
-            <p className="text-xs text-red-500">{errors.section}</p>
-          )}
+          {errors.section && <p className="text-xs text-red-500">{errors.section}</p>}
         </div>
 
-        {inp("cgpa", "CGPA", "number", "0.00 – 4.00")}
+        {inp('cgpa', 'CGPA', 'number', '0.00 – 4.00')}
       </div>
 
       {/* ── Personal ── */}
-      {heading("Personal details")}
+      {heading('Personal details')}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {inp("father_name", "Father's name", "text", "Amjad")}
-        {inp("date_of_birth", "Date of birth", "date")}
-        {sel("gender", "Gender", [
-          { value: "male", label: "Male" },
-          { value: "female", label: "Female" },
-          { value: "other", label: "Other" },
+        {inp('father_name', "Father's name", 'text', 'Amjad')}
+        {inp('date_of_birth', 'Date of birth', 'date')}
+        {sel('gender', 'Gender', [
+          { value: 'male', label: 'Male' },
+          { value: 'female', label: 'Female' },
+          { value: 'other', label: 'Other' },
         ])}
-        {inp("nationality", "Nationality", "text", "Pakistani")}
-        {inp("cnic", "CNIC", "text", "35404-1343427-3")}
-        {inp("religion", "Religion", "text", "Islam")}
+        {inp('nationality', 'Nationality', 'text', 'Pakistani')}
+        {inp('cnic', 'CNIC', 'text', '35404-1343427-3')}
+        {inp('religion', 'Religion', 'text', 'Islam')}
       </div>
 
       {/* ── Contact ── */}
-      {heading("Contact")}
+      {heading('Contact')}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {inp("phone_number", "Phone number", "text", "0310-0044108")}
-        {inp("emergency_contact", "Emergency contact", "text", "0300-0000000")}
+        {inp('phone_number', 'Phone number', 'text', '0310-0044108')}
+        {inp('emergency_contact', 'Emergency contact', 'text', '0300-0000000')}
       </div>
 
       {/* ── Address ── */}
-      {heading("Address")}
+      {heading('Address')}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {inp("address", "Address", "text", "Street / Block")}
-        {inp("city", "City", "text", "Sheikhupura")}
-        {inp("country", "Country", "text", "Pakistan")}
+        {inp('address', 'Address', 'text', 'Street / Block')}
+        {inp('city', 'City', 'text', 'Sheikhupura')}
+        {inp('country', 'Country', 'text', 'Pakistan')}
       </div>
 
       {/* ── Bio ── */}
-      {heading("Bio")}
+      {heading('Bio')}
       <div className="flex flex-col gap-1">
         <label className="text-sm font-medium text-gray-700">Bio</label>
         <textarea
           value={form.bio}
-          onChange={set("bio")}
+          onChange={set('bio')}
           placeholder="A brief note about the student…"
           rows={3}
           className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
@@ -421,7 +391,7 @@ export default function StudentForm({ onSuccess, onCancel }) {
           disabled={loading || isUploading}
           className="px-5 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-60"
         >
-          {loading ? "Registering…" : "Register student"}
+          {loading ? 'Registering…' : 'Register student'}
         </button>
       </div>
     </form>

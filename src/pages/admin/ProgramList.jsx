@@ -16,7 +16,7 @@ const ProgramList = () => {
       const data = await ProgramService.getPrograms();
       setPrograms(data);
     } catch (error) {
-      console.error("Error fetching programs:", error);
+      console.error('Error fetching programs:', error);
     } finally {
       setLoading(false);
     }
@@ -28,15 +28,16 @@ const ProgramList = () => {
       try {
         await ProgramService.deleteProgram(id);
         // Update local state to remove the deleted program from the UI
-        setPrograms(programs.filter(p => p.id !== id));
+        setPrograms(programs.filter((p) => p.id !== id));
       } catch (error) {
-        console.error("Delete failed:", error);
-        alert("Failed to delete program. It may have linked data (like courses or enrollments).");
+        console.error('Delete failed:', error);
+        alert('Failed to delete program. It may have linked data (like courses or enrollments).');
       }
     }
   };
 
-  if (loading) return <div className="p-10 text-center text-gray-500 text-lg">Loading programs...</div>;
+  if (loading)
+    return <div className="p-10 text-center text-gray-500 text-lg">Loading programs...</div>;
 
   return (
     <div className="p-6">
@@ -45,7 +46,7 @@ const ProgramList = () => {
           <h1 className="text-2xl font-bold text-gray-800">Degree Programs</h1>
           <p className="text-sm text-gray-500">Manage academic programs across all departments</p>
         </div>
-        <button 
+        <button
           onClick={() => navigate('/academics/programs/create')}
           className="bg-green-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-green-700 transition font-semibold"
         >
@@ -67,10 +68,12 @@ const ProgramList = () => {
           <tbody>
             {programs.length === 0 ? (
               <tr>
-                <td colSpan="5" className="p-10 text-center text-gray-400">No programs found.</td>
+                <td colSpan="5" className="p-10 text-center text-gray-400">
+                  No programs found.
+                </td>
               </tr>
             ) : (
-              programs.map(p => (
+              programs.map((p) => (
                 <tr key={p.id} className="border-b hover:bg-gray-50 transition">
                   <td className="p-4 font-mono font-bold text-blue-700">{p.code}</td>
                   <td className="p-4 font-medium text-gray-800">{p.name}</td>
@@ -81,14 +84,14 @@ const ProgramList = () => {
                     </span>
                   </td>
                   <td className="p-4 text-right space-x-4">
-                    <button 
-                      onClick={() => navigate(`/academics/programs/edit/${p.id}`)} 
+                    <button
+                      onClick={() => navigate(`/academics/programs/edit/${p.id}`)}
                       className="text-indigo-600 hover:text-indigo-900 font-medium transition"
                     >
                       Edit
                     </button>
-                    <button 
-                      onClick={() => handleDelete(p.id, p.name)} 
+                    <button
+                      onClick={() => handleDelete(p.id, p.name)}
                       className="text-red-500 hover:text-red-700 font-medium transition"
                     >
                       Delete

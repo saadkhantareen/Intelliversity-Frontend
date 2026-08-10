@@ -13,17 +13,21 @@ const AcademicYearList = () => {
   const loadYears = () => {
     AcademicYearService.getYears()
       .then(setYears)
-      .catch(err => console.error("Failed to load academic years", err));
+      .catch((err) => console.error('Failed to load academic years', err));
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this academic year? This will also delete all associated terms.")) {
+    if (
+      window.confirm(
+        'Are you sure you want to delete this academic year? This will also delete all associated terms.'
+      )
+    ) {
       try {
         await AcademicYearService.deleteYear(id);
         // Refresh the list after deletion
-        setYears(years.filter(year => year.id !== id));
+        setYears(years.filter((year) => year.id !== id));
       } catch (err) {
-        alert("Failed to delete. It might be linked to other records.");
+        alert('Failed to delete. It might be linked to other records.');
         console.error(err);
       }
     }
@@ -36,7 +40,7 @@ const AcademicYearList = () => {
           <h1 className="text-3xl font-extrabold text-gray-900">Academic Years</h1>
           <p className="text-gray-500 text-sm">Define your university cycles and semesters</p>
         </div>
-        <button 
+        <button
           onClick={() => navigate('/academics/academic-years/create')}
           className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg transition-all"
         >
@@ -72,20 +76,24 @@ const AcademicYearList = () => {
                 </td>
                 <td className="px-6 py-4 text-center">
                   {year.is_active ? (
-                    <span className="text-green-600 bg-green-100 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-tighter">Active</span>
+                    <span className="text-green-600 bg-green-100 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-tighter">
+                      Active
+                    </span>
                   ) : (
-                    <span className="text-gray-400 bg-gray-100 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-tighter">Inactive</span>
+                    <span className="text-gray-400 bg-gray-100 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-tighter">
+                      Inactive
+                    </span>
                   )}
                 </td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex justify-end gap-3">
-                    <button 
+                    <button
                       onClick={() => navigate(`/academics/academic-years/edit/${year.id}`)}
                       className="text-indigo-600 hover:text-indigo-900 font-bold text-sm"
                     >
                       Edit
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleDelete(year.id)}
                       className="text-red-500 hover:text-red-700 font-bold text-sm"
                     >
@@ -97,7 +105,7 @@ const AcademicYearList = () => {
             ))}
           </tbody>
         </table>
-        
+
         {years.length === 0 && (
           <div className="p-10 text-center text-gray-400 italic">
             No academic years defined yet.

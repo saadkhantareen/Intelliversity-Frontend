@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import { ProfileService } from '../services/profile.service'
-import { useAuth } from "./AuthContext";
+import { createContext, useContext, useState, useEffect } from 'react';
+import { ProfileService } from '../services/profile.service';
+import { useAuth } from './AuthContext';
 
 const ProfileContext = createContext(null);
 
@@ -28,7 +28,7 @@ export function ProfileProvider({ children }) {
       const res = await ProfileService.getMyProfile();
       setProfile(res.data);
     } catch (err) {
-      console.error("Failed to load profile");
+      console.error('Failed to load profile');
     } finally {
       setIsLoading(false);
     }
@@ -39,7 +39,7 @@ export function ProfileProvider({ children }) {
       const res = await ProfileService.getMyDocuments();
       setDocuments(res.data);
     } catch (err) {
-      console.error("Failed to load documents");
+      console.error('Failed to load documents');
     }
   };
 
@@ -51,7 +51,7 @@ export function ProfileProvider({ children }) {
 
   const updateProfilePicture = async (file) => {
     const data = new FormData();
-    data.append("profile_picture", file);
+    data.append('profile_picture', file);
     const res = await ProfileService.updateMyProfile(data);
     setProfile(res.data);
     return res.data;
@@ -89,6 +89,6 @@ export function ProfileProvider({ children }) {
 
 export function useProfile() {
   const ctx = useContext(ProfileContext);
-  if (!ctx) throw new Error("useProfile must be used inside <ProfileProvider>");
+  if (!ctx) throw new Error('useProfile must be used inside <ProfileProvider>');
   return ctx;
 }

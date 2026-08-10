@@ -16,19 +16,19 @@ const DepartmentList = () => {
       const data = await DepartmentService.getDepartments();
       setDepartments(data);
     } catch (error) {
-      console.error("Error fetching departments:", error);
+      console.error('Error fetching departments:', error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this department?")) {
+    if (window.confirm('Are you sure you want to delete this department?')) {
       try {
         await DepartmentService.deleteDepartment(id);
-        setDepartments(departments.filter(d => d.id !== id));
+        setDepartments(departments.filter((d) => d.id !== id));
       } catch (error) {
-        alert("Failed to delete. It might have linked programs.");
+        alert('Failed to delete. It might have linked programs.');
       }
     }
   };
@@ -39,7 +39,7 @@ const DepartmentList = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Departments</h1>
-        <button 
+        <button
           onClick={() => navigate('/academics/departments/create')}
           className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700"
         >
@@ -64,13 +64,13 @@ const DepartmentList = () => {
                 <td className="p-4">{dept.name}</td>
                 <td className="p-4 text-gray-500 truncate max-w-xs">{dept.description}</td>
                 <td className="p-4 text-right space-x-2">
-                  <button 
+                  <button
                     onClick={() => navigate(`/academics/departments/edit/${dept.id}`)}
                     className="text-indigo-600 hover:underline"
                   >
                     Edit
                   </button>
-                  <button 
+                  <button
                     onClick={() => handleDelete(dept.id)}
                     className="text-red-600 hover:underline"
                   >

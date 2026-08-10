@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { ProfileService } from "../../services/profile.service";
-import { useCloudinary } from "../../hooks/useCloudinary";
-import toast from "react-hot-toast";
+import React, { useEffect, useState } from 'react';
+import { ProfileService } from '../../services/profile.service';
+import { useCloudinary } from '../../hooks/useCloudinary';
+import toast from 'react-hot-toast';
 
 const FacultyProfilePage = () => {
   const [profileData, setProfileData] = useState(null);
@@ -21,7 +21,7 @@ const FacultyProfilePage = () => {
         setProfileData(profileRes.profile);
         setDocuments(docsRes);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
       } finally {
         setLoading(false);
       }
@@ -34,71 +34,67 @@ const FacultyProfilePage = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-      toast.error("Invalid file type. Please upload an image file (JPG, PNG).");
+    if (!file.type.startsWith('image/')) {
+      toast.error('Invalid file type. Please upload an image file (JPG, PNG).');
       e.target.value = null;
       return;
     }
 
     try {
-      const { public_id, resource_type } = await uploadToCloudinary(
-        file,
-        "document",
-      );
+      const { public_id, resource_type } = await uploadToCloudinary(file, 'document');
 
       await ProfileService.saveDocument({
         title: file.name,
-        document_type: "other",
-        description: "Uploaded via faculty portal",
+        document_type: 'other',
+        description: 'Uploaded via faculty portal',
         document_public_id: public_id,
         resource_type: resource_type,
       });
 
       const updatedDocs = await ProfileService.getMyDocuments();
       setDocuments(updatedDocs);
-      toast.success("Document uploaded successfully!");
+      toast.success('Document uploaded successfully!');
       e.target.value = null;
     } catch (error) {
-      console.error("Upload Error Details:", error);
-      toast.error("Upload failed. Please try again.");
+      console.error('Upload Error Details:', error);
+      toast.error('Upload failed. Please try again.');
     }
   };
 
   const handleViewDoc = (doc) => {
     if (!doc.url) {
-      toast.error("Document URL is not available.");
+      toast.error('Document URL is not available.');
       return;
     }
 
-    let fileType = doc.resource_type || "image";
+    let fileType = doc.resource_type || 'image';
     const urlStr = doc.url.toLowerCase();
-    const titleStr = (doc.title || "").toLowerCase();
+    const titleStr = (doc.title || '').toLowerCase();
 
-    if (urlStr.includes(".pdf") || titleStr.includes(".pdf")) {
-      fileType = "pdf";
+    if (urlStr.includes('.pdf') || titleStr.includes('.pdf')) {
+      fileType = 'pdf';
     }
 
     setPreviewDoc({
       id: doc.id,
       url: doc.url,
       type: fileType,
-      title: doc.title || "Document Preview",
+      title: doc.title || 'Document Preview',
     });
   };
 
   const handleDeleteDoc = async (docId) => {
-    if (!window.confirm("Are you sure you want to delete this document?"))
-      return;
+    if (!window.confirm('Are you sure you want to delete this document?')) return;
     try {
       await ProfileService.deleteDocument(docId);
       setDocuments(documents.filter((doc) => doc.id !== docId));
       if (previewDoc && previewDoc.id === docId) {
         setPreviewDoc(null);
       }
-      toast.success("Document deleted.");
+      toast.success('Document deleted.');
     } catch (error) {
-      console.error("Delete failed", error);
-      toast.error("Failed to delete document.");
+      console.error('Delete failed', error);
+      toast.error('Failed to delete document.');
     }
   };
 
@@ -126,10 +122,7 @@ const FacultyProfilePage = () => {
       {/* ── HEADER & PROFILE SUMMARY ── */}
       <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-gray-100 flex flex-col sm:flex-row items-center sm:items-start gap-6">
         <img
-          src={
-            base_profile.profile_picture_url ||
-            "https://via.placeholder.com/150"
-          }
+          src={base_profile.profile_picture_url || 'https://via.placeholder.com/150'}
           alt="Profile"
           className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md flex-shrink-0"
         />
@@ -150,9 +143,7 @@ const FacultyProfilePage = () => {
 
       {/* ── PERSONAL DETAILS GRID ── */}
       <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-gray-100">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">
-          Personal Details
-        </h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Personal Details</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div>
@@ -160,7 +151,7 @@ const FacultyProfilePage = () => {
               Father's Name
             </p>
             <p className="text-base text-gray-900 font-medium">
-              {base_profile.father_name || "N/A"}
+              {base_profile.father_name || 'N/A'}
             </p>
           </div>
           <div>
@@ -168,47 +159,41 @@ const FacultyProfilePage = () => {
               Date of Birth
             </p>
             <p className="text-base text-gray-900 font-medium">
-              {base_profile.date_of_birth || "N/A"}
+              {base_profile.date_of_birth || 'N/A'}
             </p>
           </div>
           <div>
             <p className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">
               Gender
             </p>
-            <p className="text-base text-gray-900 font-medium">
-              {base_profile.gender || "N/A"}
-            </p>
+            <p className="text-base text-gray-900 font-medium">{base_profile.gender || 'N/A'}</p>
           </div>
           <div>
             <p className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">
               CNIC
             </p>
-            <p className="text-base text-gray-900 font-medium">
-              {base_profile.cnic || "N/A"}
-            </p>
+            <p className="text-base text-gray-900 font-medium">{base_profile.cnic || 'N/A'}</p>
           </div>
           <div>
             <p className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">
               Nationality
             </p>
             <p className="text-base text-gray-900 font-medium">
-              {base_profile.nationality || "N/A"}
+              {base_profile.nationality || 'N/A'}
             </p>
           </div>
           <div>
             <p className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">
               Religion
             </p>
-            <p className="text-base text-gray-900 font-medium">
-              {base_profile.religion || "N/A"}
-            </p>
+            <p className="text-base text-gray-900 font-medium">{base_profile.religion || 'N/A'}</p>
           </div>
           <div>
             <p className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">
               Phone Number
             </p>
             <p className="text-base text-gray-900 font-medium">
-              {base_profile.phone_number || "N/A"}
+              {base_profile.phone_number || 'N/A'}
             </p>
           </div>
         </div>
@@ -217,7 +202,7 @@ const FacultyProfilePage = () => {
         <div className="mt-8 p-5 bg-blue-50/50 rounded-xl border-l-4 border-blue-500">
           <p className="text-sm text-gray-700 leading-relaxed mb-3">
             <strong className="text-gray-900 block mb-1">Biography</strong>
-            {base_profile.bio || "No biography provided."}
+            {base_profile.bio || 'No biography provided.'}
           </p>
           <p className="text-sm text-gray-700">
             <strong className="text-gray-900 mr-2">Location:</strong>
@@ -228,9 +213,7 @@ const FacultyProfilePage = () => {
 
       {/* ── DOCUMENT MANAGEMENT ── */}
       <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-gray-100">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">
-          Documents & Certificates
-        </h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Documents & Certificates</h2>
 
         {/* Sleek Upload Dropzone */}
         <div className="relative mb-8 p-8 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 text-center hover:bg-blue-100 transition-colors group">
@@ -249,8 +232,8 @@ const FacultyProfilePage = () => {
           </svg>
           <label className="block cursor-pointer text-blue-700 font-semibold text-lg">
             {isUploading
-              ? "Uploading to secure storage..."
-              : "Click to browse or drop an image here"}
+              ? 'Uploading to secure storage...'
+              : 'Click to browse or drop an image here'}
             <input
               type="file"
               onChange={handleFileUpload}
@@ -258,9 +241,7 @@ const FacultyProfilePage = () => {
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
             />
           </label>
-          <p className="mt-2 text-sm text-blue-500 font-medium">
-            Supports JPG, PNG (Max 5MB)
-          </p>
+          <p className="mt-2 text-sm text-blue-500 font-medium">Supports JPG, PNG (Max 5MB)</p>
         </div>
 
         {/* Documents List */}
@@ -289,12 +270,12 @@ const FacultyProfilePage = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="text-base font-semibold text-gray-900 truncate">
-                      {doc.title || "Untitled Document"}
+                      {doc.title || 'Untitled Document'}
                     </h4>
                     <span
-                      className={`inline-block mt-1 text-xs px-2.5 py-1 rounded-full font-medium ${doc.is_verified ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}
+                      className={`inline-block mt-1 text-xs px-2.5 py-1 rounded-full font-medium ${doc.is_verified ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}
                     >
-                      {doc.is_verified ? "✓ Verified" : "Pending Review"}
+                      {doc.is_verified ? '✓ Verified' : 'Pending Review'}
                     </span>
                   </div>
                 </div>
@@ -345,12 +326,7 @@ const FacultyProfilePage = () => {
                 className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full transition-colors"
                 title="Close"
               >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -363,7 +339,7 @@ const FacultyProfilePage = () => {
 
             {/* Modal Body */}
             <div className="flex-1 bg-gray-100 p-4 md:p-8 flex justify-center items-center overflow-hidden">
-              {previewDoc.type === "pdf" ? (
+              {previewDoc.type === 'pdf' ? (
                 <iframe
                   src={previewDoc.url}
                   title={previewDoc.title}

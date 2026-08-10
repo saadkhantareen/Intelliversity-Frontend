@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import CurriculumService from "../../services/curriculum.service";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import CurriculumService from '../../services/curriculum.service';
 
 const CurriculumList = () => {
   const [curriculums, setCurriculums] = useState([]);
@@ -9,9 +9,7 @@ const CurriculumList = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    CurriculumService.getCurriculums()
-      .then(setCurriculums)
-      .catch(console.error);
+    CurriculumService.getCurriculums().then(setCurriculums).catch(console.error);
   }, []);
 
   const handleViewCourses = async (id) => {
@@ -21,7 +19,7 @@ const CurriculumList = () => {
       setSelectedCurriculum(data);
       setIsModalOpen(true);
     } catch (err) {
-      console.error("Error fetching courses:", err);
+      console.error('Error fetching courses:', err);
     }
   };
 
@@ -30,7 +28,7 @@ const CurriculumList = () => {
       <div className="flex justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Curriculums</h1>
         <button
-          onClick={() => navigate("/academics/curriculums/create")}
+          onClick={() => navigate('/academics/curriculums/create')}
           className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 shadow"
         >
           + Create Curriculum
@@ -95,9 +93,7 @@ const CurriculumList = () => {
                 <tbody className="divide-y divide-gray-100">
                   {selectedCurriculum.courses?.map((item, idx) => (
                     <tr key={idx} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 font-medium text-blue-600">
-                        {item.course}
-                      </td>
+                      <td className="px-4 py-3 font-medium text-blue-600">{item.course}</td>
                       <td className="px-4 py-3">{item.recommended_semester}</td>
                       <td className="px-4 py-3">
                         <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">
@@ -106,13 +102,9 @@ const CurriculumList = () => {
                       </td>
                     </tr>
                   ))}
-                  {(!selectedCurriculum.courses ||
-                    selectedCurriculum.courses.length === 0) && (
+                  {(!selectedCurriculum.courses || selectedCurriculum.courses.length === 0) && (
                     <tr>
-                      <td
-                        colSpan="3"
-                        className="px-4 py-10 text-center text-gray-400 italic"
-                      >
+                      <td colSpan="3" className="px-4 py-10 text-center text-gray-400 italic">
                         No courses added to this curriculum.
                       </td>
                     </tr>

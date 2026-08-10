@@ -1,20 +1,16 @@
 // src/components/layout/DashboardShell.jsx
-import { useState, useEffect } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
-import { useTenant } from "../../context/TenantContext";
-import {
-  IcBell, IcMenu, IcChevronLeft, IcLogout,
-} from "./icons";
+import { useState, useEffect } from 'react';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { useTenant } from '../../context/TenantContext';
+import { IcBell, IcMenu, IcChevronLeft, IcLogout } from './icons';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function initials(name) {
-  if (!name) return "U";
-  const p = name.trim().split(" ");
-  return p.length === 1
-    ? p[0][0].toUpperCase()
-    : (p[0][0] + p[p.length - 1][0]).toUpperCase();
+  if (!name) return 'U';
+  const p = name.trim().split(' ');
+  return p.length === 1 ? p[0][0].toUpperCase() : (p[0][0] + p[p.length - 1][0]).toUpperCase();
 }
 
 // ── Shell ─────────────────────────────────────────────────────────────────────
@@ -24,50 +20,52 @@ export function DashboardShell({ config }) {
   const { tenant, branding } = useTenant();
   const navigate = useNavigate();
 
-  const [collapsed, setCollapsed]     = useState(false);
-  const [mobileOpen, setMobileOpen]   = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const { accent, label, badge, sections } = config;
-  const accentColor = accent || "var(--brand-primary)";
+  const accentColor = accent || 'var(--brand-primary)';
 
   const userName = user?.first_name
-    ? `${user.first_name}${user.last_name ? " " + user.last_name : ""}`
-    : "User";
+    ? `${user.first_name}${user.last_name ? ' ' + user.last_name : ''}`
+    : 'User';
 
-  const uniLabel =
-    tenant?.university_name || tenant?.university?.name || "Intelliversity";
+  const uniLabel = tenant?.university_name || tenant?.university?.name || 'Intelliversity';
   const logoUrl = branding?.logo_url;
 
-  useEffect(() => { setMobileOpen(false); }, [navigate]);
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [navigate]);
 
   useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") setMobileOpen(false); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    const onKey = (e) => {
+      if (e.key === 'Escape') setMobileOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  const handleLogout = () => { logout(); navigate("/login"); };
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   // ── Sidebar content (reused for desktop + mobile drawer) ─────────────────
 
   const SidebarContent = () => (
-    <div className="iv-sb-inner" style={{ "--accent": accentColor }}>
+    <div className="iv-sb-inner" style={{ '--accent': accentColor }}>
       <div className="iv-sb-head">
         <div className="iv-sb-brand">
           <div className="iv-sb-icon" style={{ background: accentColor }}>
             {logoUrl ? (
-              <img
-                src={logoUrl}
-                alt={`${uniLabel} logo`}
-                className="iv-sb-logo"
-              />
+              <img src={logoUrl} alt={`${uniLabel} logo`} className="iv-sb-logo" />
             ) : (
-              (uniLabel || "I")[0].toUpperCase()
+              (uniLabel || 'I')[0].toUpperCase()
             )}
           </div>
           {!collapsed && (
             <div className="iv-sb-brandtext">
-              <span className="iv-sb-uni">{uniLabel || "Intelliversity"}</span>
+              <span className="iv-sb-uni">{uniLabel || 'Intelliversity'}</span>
               <span className="iv-sb-badge" style={{ background: badge.bg, color: badge.text }}>
                 {label}
               </span>
@@ -76,14 +74,16 @@ export function DashboardShell({ config }) {
         </div>
         <button
           className="iv-sb-collapse iv-desktop-only"
-          onClick={() => setCollapsed(c => !c)}
-          aria-label={collapsed ? "Expand" : "Collapse"}
+          onClick={() => setCollapsed((c) => !c)}
+          aria-label={collapsed ? 'Expand' : 'Collapse'}
         >
-          <span style={{
-            display: "inline-flex",
-            transform: collapsed ? "rotate(180deg)" : "none",
-            transition: "transform .22s",
-          }}>
+          <span
+            style={{
+              display: 'inline-flex',
+              transform: collapsed ? 'rotate(180deg)' : 'none',
+              transition: 'transform .22s',
+            }}
+          >
             <IcChevronLeft s={15} />
           </span>
         </button>
@@ -92,21 +92,21 @@ export function DashboardShell({ config }) {
       <nav className="iv-sb-nav">
         {sections.map((section) => (
           <div className="iv-sb-section" key={section.title}>
-            {!collapsed && (
-              <p className="iv-sb-section-title">{section.title}</p>
-            )}
+            {!collapsed && <p className="iv-sb-section-title">{section.title}</p>}
             <ul className="iv-sb-list">
               {section.items.map((item) => (
                 <li key={item.to}>
                   <NavLink
                     to={item.to}
                     className={({ isActive }) =>
-                      "iv-nav-item" + (isActive ? " iv-nav-item--active" : "")
+                      'iv-nav-item' + (isActive ? ' iv-nav-item--active' : '')
                     }
                     title={collapsed ? item.label : undefined}
                     onClick={() => setMobileOpen(false)}
                   >
-                    <span className="iv-nav-icon"><item.Icon s={17} /></span>
+                    <span className="iv-nav-icon">
+                      <item.Icon s={17} />
+                    </span>
                     {!collapsed && <span className="iv-nav-label">{item.label}</span>}
                   </NavLink>
                 </li>
@@ -116,11 +116,11 @@ export function DashboardShell({ config }) {
         ))}
       </nav>
 
-      <div className={`iv-sb-foot${collapsed ? " iv-sb-foot--col" : ""}`}>
+      <div className={`iv-sb-foot${collapsed ? ' iv-sb-foot--col' : ''}`}>
         <div className="iv-user-row">
           <div
             className="iv-user-av"
-            style={{ background: accentColor + "20", color: accentColor }}
+            style={{ background: accentColor + '20', color: accentColor }}
           >
             {initials(userName)}
           </div>
@@ -151,25 +151,21 @@ export function DashboardShell({ config }) {
     <>
       <style>{css(accentColor)}</style>
 
-      <div className="iv-root" data-portal={config.portal || "default"}>
-        <aside className={`iv-sidebar iv-sidebar--desk${collapsed ? " iv-sidebar--col" : ""}`}>
+      <div className="iv-root" data-portal={config.portal || 'default'}>
+        <aside className={`iv-sidebar iv-sidebar--desk${collapsed ? ' iv-sidebar--col' : ''}`}>
           <SidebarContent />
         </aside>
 
         {mobileOpen && (
-          <div
-            className="iv-overlay"
-            onClick={() => setMobileOpen(false)}
-            aria-hidden="true"
-          />
+          <div className="iv-overlay" onClick={() => setMobileOpen(false)} aria-hidden="true" />
         )}
 
-        <aside className={`iv-sidebar iv-sidebar--mob${mobileOpen ? " iv-sidebar--mob-open" : ""}`}>
+        <aside className={`iv-sidebar iv-sidebar--mob${mobileOpen ? ' iv-sidebar--mob-open' : ''}`}>
           <SidebarContent />
         </aside>
 
-        <div className={`iv-main${collapsed ? " iv-main--col" : ""}`}>
-          <header className="iv-topbar" style={{ "--accent": accentColor }}>
+        <div className={`iv-main${collapsed ? ' iv-main--col' : ''}`}>
+          <header className="iv-topbar" style={{ '--accent': accentColor }}>
             <div className="iv-topbar-l">
               <button
                 className="iv-hamburger iv-mob-only"
@@ -191,7 +187,7 @@ export function DashboardShell({ config }) {
               <div className="iv-topbar-user">
                 <div
                   className="iv-topbar-av"
-                  style={{ background: accentColor + "18", color: accentColor }}
+                  style={{ background: accentColor + '18', color: accentColor }}
                 >
                   {initials(userName)}
                 </div>

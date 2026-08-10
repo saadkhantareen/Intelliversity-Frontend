@@ -1,30 +1,30 @@
-import DashboardShell from "./DashboardShell";
-import { useTenant } from "@/context/TenantContext";
+import DashboardShell from './DashboardShell';
+import { useTenant } from '@/context/TenantContext';
 import {
-  IcGrid,      // For Dashboard
+  IcGrid, // For Dashboard
   IcClipboard, // For Registration Card
-  IcArchive,   // For Fees (or use a currency icon if available)
-  IcChart,     // For Result Card
-  IcBell,      // For Profile (or use a User icon if available)
-  IcBook,      // For SoS
-} from "./icons";
+  IcArchive, // For Fees (or use a currency icon if available)
+  IcChart, // For Result Card
+  IcBell, // For Profile (or use a User icon if available)
+  IcBook, // For SoS
+} from './icons';
 
 const STUDENT_CONFIG = {
-  accent: "var(--brand-primary)",
-  portal: "student",
-  label:  "Student Portal",
-  badge:  { bg: "var(--brand-accent)", text: "var(--brand-surface)" },
+  accent: 'var(--brand-primary)',
+  portal: 'student',
+  label: 'Student Portal',
+  badge: { bg: 'var(--brand-accent)', text: 'var(--brand-surface)' },
   sections: [
     {
-      title: "Main Menu",
+      title: 'Main Menu',
       items: [
-        { label: "Dashboard",         to: "/dashboard",         Icon: IcGrid },
-        { label: "Profile",           to: "/profile",           Icon: IcBell },
-        { label: "View Courses",      to: "/courses",           Icon: IcBook },
-        { label: "Registration Card", to: "/registration",      Icon: IcClipboard },
-        { label: "Fees",              to: "/fees",              Icon: IcArchive },
-        { label: "Result Card",       to: "/results",           Icon: IcChart },
-        { label: "SoS",               to: "/sos",               Icon: IcBook },
+        { label: 'Dashboard', to: '/dashboard', Icon: IcGrid },
+        { label: 'Profile', to: '/profile', Icon: IcBell },
+        { label: 'View Courses', to: '/courses', Icon: IcBook },
+        { label: 'Registration Card', to: '/registration', Icon: IcClipboard },
+        { label: 'Fees', to: '/fees', Icon: IcArchive },
+        { label: 'Result Card', to: '/results', Icon: IcChart },
+        { label: 'SoS', to: '/sos', Icon: IcBook },
       ],
     },
   ],

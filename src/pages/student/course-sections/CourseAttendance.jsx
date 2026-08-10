@@ -1,11 +1,7 @@
-import React from 'react'
+import React from 'react';
 
 function CourseAttendance() {
-  return (
-    <div>
-      CourseAttendance
-    </div>
-  )
+  return <div>CourseAttendance</div>;
 }
 
-export default CourseAttendance
+export default CourseAttendance;

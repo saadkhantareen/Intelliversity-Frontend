@@ -9,7 +9,7 @@ const TermList = () => {
   useEffect(() => {
     TermService.getTerms()
       .then(setTerms)
-      .catch(err => console.error("Failed to load terms", err));
+      .catch((err) => console.error('Failed to load terms', err));
   }, []);
 
   return (
@@ -17,9 +17,11 @@ const TermList = () => {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-extrabold text-gray-900">All Academic Terms</h1>
-          <p className="text-gray-500 text-sm">Overview of semesters, deadlines, and registration periods</p>
+          <p className="text-gray-500 text-sm">
+            Overview of semesters, deadlines, and registration periods
+          </p>
         </div>
-        <button 
+        <button
           onClick={() => navigate('/academics/terms/create')}
           className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg transition-all"
         >
@@ -44,7 +46,9 @@ const TermList = () => {
               <tr key={term.id} className="hover:bg-blue-50/30 transition-colors text-sm">
                 <td className="px-6 py-4">
                   <div className="font-bold text-gray-800">{term.name}</div>
-                  <div className="text-xs text-indigo-500 font-medium uppercase">{term.term_type}</div>
+                  <div className="text-xs text-indigo-500 font-medium uppercase">
+                    {term.term_type}
+                  </div>
                 </td>
                 <td className="px-6 py-4 text-gray-600">
                   {term.start_date} <span className="text-gray-400">to</span> {term.end_date}
@@ -54,18 +58,26 @@ const TermList = () => {
                   <div className="text-xs">End: {term.course_registration_end_date}</div>
                 </td>
                 <td className="px-6 py-4">
-                  <div className="text-xs text-red-500 font-semibold">Drop: {term.course_drop_deadline}</div>
-                  <div className="text-xs text-green-600 font-semibold">Fee: {term.fee_deadline}</div>
+                  <div className="text-xs text-red-500 font-semibold">
+                    Drop: {term.course_drop_deadline}
+                  </div>
+                  <div className="text-xs text-green-600 font-semibold">
+                    Fee: {term.fee_deadline}
+                  </div>
                 </td>
                 <td className="px-6 py-4 text-center">
                   {term.is_active ? (
-                    <span className="text-green-600 bg-green-100 px-2.5 py-1 rounded-md text-xs font-bold uppercase">Active</span>
+                    <span className="text-green-600 bg-green-100 px-2.5 py-1 rounded-md text-xs font-bold uppercase">
+                      Active
+                    </span>
                   ) : (
-                    <span className="text-gray-400 bg-gray-100 px-2.5 py-1 rounded-md text-xs font-bold uppercase">Inactive</span>
+                    <span className="text-gray-400 bg-gray-100 px-2.5 py-1 rounded-md text-xs font-bold uppercase">
+                      Inactive
+                    </span>
                   )}
                 </td>
                 <td className="px-6 py-4 text-right">
-                  <button 
+                  <button
                     onClick={() => navigate(`/academics/terms/edit/${term.id}`)}
                     className="text-indigo-600 hover:text-indigo-900 font-bold"
                   >

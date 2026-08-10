@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useTenant } from "../../context/TenantContext";
-import { ProfileService } from "../../services/profile.service";
-import SectionCard from "../../components/ui/SectionCard";
-import InfoField from "../../components/ui/InfoField";
-import toast from "react-hot-toast";
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useTenant } from '../../context/TenantContext';
+import { ProfileService } from '../../services/profile.service';
+import SectionCard from '../../components/ui/SectionCard';
+import InfoField from '../../components/ui/InfoField';
+import toast from 'react-hot-toast';
 
 function UserDetailPage() {
   const { config } = useTenant();
@@ -21,10 +21,10 @@ function UserDetailPage() {
   const [formData, setFormData] = useState({});
 
   const [docForm, setDocForm] = useState({
-    document_type: "",
-    title: "",
+    document_type: '',
+    title: '',
     file: null,
-    description: "",
+    description: '',
   });
 
   useEffect(() => {
@@ -38,7 +38,7 @@ function UserDetailPage() {
       setProfile(res.data);
       populateForm(res.data);
     } catch (err) {
-      toast.error("Failed to load user profile");
+      toast.error('Failed to load user profile');
     } finally {
       setIsLoading(false);
     }
@@ -49,7 +49,7 @@ function UserDetailPage() {
       const res = await ProfileService.getUserDocuments(userId);
       setDocuments(res.data);
     } catch (err) {
-      console.error("Failed to load documents");
+      console.error('Failed to load documents');
     }
   };
 
@@ -59,42 +59,42 @@ function UserDetailPage() {
 
     // student fields
     if (data?.enrollment_number !== undefined) {
-      roleSpecific.enrollment_number = data.enrollment_number || "";
-      roleSpecific.department = data.department || "";
-      roleSpecific.program = data.program || "";
-      roleSpecific.semester = data.semester || "";
-      roleSpecific.batch_year = data.batch_year || "";
-      roleSpecific.cgpa = data.cgpa || "";
+      roleSpecific.enrollment_number = data.enrollment_number || '';
+      roleSpecific.department = data.department || '';
+      roleSpecific.program = data.program || '';
+      roleSpecific.semester = data.semester || '';
+      roleSpecific.batch_year = data.batch_year || '';
+      roleSpecific.cgpa = data.cgpa || '';
     }
 
     // faculty/admin fields
     if (data?.designation !== undefined) {
-      roleSpecific.designation = data.designation || "";
-      roleSpecific.office_number = data.office_number || "";
-      roleSpecific.office_location = data.office_location || "";
+      roleSpecific.designation = data.designation || '';
+      roleSpecific.office_number = data.office_number || '';
+      roleSpecific.office_location = data.office_location || '';
     }
 
     // faculty only
     if (data?.qualification !== undefined) {
-      roleSpecific.qualification = data.qualification || "";
-      roleSpecific.specialization = data.specialization || "";
-      roleSpecific.experience_years = data.experience_years || "";
+      roleSpecific.qualification = data.qualification || '';
+      roleSpecific.specialization = data.specialization || '';
+      roleSpecific.experience_years = data.experience_years || '';
     }
 
     setFormData({
       base_profile: {
-        phone_number: bp?.phone_number || "",
-        emergency_contact: bp?.emergency_contact || "",
-        father_name: bp?.father_name || "",
-        date_of_birth: bp?.date_of_birth || "",
-        gender: bp?.gender || "",
-        nationality: bp?.nationality || "",
-        cnic: bp?.cnic || "",
-        religion: bp?.religion || "",
-        address: bp?.address || "",
-        city: bp?.city || "",
-        country: bp?.country || "",
-        bio: bp?.bio || "",
+        phone_number: bp?.phone_number || '',
+        emergency_contact: bp?.emergency_contact || '',
+        father_name: bp?.father_name || '',
+        date_of_birth: bp?.date_of_birth || '',
+        gender: bp?.gender || '',
+        nationality: bp?.nationality || '',
+        cnic: bp?.cnic || '',
+        religion: bp?.religion || '',
+        address: bp?.address || '',
+        city: bp?.city || '',
+        country: bp?.country || '',
+        bio: bp?.bio || '',
       },
       ...roleSpecific,
     });
@@ -117,9 +117,9 @@ function UserDetailPage() {
       const res = await ProfileService.updateUserProfile(userId, formData);
       setProfile(res.data);
       setIsEditing(false);
-      toast.success("Profile updated successfully!");
+      toast.success('Profile updated successfully!');
     } catch (err) {
-      toast.error("Failed to update profile");
+      toast.error('Failed to update profile');
     } finally {
       setIsSaving(false);
     }
@@ -128,22 +128,22 @@ function UserDetailPage() {
   const handleDocUpload = async (e) => {
     e.preventDefault();
     if (!docForm.file || !docForm.document_type || !docForm.title) {
-      toast.error("Please fill all document fields");
+      toast.error('Please fill all document fields');
       return;
     }
     setIsUploading(true);
     try {
       const data = new FormData();
-      data.append("document_type", docForm.document_type);
-      data.append("title", docForm.title);
-      data.append("file", docForm.file);
-      data.append("description", docForm.description);
+      data.append('document_type', docForm.document_type);
+      data.append('title', docForm.title);
+      data.append('file', docForm.file);
+      data.append('description', docForm.description);
       await ProfileService.uploadUserDocument(userId, data);
-      toast.success("Document uploaded!");
-      setDocForm({ document_type: "", title: "", file: null, description: "" });
+      toast.success('Document uploaded!');
+      setDocForm({ document_type: '', title: '', file: null, description: '' });
       fetchUserDocuments();
     } catch (err) {
-      toast.error("Failed to upload document");
+      toast.error('Failed to upload document');
     } finally {
       setIsUploading(false);
     }
@@ -166,7 +166,7 @@ function UserDetailPage() {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate("/users")}
+            onClick={() => navigate('/users')}
             className="text-sm text-gray-400 hover:underline"
           >
             ← Back
@@ -203,7 +203,7 @@ function UserDetailPage() {
               style={{ backgroundColor: config?.color }}
               className="text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 disabled:opacity-50"
             >
-              {isSaving ? "Saving..." : "Save Changes"}
+              {isSaving ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         )}
@@ -213,11 +213,7 @@ function UserDetailPage() {
       <SectionCard title="Basic Information">
         <div className="flex items-center gap-4">
           {bp?.profile_picture ? (
-            <img
-              src={bp.profile_picture}
-              alt=""
-              className="w-16 h-16 rounded-full object-cover"
-            />
+            <img src={bp.profile_picture} alt="" className="w-16 h-16 rounded-full object-cover" />
           ) : (
             <div
               style={{ backgroundColor: config?.color }}
@@ -237,25 +233,25 @@ function UserDetailPage() {
       </SectionCard>
 
       {/* Role Specific Info — editable by admin */}
-      {role === "student" && (
+      {role === 'student' && (
         <SectionCard title="Academic Information">
           {isEditing ? (
             <div className="grid grid-cols-2 gap-4">
               {[
-                { label: "Enrollment Number", field: "enrollment_number" },
-                { label: "Department", field: "department" },
-                { label: "Program", field: "program" },
-                { label: "Semester", field: "semester", type: "number" },
-                { label: "Batch Year", field: "batch_year", type: "number" },
-                { label: "CGPA", field: "cgpa", type: "number" },
+                { label: 'Enrollment Number', field: 'enrollment_number' },
+                { label: 'Department', field: 'department' },
+                { label: 'Program', field: 'program' },
+                { label: 'Semester', field: 'semester', type: 'number' },
+                { label: 'Batch Year', field: 'batch_year', type: 'number' },
+                { label: 'CGPA', field: 'cgpa', type: 'number' },
               ].map(({ label, field, type }) => (
                 <div key={field}>
                   <label className="block text-xs text-gray-400 uppercase tracking-wide mb-1">
                     {label}
                   </label>
                   <input
-                    type={type || "text"}
-                    value={formData[field] || ""}
+                    type={type || 'text'}
+                    value={formData[field] || ''}
                     onChange={(e) => handleRoleChange(field, e.target.value)}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none"
                   />
@@ -264,10 +260,7 @@ function UserDetailPage() {
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-4">
-              <InfoField
-                label="Enrollment Number"
-                value={profile?.enrollment_number}
-              />
+              <InfoField label="Enrollment Number" value={profile?.enrollment_number} />
               <InfoField label="Department" value={profile?.department} />
               <InfoField label="Program" value={profile?.program} />
               <InfoField label="Semester" value={profile?.semester} />
@@ -278,29 +271,29 @@ function UserDetailPage() {
         </SectionCard>
       )}
 
-      {role === "faculty" && (
+      {role === 'faculty' && (
         <SectionCard title="Professional Information">
           {isEditing ? (
             <div className="grid grid-cols-2 gap-4">
               {[
-                { label: "Designation", field: "designation" },
-                { label: "Qualification", field: "qualification" },
-                { label: "Specialization", field: "specialization" },
+                { label: 'Designation', field: 'designation' },
+                { label: 'Qualification', field: 'qualification' },
+                { label: 'Specialization', field: 'specialization' },
                 {
-                  label: "Experience Years",
-                  field: "experience_years",
-                  type: "number",
+                  label: 'Experience Years',
+                  field: 'experience_years',
+                  type: 'number',
                 },
-                { label: "Office Number", field: "office_number" },
-                { label: "Office Location", field: "office_location" },
+                { label: 'Office Number', field: 'office_number' },
+                { label: 'Office Location', field: 'office_location' },
               ].map(({ label, field, type }) => (
                 <div key={field}>
                   <label className="block text-xs text-gray-400 uppercase tracking-wide mb-1">
                     {label}
                   </label>
                   <input
-                    type={type || "text"}
-                    value={formData[field] || ""}
+                    type={type || 'text'}
+                    value={formData[field] || ''}
                     onChange={(e) => handleRoleChange(field, e.target.value)}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none"
                   />
@@ -311,36 +304,26 @@ function UserDetailPage() {
             <div className="grid grid-cols-2 gap-4">
               <InfoField label="Designation" value={profile?.designation} />
               <InfoField label="Qualification" value={profile?.qualification} />
-              <InfoField
-                label="Specialization"
-                value={profile?.specialization}
-              />
+              <InfoField label="Specialization" value={profile?.specialization} />
               <InfoField
                 label="Experience"
-                value={
-                  profile?.experience_years
-                    ? `${profile.experience_years} years`
-                    : null
-                }
+                value={profile?.experience_years ? `${profile.experience_years} years` : null}
               />
               <InfoField label="Office Number" value={profile?.office_number} />
-              <InfoField
-                label="Office Location"
-                value={profile?.office_location}
-              />
+              <InfoField label="Office Location" value={profile?.office_location} />
             </div>
           )}
         </SectionCard>
       )}
 
-      {role === "admin" && (
+      {role === 'admin' && (
         <SectionCard title="Admin Information">
           {isEditing ? (
             <div className="grid grid-cols-2 gap-4">
               {[
-                { label: "Designation", field: "designation" },
-                { label: "Office Number", field: "office_number" },
-                { label: "Office Location", field: "office_location" },
+                { label: 'Designation', field: 'designation' },
+                { label: 'Office Number', field: 'office_number' },
+                { label: 'Office Location', field: 'office_location' },
               ].map(({ label, field }) => (
                 <div key={field}>
                   <label className="block text-xs text-gray-400 uppercase tracking-wide mb-1">
@@ -348,7 +331,7 @@ function UserDetailPage() {
                   </label>
                   <input
                     type="text"
-                    value={formData[field] || ""}
+                    value={formData[field] || ''}
                     onChange={(e) => handleRoleChange(field, e.target.value)}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none"
                   />
@@ -359,10 +342,7 @@ function UserDetailPage() {
             <div className="grid grid-cols-2 gap-4">
               <InfoField label="Designation" value={profile?.designation} />
               <InfoField label="Office Number" value={profile?.office_number} />
-              <InfoField
-                label="Office Location"
-                value={profile?.office_location}
-              />
+              <InfoField label="Office Location" value={profile?.office_location} />
             </div>
           )}
         </SectionCard>
@@ -373,19 +353,19 @@ function UserDetailPage() {
         {isEditing ? (
           <div className="grid grid-cols-2 gap-4">
             {[
-              { label: "Father Name", field: "father_name" },
-              { label: "Date of Birth", field: "date_of_birth", type: "date" },
-              { label: "CNIC", field: "cnic" },
-              { label: "Religion", field: "religion" },
-              { label: "Nationality", field: "nationality" },
+              { label: 'Father Name', field: 'father_name' },
+              { label: 'Date of Birth', field: 'date_of_birth', type: 'date' },
+              { label: 'CNIC', field: 'cnic' },
+              { label: 'Religion', field: 'religion' },
+              { label: 'Nationality', field: 'nationality' },
             ].map(({ label, field, type }) => (
               <div key={field}>
                 <label className="block text-xs text-gray-400 uppercase tracking-wide mb-1">
                   {label}
                 </label>
                 <input
-                  type={type || "text"}
-                  value={formData.base_profile?.[field] || ""}
+                  type={type || 'text'}
+                  value={formData.base_profile?.[field] || ''}
                   onChange={(e) => handleBaseChange(field, e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none"
                 />
@@ -396,8 +376,8 @@ function UserDetailPage() {
                 Gender
               </label>
               <select
-                value={formData.base_profile?.gender || ""}
-                onChange={(e) => handleBaseChange("gender", e.target.value)}
+                value={formData.base_profile?.gender || ''}
+                onChange={(e) => handleBaseChange('gender', e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none"
               >
                 <option value="">Select</option>
@@ -424,10 +404,10 @@ function UserDetailPage() {
         {isEditing ? (
           <div className="grid grid-cols-2 gap-4">
             {[
-              { label: "Phone Number", field: "phone_number" },
-              { label: "Emergency Contact", field: "emergency_contact" },
-              { label: "City", field: "city" },
-              { label: "Country", field: "country" },
+              { label: 'Phone Number', field: 'phone_number' },
+              { label: 'Emergency Contact', field: 'emergency_contact' },
+              { label: 'City', field: 'city' },
+              { label: 'Country', field: 'country' },
             ].map(({ label, field }) => (
               <div key={field}>
                 <label className="block text-xs text-gray-400 uppercase tracking-wide mb-1">
@@ -435,7 +415,7 @@ function UserDetailPage() {
                 </label>
                 <input
                   type="text"
-                  value={formData.base_profile?.[field] || ""}
+                  value={formData.base_profile?.[field] || ''}
                   onChange={(e) => handleBaseChange(field, e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none"
                 />
@@ -446,8 +426,8 @@ function UserDetailPage() {
                 Address
               </label>
               <textarea
-                value={formData.base_profile?.address || ""}
-                onChange={(e) => handleBaseChange("address", e.target.value)}
+                value={formData.base_profile?.address || ''}
+                onChange={(e) => handleBaseChange('address', e.target.value)}
                 rows={2}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none"
               />
@@ -456,10 +436,7 @@ function UserDetailPage() {
         ) : (
           <div className="grid grid-cols-2 gap-4">
             <InfoField label="Phone Number" value={bp?.phone_number} />
-            <InfoField
-              label="Emergency Contact"
-              value={bp?.emergency_contact}
-            />
+            <InfoField label="Emergency Contact" value={bp?.emergency_contact} />
             <InfoField label="Address" value={bp?.address} />
             <InfoField label="City" value={bp?.city} />
             <InfoField label="Country" value={bp?.country} />
@@ -509,22 +486,16 @@ function UserDetailPage() {
             <input
               type="text"
               value={docForm.title}
-              onChange={(e) =>
-                setDocForm((prev) => ({ ...prev, title: e.target.value }))
-              }
+              onChange={(e) => setDocForm((prev) => ({ ...prev, title: e.target.value }))}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none"
               placeholder="Document title"
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-400 uppercase tracking-wide mb-1">
-              File
-            </label>
+            <label className="block text-xs text-gray-400 uppercase tracking-wide mb-1">File</label>
             <input
               type="file"
-              onChange={(e) =>
-                setDocForm((prev) => ({ ...prev, file: e.target.files[0] }))
-              }
+              onChange={(e) => setDocForm((prev) => ({ ...prev, file: e.target.files[0] }))}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none"
             />
           </div>
@@ -535,9 +506,7 @@ function UserDetailPage() {
             <input
               type="text"
               value={docForm.description}
-              onChange={(e) =>
-                setDocForm((prev) => ({ ...prev, description: e.target.value }))
-              }
+              onChange={(e) => setDocForm((prev) => ({ ...prev, description: e.target.value }))}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none"
               placeholder="Optional description"
             />
@@ -549,7 +518,7 @@ function UserDetailPage() {
               style={{ backgroundColor: config?.color }}
               className="text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 disabled:opacity-50"
             >
-              {isUploading ? "Uploading..." : "Upload Document"}
+              {isUploading ? 'Uploading...' : 'Upload Document'}
             </button>
           </div>
         </form>
@@ -564,9 +533,7 @@ function UserDetailPage() {
                 className="flex items-center justify-between border border-gray-100 rounded-lg p-3"
               >
                 <div>
-                  <p className="text-sm font-medium text-gray-700">
-                    {doc.title}
-                  </p>
+                  <p className="text-sm font-medium text-gray-700">{doc.title}</p>
                   <p className="text-xs text-gray-400">{doc.document_type}</p>
                 </div>
                 <a

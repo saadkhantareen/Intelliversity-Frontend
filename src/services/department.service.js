@@ -33,7 +33,7 @@ const DepartmentService = {
   getDepartmentCodes: async () => {
     const response = await api.get(`${BASE}/codes/`);
     return response.data;
-  }
+  },
 };
 
 export default DepartmentService;

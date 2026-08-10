@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { cloudinaryService } from "../services/cloudinary.service";
-import toast from "react-hot-toast";
+import { useState } from 'react';
+import { cloudinaryService } from '../services/cloudinary.service';
+import toast from 'react-hot-toast';
 
 export function useCloudinary() {
   const [isUploading, setIsUploading] = useState(false);
@@ -12,8 +12,8 @@ export function useCloudinary() {
       const result = await cloudinaryService.uploadFile(file, assetCategory);
       return result;
     } catch (err) {
-      console.error("Cloudinary Upload Error:", err);
-      toast.error("Failed to upload file to storage.");
+      console.error('Cloudinary Upload Error:', err);
+      toast.error('Failed to upload file to storage.');
       throw err; // Re-throw so the component can stop its execution
     } finally {
       setIsUploading(false);

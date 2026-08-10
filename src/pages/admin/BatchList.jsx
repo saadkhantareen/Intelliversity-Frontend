@@ -14,7 +14,7 @@ const BatchList = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Batches</h1>
-        <button 
+        <button
           onClick={() => navigate('/academics/batches/create')}
           className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
         >
@@ -42,13 +42,19 @@ const BatchList = () => {
                 <td className="px-6 py-4 text-gray-600">{b.curriculum}</td>
                 <td className="px-6 py-4 italic">{b.sections?.length || 0} sections</td>
                 <td className="px-6 py-4">
-                  {b.is_active ? 
-                    <span className="text-green-600 text-xs font-bold">ACTIVE</span> : 
+                  {b.is_active ? (
+                    <span className="text-green-600 text-xs font-bold">ACTIVE</span>
+                  ) : (
                     <span className="text-gray-400 text-xs font-bold">INACTIVE</span>
-                  }
+                  )}
                 </td>
                 <td className="px-6 py-4 text-right">
-                  <button onClick={() => navigate(`/academics/batches/edit/${b.id}`)} className="text-blue-600 font-bold mr-4">Edit</button>
+                  <button
+                    onClick={() => navigate(`/academics/batches/edit/${b.id}`)}
+                    className="text-blue-600 font-bold mr-4"
+                  >
+                    Edit
+                  </button>
                 </td>
               </tr>
             ))}

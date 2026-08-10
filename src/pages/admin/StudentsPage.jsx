@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
-import toast from "react-hot-toast";
-import { ProfileService } from "../../services/profile.service";
-import StudentForm from "./StudentForm";
+import { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
+import { ProfileService } from '../../services/profile.service';
+import StudentForm from './StudentForm';
 
 // ── Icons (inline SVG to avoid icon lib dependency) ───────────────────────
 const SearchIcon = () => (
@@ -67,7 +67,7 @@ const PlusIcon = () => (
     <line x1="5" y1="12" x2="19" y2="12" />
   </svg>
 );
-const ChevronIcon = ({ dir = "right" }) => (
+const ChevronIcon = ({ dir = 'right' }) => (
   <svg
     width="16"
     height="16"
@@ -77,7 +77,7 @@ const ChevronIcon = ({ dir = "right" }) => (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    style={{ transform: dir === "left" ? "rotate(180deg)" : "none" }}
+    style={{ transform: dir === 'left' ? 'rotate(180deg)' : 'none' }}
   >
     <polyline points="9 18 15 12 9 6" />
   </svg>
@@ -102,16 +102,13 @@ const CloseIcon = () => (
 function DeleteModal({ student, onConfirm, onCancel, loading }) {
   if (!student) return null;
   const name =
-    `${student.base_profile?.user?.first_name ?? ""} ${student.base_profile?.user?.last_name ?? ""}`.trim();
+    `${student.base_profile?.user?.first_name ?? ''} ${student.base_profile?.user?.last_name ?? ''}`.trim();
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
-          Delete student?
-        </h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete student?</h3>
         <p className="text-sm text-gray-500 mb-6">
-          This will permanently delete{" "}
-          <span className="font-medium text-gray-800">{name}</span> (
+          This will permanently delete <span className="font-medium text-gray-800">{name}</span> (
           {student.registration_id}). This action cannot be undone.
         </p>
         <div className="flex justify-end gap-3">
@@ -126,7 +123,7 @@ function DeleteModal({ student, onConfirm, onCancel, loading }) {
             disabled={loading}
             className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-60"
           >
-            {loading ? "Deleting…" : "Yes, delete"}
+            {loading ? 'Deleting…' : 'Yes, delete'}
           </button>
         </div>
       </div>
@@ -137,13 +134,13 @@ function DeleteModal({ student, onConfirm, onCancel, loading }) {
 // ── Edit Modal ─────────────────────────────────────────────────────────────
 function EditModal({ student, onClose, onSaved }) {
   const [form, setForm] = useState({
-    first_name: student?.base_profile?.user?.first_name ?? "",
-    last_name: student?.base_profile?.user?.last_name ?? "",
-    phone_number: student?.base_profile?.phone_number ?? "",
-    city: student?.base_profile?.city ?? "",
-    country: student?.base_profile?.country ?? "",
-    cgpa: student?.cgpa ?? "",
-    bio: student?.base_profile?.bio ?? "",
+    first_name: student?.base_profile?.user?.first_name ?? '',
+    last_name: student?.base_profile?.user?.last_name ?? '',
+    phone_number: student?.base_profile?.phone_number ?? '',
+    city: student?.base_profile?.city ?? '',
+    country: student?.base_profile?.country ?? '',
+    cgpa: student?.cgpa ?? '',
+    bio: student?.base_profile?.bio ?? '',
   });
   const [saving, setSaving] = useState(false);
 
@@ -151,7 +148,7 @@ function EditModal({ student, onClose, onSaved }) {
 
   async function handleSave() {
     setSaving(true);
-    const toastId = toast.loading("Saving changes…");
+    const toastId = toast.loading('Saving changes…');
     try {
       const payload = {
         cgpa: form.cgpa || null,
@@ -167,24 +164,22 @@ function EditModal({ student, onClose, onSaved }) {
         },
       };
       const updated = await ProfileService.updateStudent(student.id, payload);
-      toast.success("Student updated successfully!", {
+      toast.success('Student updated successfully!', {
         id: toastId,
         duration: 3000,
       });
       onSaved(updated);
     } catch (err) {
-      const msg = err.response?.data?.detail ?? "Failed to update student.";
+      const msg = err.response?.data?.detail ?? 'Failed to update student.';
       toast.error(msg, { id: toastId, duration: 4000 });
     } finally {
       setSaving(false);
     }
   }
 
-  const inp = (id, label, type = "text") => (
+  const inp = (id, label, type = 'text') => (
     <div className="flex flex-col gap-1">
-      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-        {label}
-      </label>
+      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</label>
       <input
         type={type}
         value={form[id]}
@@ -198,36 +193,29 @@ function EditModal({ student, onClose, onSaved }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h3 className="text-base font-semibold text-gray-900">
-            Edit student
-          </h3>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
+          <h3 className="text-base font-semibold text-gray-900">Edit student</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <CloseIcon />
           </button>
         </div>
         <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
           <div className="grid grid-cols-2 gap-4">
-            {inp("first_name", "First name")}
-            {inp("last_name", "Last name")}
+            {inp('first_name', 'First name')}
+            {inp('last_name', 'Last name')}
           </div>
           <div className="grid grid-cols-2 gap-4">
-            {inp("phone_number", "Phone number")}
-            {inp("cgpa", "CGPA", "number")}
+            {inp('phone_number', 'Phone number')}
+            {inp('cgpa', 'CGPA', 'number')}
           </div>
           <div className="grid grid-cols-2 gap-4">
-            {inp("city", "City")}
-            {inp("country", "Country")}
+            {inp('city', 'City')}
+            {inp('country', 'Country')}
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-              Bio
-            </label>
+            <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Bio</label>
             <textarea
               value={form.bio}
-              onChange={set("bio")}
+              onChange={set('bio')}
               rows={3}
               className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             />
@@ -245,7 +233,7 @@ function EditModal({ student, onClose, onSaved }) {
             disabled={saving}
             className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-60"
           >
-            {saving ? "Saving…" : "Save changes"}
+            {saving ? 'Saving…' : 'Save changes'}
           </button>
         </div>
       </div>
@@ -258,8 +246,8 @@ export default function StudentsPage() {
   const [students, setStudents] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [fetching, setFetching] = useState(false);
 
   const [showCreate, setShowCreate] = useState(false);
@@ -286,7 +274,7 @@ export default function StudentsPage() {
         page_size: PAGE_SIZE,
         search: debouncedSearch,
       });
-      console.log("students response:", JSON.stringify(res, null, 2)); // ← add this
+      console.log('students response:', JSON.stringify(res, null, 2)); // ← add this
 
       // Handle both paginated { results, count } and plain array
       if (Array.isArray(res)) {
@@ -297,7 +285,7 @@ export default function StudentsPage() {
         setTotal(res.count ?? 0);
       }
     } catch {
-      toast.error("Failed to load students.");
+      toast.error('Failed to load students.');
     } finally {
       setFetching(false);
     }
@@ -309,14 +297,14 @@ export default function StudentsPage() {
 
   async function handleDelete() {
     setDeleting(true);
-    const toastId = toast.loading("Deleting student…");
+    const toastId = toast.loading('Deleting student…');
     try {
       await ProfileService.deleteStudent(deleteTarget.id);
-      toast.success("Student deleted.", { id: toastId, duration: 3000 });
+      toast.success('Student deleted.', { id: toastId, duration: 3000 });
       setDeleteTarget(null);
       fetchStudents();
     } catch {
-      toast.error("Failed to delete student.", { id: toastId, duration: 4000 });
+      toast.error('Failed to delete student.', { id: toastId, duration: 4000 });
     } finally {
       setDeleting(false);
     }
@@ -330,10 +318,10 @@ export default function StudentsPage() {
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   const getName = (s) =>
-    `${s.base_profile?.user?.first_name ?? ""} ${s.base_profile?.user?.last_name ?? ""}`.trim() ||
-    "—";
-  const getEmail = (s) => s.base_profile?.user?.email ?? "—";
-  const getSection = (s) => s.section?.name ?? s.section ?? "—";
+    `${s.base_profile?.user?.first_name ?? ''} ${s.base_profile?.user?.last_name ?? ''}`.trim() ||
+    '—';
+  const getEmail = (s) => s.base_profile?.user?.email ?? '—';
+  const getSection = (s) => s.section?.name ?? s.section ?? '—';
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -342,9 +330,7 @@ export default function StudentsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Students</h1>
-            <p className="text-sm text-gray-500 mt-0.5">
-              {total} total enrolled
-            </p>
+            <p className="text-sm text-gray-500 mt-0.5">{total} total enrolled</p>
           </div>
           <button
             onClick={() => setShowCreate(true)}
@@ -358,9 +344,7 @@ export default function StudentsPage() {
         {showCreate && (
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-semibold text-gray-800">
-                Register new student
-              </h2>
+              <h2 className="text-base font-semibold text-gray-800">Register new student</h2>
               <button
                 onClick={() => setShowCreate(false)}
                 className="text-gray-400 hover:text-gray-600"
@@ -421,36 +405,25 @@ export default function StudentsPage() {
               <tbody className="divide-y divide-gray-50">
                 {fetching ? (
                   <tr>
-                    <td
-                      colSpan={6}
-                      className="text-center py-16 text-gray-400 text-sm"
-                    >
+                    <td colSpan={6} className="text-center py-16 text-gray-400 text-sm">
                       Loading…
                     </td>
                   </tr>
                 ) : students.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={6}
-                      className="text-center py-16 text-gray-400 text-sm"
-                    >
+                    <td colSpan={6} className="text-center py-16 text-gray-400 text-sm">
                       No students found.
                     </td>
                   </tr>
                 ) : (
                   students.map((s) => (
-                    <tr
-                      key={s.id}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
+                    <tr key={s.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold shrink-0">
                             {getName(s).charAt(0).toUpperCase()}
                           </div>
-                          <span className="font-medium text-gray-900">
-                            {getName(s)}
-                          </span>
+                          <span className="font-medium text-gray-900">{getName(s)}</span>
                         </div>
                       </td>
                       <td className="px-5 py-3 text-gray-600 font-mono text-xs">
@@ -462,9 +435,7 @@ export default function StudentsPage() {
                           {s.section_name}
                         </span>
                       </td>
-                      <td className="px-5 py-3 text-gray-600">
-                        {s.cgpa ?? "—"}
-                      </td>
+                      <td className="px-5 py-3 text-gray-600">{s.cgpa ?? '—'}</td>
                       <td className="px-5 py-3">
                         <div className="flex items-center justify-end gap-2">
                           <button
@@ -475,7 +446,7 @@ export default function StudentsPage() {
                           </button>
                           <button
                             onClick={() => {
-                              console.log("delete clicked", s.id, s); // ← add this
+                              console.log('delete clicked', s.id, s); // ← add this
                               setDeleteTarget(s);
                             }}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
@@ -520,11 +491,7 @@ export default function StudentsPage() {
 
       {/* ── Modals ── */}
       {editTarget && (
-        <EditModal
-          student={editTarget}
-          onClose={() => setEditTarget(null)}
-          onSaved={handleSaved}
-        />
+        <EditModal student={editTarget} onClose={() => setEditTarget(null)} onSaved={handleSaved} />
       )}
       <DeleteModal
         student={deleteTarget}

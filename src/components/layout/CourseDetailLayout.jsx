@@ -1,17 +1,17 @@
 // src/components/layout/CourseDetailLayout.jsx
-import { Outlet, useParams, useNavigate, useLocation } from "react-router-dom";
+import { Outlet, useParams, useNavigate, useLocation } from 'react-router-dom';
 
 const COURSE_NAV = [
-  { id: 'notifications', label: "Course Notification", icon: "📢" },
-  { id: 'attendance', label: "Attendance", icon: "✅" },
-  { id: 'marks', label: "Marks Summary", icon: "📊" },
-  { id: 'resources', label: "Learning Resources", icon: "📚" },
-  { id: 'assignments', label: "Assignments", icon: "📝" },
-  { id: 'mdb', label: "MDB", icon: "👥" },
-  { id: 'gdb', label: "GDB", icon: "💬" },
-  { id: 'quizzes', label: "Quizzes", icon: "✍️" },
-  { id: 'lectures', label: "Lecture Contents", icon: "💻" },
-  { id: 'info', label: "Course Information", icon: "ℹ️" },
+  { id: 'notifications', label: 'Course Notification', icon: '📢' },
+  { id: 'attendance', label: 'Attendance', icon: '✅' },
+  { id: 'marks', label: 'Marks Summary', icon: '📊' },
+  { id: 'resources', label: 'Learning Resources', icon: '📚' },
+  { id: 'assignments', label: 'Assignments', icon: '📝' },
+  { id: 'mdb', label: 'MDB', icon: '👥' },
+  { id: 'gdb', label: 'GDB', icon: '💬' },
+  { id: 'quizzes', label: 'Quizzes', icon: '✍️' },
+  { id: 'lectures', label: 'Lecture Contents', icon: '💻' },
+  { id: 'info', label: 'Course Information', icon: 'ℹ️' },
 ];
 
 export default function CourseDetailLayout() {
@@ -26,17 +26,21 @@ export default function CourseDetailLayout() {
         {COURSE_NAV.map((item) => {
           const isActive = location.pathname.includes(item.id);
           return (
-            <div 
+            <div
               key={item.id}
               onClick={() => navigate(`/courses/${courseId}/${item.id}`)}
               className="flex flex-col items-center cursor-pointer group"
             >
-              <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-xl transition-all shadow-lg 
-                ${isActive ? 'bg-[#00a191] text-white scale-110' : 'bg-white hover:bg-gray-200'}`}>
+              <div
+                className={`w-12 h-12 rounded-lg flex items-center justify-center text-xl transition-all shadow-lg 
+                ${isActive ? 'bg-[#00a191] text-white scale-110' : 'bg-white hover:bg-gray-200'}`}
+              >
                 {item.icon}
               </div>
-              <span className={`text-[10px] mt-2 text-center w-20 font-bold uppercase tracking-tighter
-                ${isActive ? 'text-[#00a191]' : 'text-white/80'}`}>
+              <span
+                className={`text-[10px] mt-2 text-center w-20 font-bold uppercase tracking-tighter
+                ${isActive ? 'text-[#00a191]' : 'text-white/80'}`}
+              >
                 {item.label}
               </span>
             </div>

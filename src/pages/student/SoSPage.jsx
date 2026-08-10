@@ -1,11 +1,7 @@
-import React from 'react'
+import React from 'react';
 
 function SoSPage() {
-  return (
-    <div>
-      SoSPage
-    </div>
-  )
+  return <div>SoSPage</div>;
 }
 
-export default SoSPage
+export default SoSPage;

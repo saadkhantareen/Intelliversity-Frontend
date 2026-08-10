@@ -1,42 +1,42 @@
-import { useState, useEffect } from "react";
-import toast from "react-hot-toast";
-import { ProfileService } from "@/services/profile.service";
-import api from "@/services/api";
-import { useCloudinary } from "@/hooks/useCloudinary"; // Make sure this path is correct for your project
+import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+import { ProfileService } from '@/services/profile.service';
+import api from '@/services/api';
+import { useCloudinary } from '@/hooks/useCloudinary'; // Make sure this path is correct for your project
 
 const EMPTY_FORM = {
   // Account
-  email: "",
-  password: "",
-  first_name: "",
-  last_name: "",
+  email: '',
+  password: '',
+  first_name: '',
+  last_name: '',
   // Profile Picture
-  profile_picture_public_id: "",
-  profile_picture_url: "", // Used strictly for frontend preview
+  profile_picture_public_id: '',
+  profile_picture_url: '', // Used strictly for frontend preview
   // Faculty-specific
-  registration_id: "",
-  designation: "",
-  qualification: "",
-  specialization: "",
-  experience_years: "",
-  office_number: "",
-  office_location: "",
-  department: "",
+  registration_id: '',
+  designation: '',
+  qualification: '',
+  specialization: '',
+  experience_years: '',
+  office_number: '',
+  office_location: '',
+  department: '',
   // Personal
-  father_name: "",
-  date_of_birth: "",
-  gender: "",
-  nationality: "",
-  cnic: "",
-  religion: "",
+  father_name: '',
+  date_of_birth: '',
+  gender: '',
+  nationality: '',
+  cnic: '',
+  religion: '',
   // Contact
-  phone_number: "",
-  emergency_contact: "",
+  phone_number: '',
+  emergency_contact: '',
   // Address
-  address: "",
-  city: "",
-  country: "",
-  bio: "",
+  address: '',
+  city: '',
+  country: '',
+  bio: '',
 };
 
 export default function FacultyForm({ onSuccess, onCancel }) {
@@ -50,11 +50,11 @@ export default function FacultyForm({ onSuccess, onCancel }) {
 
   useEffect(() => {
     api
-      .get("/api/v1/academics/departments/")
+      .get('/api/v1/academics/departments/')
       .then((res) => setDepartments(res.data?.results ?? res.data ?? []))
       .catch(() => {
         setDepartments([]);
-        toast.error("Failed to load departments. Please refresh.");
+        toast.error('Failed to load departments. Please refresh.');
       });
   }, []);
 
@@ -68,18 +68,15 @@ export default function FacultyForm({ onSuccess, onCancel }) {
     const file = e.target.files[0];
     if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-      toast.error("Invalid file type. Please upload an image (JPG, PNG).");
+    if (!file.type.startsWith('image/')) {
+      toast.error('Invalid file type. Please upload an image (JPG, PNG).');
       e.target.value = null;
       return;
     }
 
     try {
       // Asset category passed as "profile" (adjust if your backend expects a different string)
-      const { public_id, secure_url } = await uploadToCloudinary(
-        file,
-        "profile",
-      );
+      const { public_id, secure_url } = await uploadToCloudinary(file, 'profile');
 
       setForm((prev) => ({
         ...prev,
@@ -87,9 +84,9 @@ export default function FacultyForm({ onSuccess, onCancel }) {
         profile_picture_url: secure_url,
       }));
 
-      toast.success("Profile picture uploaded!");
+      toast.success('Profile picture uploaded!');
     } catch (error) {
-      console.error("Upload Error:", error);
+      console.error('Upload Error:', error);
       // The useCloudinary hook already fires an error toast, so we just catch it here
     } finally {
       e.target.value = null; // Reset input so the user can upload a new one if they change their mind
@@ -136,10 +133,7 @@ export default function FacultyForm({ onSuccess, onCancel }) {
   }
 
   function firstError(flat) {
-    return (
-      Object.values(flat).find(Boolean) ??
-      "Please fix the errors and try again."
-    );
+    return Object.values(flat).find(Boolean) ?? 'Please fix the errors and try again.';
   }
 
   function buildPayload() {
@@ -148,9 +142,7 @@ export default function FacultyForm({ onSuccess, onCancel }) {
       designation: form.designation.trim() || null,
       qualification: form.qualification.trim() || null,
       specialization: form.specialization.trim() || null,
-      experience_years: form.experience_years
-        ? Number(form.experience_years)
-        : null,
+      experience_years: form.experience_years ? Number(form.experience_years) : null,
       office_number: form.office_number.trim() || null,
       office_location: form.office_location.trim() || null,
       department: form.department || null,
@@ -161,7 +153,7 @@ export default function FacultyForm({ onSuccess, onCancel }) {
           first_name: form.first_name.trim(),
           last_name: form.last_name.trim(),
           password: form.password,
-          role: "faculty",
+          role: 'faculty',
         },
         father_name: form.father_name.trim() || null,
         date_of_birth: form.date_of_birth || null,
@@ -184,14 +176,14 @@ export default function FacultyForm({ onSuccess, onCancel }) {
     setErrors({});
     setLoading(true);
 
-    const toastId = toast.loading("Registering faculty member…");
+    const toastId = toast.loading('Registering faculty member…');
 
     try {
       const data = await ProfileService.createFaculty(buildPayload());
 
       toast.success(
         `${form.first_name} ${form.last_name} (${form.registration_id}) registered successfully!`,
-        { id: toastId, duration: 4000 },
+        { id: toastId, duration: 4000 }
       );
 
       setForm(EMPTY_FORM);
@@ -208,13 +200,7 @@ export default function FacultyForm({ onSuccess, onCancel }) {
   }
 
   // ── Field helpers ──────────────────────────────────────────────────────
-  const inp = (
-    id,
-    label,
-    type = "text",
-    placeholder = "",
-    required = false,
-  ) => (
+  const inp = (id, label, type = 'text', placeholder = '', required = false) => (
     <div className="flex flex-col gap-1">
       <label className="text-sm font-medium text-gray-700">
         {label}
@@ -226,7 +212,7 @@ export default function FacultyForm({ onSuccess, onCancel }) {
         onChange={set(id)}
         placeholder={placeholder}
         className={`border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-          errors[id] ? "border-red-400 bg-red-50" : "border-gray-300"
+          errors[id] ? 'border-red-400 bg-red-50' : 'border-gray-300'
         }`}
       />
       {errors[id] && <p className="text-xs text-red-500">{errors[id]}</p>}
@@ -243,7 +229,7 @@ export default function FacultyForm({ onSuccess, onCancel }) {
         value={form[id]}
         onChange={set(id)}
         className={`border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-          errors[id] ? "border-red-400 bg-red-50" : "border-gray-300"
+          errors[id] ? 'border-red-400 bg-red-50' : 'border-gray-300'
         }`}
       >
         <option value="">— select —</option>
@@ -267,9 +253,7 @@ export default function FacultyForm({ onSuccess, onCancel }) {
     <form onSubmit={handleSubmit} className="space-y-2 max-w-3xl">
       {/* ── Header Area: Account + Profile Picture ── */}
       <div className="flex justify-between items-end border-b pb-1 mt-6 mb-3">
-        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 m-0">
-          Account
-        </p>
+        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 m-0">Account</p>
 
         {/* Profile Picture Uploader aligned to Top Right */}
         <div className="flex items-center gap-4">
@@ -302,11 +286,11 @@ export default function FacultyForm({ onSuccess, onCancel }) {
               htmlFor="profile-upload"
               className={`cursor-pointer text-sm font-medium px-3 py-1.5 rounded-md border transition-colors ${
                 isUploading
-                  ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
-                  : "bg-white text-blue-600 border-blue-200 hover:bg-blue-50"
+                  ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                  : 'bg-white text-blue-600 border-blue-200 hover:bg-blue-50'
               }`}
             >
-              {isUploading ? "Uploading..." : "Upload Photo"}
+              {isUploading ? 'Uploading...' : 'Upload Photo'}
             </label>
             <input
               type="file"
@@ -317,42 +301,32 @@ export default function FacultyForm({ onSuccess, onCancel }) {
               disabled={isUploading}
             />
             {errors.profile_picture_public_id && (
-              <p className="text-xs text-red-500 m-0">
-                {errors.profile_picture_public_id}
-              </p>
+              <p className="text-xs text-red-500 m-0">{errors.profile_picture_public_id}</p>
             )}
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {inp("email", "University email", "email", "dr.ali@fast.edu.pk", true)}
-        {inp(
-          "password",
-          "Password",
-          "password",
-          "Min 8 chars, 1 upper, 1 number, 1 symbol",
-          true,
-        )}
-        {inp("first_name", "First name", "text", "Ali", true)}
-        {inp("last_name", "Last name", "text", "Hassan", true)}
+        {inp('email', 'University email', 'email', 'dr.ali@fast.edu.pk', true)}
+        {inp('password', 'Password', 'password', 'Min 8 chars, 1 upper, 1 number, 1 symbol', true)}
+        {inp('first_name', 'First name', 'text', 'Ali', true)}
+        {inp('last_name', 'Last name', 'text', 'Hassan', true)}
       </div>
 
       {/* ── Faculty details ── */}
-      {heading("Faculty details")}
+      {heading('Faculty details')}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {inp("registration_id", "Registration ID", "text", "FAC-001", true)}
+        {inp('registration_id', 'Registration ID', 'text', 'FAC-001', true)}
 
         {/* Department — populated from API */}
         <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium text-gray-700">
-            Department
-          </label>
+          <label className="text-sm font-medium text-gray-700">Department</label>
           <select
             value={form.department}
-            onChange={set("department")}
+            onChange={set('department')}
             className={`border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.department ? "border-red-400 bg-red-50" : "border-gray-300"
+              errors.department ? 'border-red-400 bg-red-50' : 'border-gray-300'
             }`}
           >
             <option value="">— select department —</option>
@@ -362,56 +336,54 @@ export default function FacultyForm({ onSuccess, onCancel }) {
               </option>
             ))}
           </select>
-          {errors.department && (
-            <p className="text-xs text-red-500">{errors.department}</p>
-          )}
+          {errors.department && <p className="text-xs text-red-500">{errors.department}</p>}
         </div>
 
-        {inp("designation", "Designation", "text", "Assistant Professor")}
-        {inp("qualification", "Qualification", "text", "PhD Computer Science")}
-        {inp("specialization", "Specialization", "text", "Machine Learning")}
-        {inp("experience_years", "Experience (years)", "number", "5")}
-        {inp("office_number", "Office number", "text", "301")}
-        {inp("office_location", "Office location", "text", "Block A")}
+        {inp('designation', 'Designation', 'text', 'Assistant Professor')}
+        {inp('qualification', 'Qualification', 'text', 'PhD Computer Science')}
+        {inp('specialization', 'Specialization', 'text', 'Machine Learning')}
+        {inp('experience_years', 'Experience (years)', 'number', '5')}
+        {inp('office_number', 'Office number', 'text', '301')}
+        {inp('office_location', 'Office location', 'text', 'Block A')}
       </div>
 
       {/* ── Personal ── */}
-      {heading("Personal details")}
+      {heading('Personal details')}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {inp("father_name", "Father's name", "text", "Hassan")}
-        {inp("date_of_birth", "Date of birth", "date")}
-        {sel("gender", "Gender", [
-          { value: "male", label: "Male" },
-          { value: "female", label: "Female" },
-          { value: "other", label: "Other" },
+        {inp('father_name', "Father's name", 'text', 'Hassan')}
+        {inp('date_of_birth', 'Date of birth', 'date')}
+        {sel('gender', 'Gender', [
+          { value: 'male', label: 'Male' },
+          { value: 'female', label: 'Female' },
+          { value: 'other', label: 'Other' },
         ])}
-        {inp("nationality", "Nationality", "text", "Pakistani")}
-        {inp("cnic", "CNIC", "text", "35404-1343427-3")}
-        {inp("religion", "Religion", "text", "Islam")}
+        {inp('nationality', 'Nationality', 'text', 'Pakistani')}
+        {inp('cnic', 'CNIC', 'text', '35404-1343427-3')}
+        {inp('religion', 'Religion', 'text', 'Islam')}
       </div>
 
       {/* ── Contact ── */}
-      {heading("Contact")}
+      {heading('Contact')}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {inp("phone_number", "Phone number", "text", "0321-1234567")}
-        {inp("emergency_contact", "Emergency contact", "text", "0300-0000000")}
+        {inp('phone_number', 'Phone number', 'text', '0321-1234567')}
+        {inp('emergency_contact', 'Emergency contact', 'text', '0300-0000000')}
       </div>
 
       {/* ── Address ── */}
-      {heading("Address")}
+      {heading('Address')}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {inp("address", "Address", "text", "Street / Block")}
-        {inp("city", "City", "text", "Islamabad")}
-        {inp("country", "Country", "text", "Pakistan")}
+        {inp('address', 'Address', 'text', 'Street / Block')}
+        {inp('city', 'City', 'text', 'Islamabad')}
+        {inp('country', 'Country', 'text', 'Pakistan')}
       </div>
 
       {/* ── Bio ── */}
-      {heading("Bio")}
+      {heading('Bio')}
       <div className="flex flex-col gap-1">
         <label className="text-sm font-medium text-gray-700">Bio</label>
         <textarea
           value={form.bio}
-          onChange={set("bio")}
+          onChange={set('bio')}
           placeholder="A brief note about the faculty member…"
           rows={3}
           className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
@@ -435,7 +407,7 @@ export default function FacultyForm({ onSuccess, onCancel }) {
           disabled={loading || isUploading}
           className="px-5 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-60"
         >
-          {loading ? "Registering…" : "Register faculty"}
+          {loading ? 'Registering…' : 'Register faculty'}
         </button>
       </div>
     </form>

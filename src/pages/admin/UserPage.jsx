@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useTenant } from "../../context/TenantContext";
-import { ProfileService } from "../../services/profile.service";
-import SectionCard from "../../components/ui/SectionCard";
-import toast from "react-hot-toast";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTenant } from '../../context/TenantContext';
+import { ProfileService } from '../../services/profile.service';
+import SectionCard from '../../components/ui/SectionCard';
+import toast from 'react-hot-toast';
 
 function UsersPage() {
   const { config } = useTenant();
@@ -12,8 +12,8 @@ function UsersPage() {
   const [users, setUsers] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState("all");
+  const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
 
   useEffect(() => {
     fetchUsers();
@@ -22,10 +22,8 @@ function UsersPage() {
   useEffect(() => {
     let result = users;
 
-    if (roleFilter !== "all") {
-      result = result.filter((u) =>
-        u.base_profile?.roles?.includes(roleFilter),
-      );
+    if (roleFilter !== 'all') {
+      result = result.filter((u) => u.base_profile?.roles?.includes(roleFilter));
     }
 
     if (search) {
@@ -34,7 +32,7 @@ function UsersPage() {
         (u) =>
           u.base_profile?.first_name?.toLowerCase().includes(q) ||
           u.base_profile?.last_name?.toLowerCase().includes(q) ||
-          u.base_profile?.email?.toLowerCase().includes(q),
+          u.base_profile?.email?.toLowerCase().includes(q)
       );
     }
 
@@ -47,7 +45,7 @@ function UsersPage() {
       setUsers(res.data);
       setFiltered(res.data);
     } catch (err) {
-      toast.error("Failed to load users");
+      toast.error('Failed to load users');
     } finally {
       setIsLoading(false);
     }
@@ -111,10 +109,7 @@ function UsersPage() {
                 const bp = user.base_profile;
                 const role = bp?.roles?.[0];
                 return (
-                  <tr
-                    key={index}
-                    className="border-b border-gray-50 hover:bg-gray-50"
-                  >
+                  <tr key={index} className="border-b border-gray-50 hover:bg-gray-50">
                     <td className="py-3 pr-4">
                       <div className="flex items-center gap-2">
                         {bp?.profile_picture ? (
@@ -146,9 +141,7 @@ function UsersPage() {
                         {role}
                       </span>
                     </td>
-                    <td className="py-3 pr-4 text-gray-500">
-                      {bp?.cnic || "—"}
-                    </td>
+                    <td className="py-3 pr-4 text-gray-500">{bp?.cnic || '—'}</td>
                     <td className="py-3">
                       <button
                         onClick={() => navigate(`/users/${bp?.user}`)}

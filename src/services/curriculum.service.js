@@ -26,7 +26,7 @@ const CurriculumService = {
   deleteCurriculum: async (id) => {
     const response = await api.delete(`${BASE}/${id}/`);
     return response.data;
-  }
+  },
 };
 
 export default CurriculumService;

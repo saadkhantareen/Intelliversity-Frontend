@@ -11,9 +11,9 @@ const CourseList = () => {
   }, []);
 
   const handleDelete = async (id) => {
-    if (window.confirm("Delete this course?")) {
+    if (window.confirm('Delete this course?')) {
       await CourseService.deleteCourse(id);
-      setCourses(courses.filter(c => c.id !== id));
+      setCourses(courses.filter((c) => c.id !== id));
     }
   };
 
@@ -21,7 +21,10 @@ const CourseList = () => {
     <div className="p-6">
       <div className="flex justify-between mb-6">
         <h1 className="text-2xl font-bold">Courses</h1>
-        <button onClick={() => navigate('/academics/courses/create')} className="bg-blue-600 text-white px-4 py-2 rounded shadow">
+        <button
+          onClick={() => navigate('/academics/courses/create')}
+          className="bg-blue-600 text-white px-4 py-2 rounded shadow"
+        >
           + Add Course
         </button>
       </div>
@@ -39,20 +42,29 @@ const CourseList = () => {
             </tr>
           </thead>
           <tbody>
-            {courses.map(c => (
+            {courses.map((c) => (
               <tr key={c.id} className="border-b hover:bg-gray-50">
                 <td className="p-4 font-bold">{c.code}</td>
                 <td className="p-4">{c.name}</td>
                 <td className="p-4 text-gray-500">{c.department}</td>
                 <td className="p-4 text-center">{c.credit_hours}</td>
                 <td className="p-4">
-                  {c.prerequisites?.map(p => (
-                    <span key={p} className="bg-gray-100 text-xs px-2 py-1 rounded mr-1">{p}</span>
+                  {c.prerequisites?.map((p) => (
+                    <span key={p} className="bg-gray-100 text-xs px-2 py-1 rounded mr-1">
+                      {p}
+                    </span>
                   ))}
                 </td>
                 <td className="p-4 text-right space-x-3">
-                  <button onClick={() => navigate(`/academics/courses/edit/${c.id}`)} className="text-blue-600">Edit</button>
-                  <button onClick={() => handleDelete(c.id)} className="text-red-600">Delete</button>
+                  <button
+                    onClick={() => navigate(`/academics/courses/edit/${c.id}`)}
+                    className="text-blue-600"
+                  >
+                    Edit
+                  </button>
+                  <button onClick={() => handleDelete(c.id)} className="text-red-600">
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}

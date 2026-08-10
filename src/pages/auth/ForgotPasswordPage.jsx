@@ -1,37 +1,33 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { useTenant } from '@/context/TenantContext'
-import { authService } from '@/services/auth.service'
-import toast from 'react-hot-toast'
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useTenant } from '@/context/TenantContext';
+import { authService } from '@/services/auth.service';
+import toast from 'react-hot-toast';
 
 function ForgotPasswordPage() {
-  const { config, university } = useTenant()
-  const [email, setEmail]       = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
+  const { config, university } = useTenant();
+  const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
     try {
-      await authService.forgotPassword({ email })
-      setSubmitted(true)
+      await authService.forgotPassword({ email });
+      setSubmitted(true);
     } catch (err) {
-      const errors = err.response?.data
-      const message =
-        errors?.email?.[0]?.detail ||
-        errors?.detail ||
-        'Something went wrong'
-      toast.error(message)
+      const errors = err.response?.data;
+      const message = errors?.email?.[0]?.detail || errors?.detail || 'Something went wrong';
+      toast.error(message);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="flex h-screen items-center justify-center bg-gray-100">
       <div className="bg-white rounded-xl shadow-lg p-10 w-full max-w-md">
-
         <p
           style={{ color: config?.color }}
           className="text-center uppercase tracking-widest text-sm font-semibold mb-1"
@@ -39,10 +35,7 @@ function ForgotPasswordPage() {
           {university}
         </p>
 
-        <h1
-          style={{ color: config?.color }}
-          className="text-3xl font-bold text-center mb-2"
-        >
+        <h1 style={{ color: config?.color }} className="text-3xl font-bold text-center mb-2">
           Forgot Password
         </h1>
 
@@ -67,9 +60,7 @@ function ForgotPasswordPage() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <input
                   type="email"
                   value={email}
@@ -103,7 +94,7 @@ function ForgotPasswordPage() {
         )}
       </div>
     </div>
-  )
+  );
 }
 
-export default ForgotPasswordPage
+export default ForgotPasswordPage;

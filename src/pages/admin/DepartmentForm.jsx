@@ -18,7 +18,7 @@ const DepartmentForm = () => {
       const data = await DepartmentService.getDepartmentById(id);
       setFormData(data);
     } catch (error) {
-      console.error("Error loading department:", error);
+      console.error('Error loading department:', error);
     }
   };
 
@@ -32,7 +32,7 @@ const DepartmentForm = () => {
       }
       navigate('/academics/departments');
     } catch (error) {
-      alert("Error: " + JSON.stringify(error.response?.data));
+      alert('Error: ' + JSON.stringify(error.response?.data));
     }
   };
 
@@ -46,7 +46,7 @@ const DepartmentForm = () => {
             type="text"
             className="mt-1 block w-full border rounded-md p-2"
             value={formData.name}
-            onChange={(e) => setFormData({...formData, name: e.target.value})}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
           />
         </div>
@@ -56,7 +56,7 @@ const DepartmentForm = () => {
             type="text"
             className="mt-1 block w-full border rounded-md p-2"
             value={formData.code}
-            onChange={(e) => setFormData({...formData, code: e.target.value})}
+            onChange={(e) => setFormData({ ...formData, code: e.target.value })}
             placeholder="e.g. CS"
             required
           />
@@ -67,21 +67,14 @@ const DepartmentForm = () => {
             className="mt-1 block w-full border rounded-md p-2"
             rows="3"
             value={formData.description}
-            onChange={(e) => setFormData({...formData, description: e.target.value})}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           ></textarea>
         </div>
         <div className="flex justify-end space-x-3">
-          <button 
-            type="button" 
-            onClick={() => navigate(-1)}
-            className="px-4 py-2 text-gray-600"
-          >
+          <button type="button" onClick={() => navigate(-1)} className="px-4 py-2 text-gray-600">
             Cancel
           </button>
-          <button 
-            type="submit" 
-            className="bg-blue-600 text-white px-6 py-2 rounded"
-          >
+          <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded">
             {id ? 'Update' : 'Save'}
           </button>
         </div>
