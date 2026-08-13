@@ -1,11 +1,11 @@
-import { useTenant } from '@/context/TenantContext';
-import { useAuth } from '@/context/AuthContext';
+import { useTenant } from '@/features/tenant';
+import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
 import { Mail, Lock, GraduationCap, ArrowRight, CheckCircle2, ShieldCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate, Link } from 'react-router-dom';
-import PortalNotFound from '@/pages/errors/PortalNotFound';
-import { getRecaptchaToken } from '@/services/recaptcha.service';
+import PortalNotFound from '@/app/pages/errors/PortalNotFound';
+import { getRecaptchaToken } from '../api/recaptcha.service';
 
 export default function LoginPage() {
   const { tenant, isTenantLoading, error } = useTenant();

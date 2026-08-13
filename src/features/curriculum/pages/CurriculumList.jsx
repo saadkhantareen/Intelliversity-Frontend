@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import CurriculumService from '../../services/curriculum.service';
+import CurriculumService from '../api/curriculum.service';
 
 const CurriculumList = () => {
   const [curriculums, setCurriculums] = useState([]);

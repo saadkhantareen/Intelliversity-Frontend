@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import TermService from '../../services/term.service';
+import TermService from '../api/term.service';
 
 const TermList = () => {
   const [terms, setTerms] = useState([]);

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AcademicYearService from '../../services/academic-year.service';
+import AcademicYearService from '../api/academic-year.service';
 
 const AcademicYearList = () => {
   const [years, setYears] = useState([]);

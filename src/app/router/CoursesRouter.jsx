@@ -1,9 +1,9 @@
 import { lazy } from 'react';
 import { useTenant } from '@/features/tenant';
 
-const RegisteredCourses = lazy(() => import('@/features/pages/student/RegisteredCourses'));
-const AdminCoursesPage = lazy(() => import('@/features/pages/admin/CoursePage'));
-const FacultyCoursesPage = lazy(() => import('@/features/pages/faculty/FacultyCoursesPage'));
+const RegisteredCourses = lazy(() => import('@/features/courses/pages/student/RegisteredCourses'));
+const AdminCoursesPage = lazy(() => import('@/features/courses/pages/admin/CourseList'));
+const FacultyCoursesPage = lazy(() => import('@/features/courses/pages/faculty/FacultyCoursesPage'));
 const PageNotFound = lazy(() => import('@/app/pages/errors/PageNotFound'));
 
 export default function CoursesRouter() {

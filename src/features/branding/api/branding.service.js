@@ -1,4 +1,4 @@
-import { globalApi } from './api';
+import { globalApi } from '@/shared/api/client';
 
 /**
  * Fetch portal branding for the current tenant.

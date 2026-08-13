@@ -58,5 +58,5 @@ export default function AdminLayout() {
     accent: branding?.theme_config?.colors?.primary || ADMIN_CONFIG.accent,
   };
 
-  return <DashboardShell3 config={resolvedConfig} />;
+  return <DashboardShell config={resolvedConfig} />;
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { cloudinaryService } from '../services/cloudinary.service';
+import { cloudinaryService } from '../api/cloudinary.service';
 import toast from 'react-hot-toast';
 
 export function useCloudinary() {

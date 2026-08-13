@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { ProfileService } from '@/services/profile.service';
-import api from '@/services/api';
-import { useCloudinary } from '@/hooks/useCloudinary'; // Make sure this path is correct for your project
+import { ProfileService } from '@/features/profile';
+import api from '@/shared/api/client';
+import { useCloudinary } from '@/features/media';
 
 const EMPTY_FORM = {
   // Account

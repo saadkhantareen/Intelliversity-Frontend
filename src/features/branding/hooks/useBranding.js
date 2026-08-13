@@ -1,4 +1,4 @@
-import { useTenant } from '@/context/TenantContext';
+import { useTenant } from '@/features/tenant';
 
 /**
  * Convenience hook returning branding values with safe defaults.

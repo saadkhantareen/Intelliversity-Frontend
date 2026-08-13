@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { ProfileService } from '../../services/profile.service';
-import { useCloudinary } from '../../hooks/useCloudinary';
+import { ProfileService } from '../api/profile.service';
+import { useCloudinary } from '@/features/media';
 import toast from 'react-hot-toast';
 
 const StudentProfilePage = () => {

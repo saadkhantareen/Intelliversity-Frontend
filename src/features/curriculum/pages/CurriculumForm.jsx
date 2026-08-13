@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import CurriculumService from '../../services/curriculum.service';
-import ProgramService from '../../services/program.service';
-import CourseService from '../../services/course.service';
+import CurriculumService from '../api/curriculum.service';
+import ProgramService from '@/features/programs';
+import CourseService from '@/features/courses';
 
 const CurriculumForm = () => {
   const { id } = useParams();

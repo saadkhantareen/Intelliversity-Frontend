@@ -1,5 +1,5 @@
 import axios from 'axios';
-import api from './api'; // Adjust path if needed
+import api from '@/shared/api/client';
 
 export const cloudinaryService = {
   /**

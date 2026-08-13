@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import ProgramService from '../../services/program.service';
-import DepartmentService from '../../services/department.service';
+import ProgramService from '../api/program.service';
+import DepartmentService from '@/features/departments';
 
 const ProgramForm = () => {
   const { id } = useParams();

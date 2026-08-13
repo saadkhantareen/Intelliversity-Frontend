@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ProgramService from '../../services/program.service';
+import ProgramService from '../api/program.service';
 
 const ProgramList = () => {
   const [programs, setPrograms] = useState([]);

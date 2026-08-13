@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { ProfileService } from '../../services/profile.service';
+import { ProfileService } from '../api/profile.service';
 import StudentForm from './StudentForm';
 
 // ── Icons (inline SVG to avoid icon lib dependency) ───────────────────────

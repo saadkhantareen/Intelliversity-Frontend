@@ -1,4 +1,4 @@
-const SITE_KEY = '6Lcad4ssAAAAALJoEgeBdGyDwAtLLoSqB6H3yiI0';
+const SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
 export const getRecaptchaToken = (action) => {
   return new Promise((resolve, reject) => {

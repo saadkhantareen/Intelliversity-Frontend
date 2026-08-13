@@ -1,6 +1,6 @@
-import api from './api';
+import api from '@/shared/api/client';
 
-const userService = {
+export const userService = {
   bulkUpload(file) {
     const formData = new FormData();
     formData.append('file', file);
@@ -15,4 +15,3 @@ const userService = {
   },
 };
 
-export default userService;

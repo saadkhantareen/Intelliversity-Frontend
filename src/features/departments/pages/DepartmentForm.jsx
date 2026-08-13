@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import DepartmentService from '../../services/department.service';
+import DepartmentService from '../api/department.service';
 
 const DepartmentForm = () => {
   const { id } = useParams(); // For edit mode

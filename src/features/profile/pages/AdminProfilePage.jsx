@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useTenant } from '../../context/TenantContext';
-import { useProfile } from '../../context/ProfileContext';
-import { useCloudinary } from '../../hooks/useCloudinary';
-import SectionCard from '../../components/ui/SectionCard';
-import InfoField from '../../components/ui/InfoField';
+import { useTenant } from '@/features/tenant';
+import { useProfile } from '@/features/profile';
+import { useCloudinary } from '@/features/media';
+import SectionCard from '@/shared/components/ui/SectionCard';
+import InfoField from '@/shared/components/ui/InfoField';
 import toast from 'react-hot-toast';
 
 function AdminProfilePage() {

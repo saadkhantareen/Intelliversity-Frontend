@@ -1,4 +1,4 @@
-import { api } from '@/shared/services/client';
+import { api } from '@/shared/api/client';
 
 
 // This matches your backend: path("api/v1/academics/", include("apps.academics.urls"))

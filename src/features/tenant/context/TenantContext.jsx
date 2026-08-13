@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { getPortalBranding } from '@/services/branding.service';
-import { applyFavicon } from '@/utils/tenantUtils';
-import { applyThemeToCSS } from '@/utils/tenantUtils';
+import { getPortalBranding } from '@/features/branding';
+import { applyFavicon } from '../utils/tenantUtils';
+import { applyThemeToCSS } from '../utils/tenantUtils';
 
 const TenantContext = createContext(null);
 

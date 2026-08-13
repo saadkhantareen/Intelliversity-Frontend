@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import AcademicYearService from '../../services/academic-year.service';
+import AcademicYearService from '../api/academic-year.service';
 
 const AcademicYearForm = () => {
   const { id } = useParams();

@@ -26,9 +26,9 @@ const BatchList = lazy(() => import('@/features/batches/pages/BatchList'));
 const BatchForm = lazy(() => import('@/features/batches/pages/BatchForm'));
 
 // Courses
-const CourseList = lazy(() => import('@/features/courses/pages/CourseList'));
-const CourseForm = lazy(() => import('@/features/courses/pages/CourseForm'));
-const RegisteredCourses = lazy(() => import('@/features/courses/pages/RegisteredCourses'));
+const CourseList = lazy(() => import('@/features/courses/pages/admin/CourseList'));
+const CourseForm = lazy(() => import('@/features/courses/pages/admin/CourseForm'));
+const RegisteredCourses = lazy(() => import('@/features/courses/pages/student/RegisteredCourses'));
 
 // Curriculum
 const CurriculumList = lazy(() => import('@/features/curriculum/pages/CurriculumList'));
@@ -51,8 +51,8 @@ const StudentsPage = lazy(() => import('@/features/profile/pages/StudentsPage'))
 const FacultyPage = lazy(() => import('@/features/profile/pages/FacultyPage'));
 const StudentForm = lazy(() => import('@/features/profile/pages/StudentForm'));
 const FacultyForm = lazy(() => import('@/features/profile/pages/FacultyForm'));
-const UserPage = lazy(() => import('@/features/profile/pages/UserPage'));
-const UserDetailPage = lazy(() => import('@/features/profile/pages/UserDetailPage'));
+// const UserPage = lazy(() => import('@/features/profile/pages/UserPage'));
+// const UserDetailPage = lazy(() => import('@/features/profile/pages/UserDetailPage'));
 
 // Loading
 function FullScreenLoader({ text = 'Loading...' }) {
@@ -124,10 +124,10 @@ function ProtectedAppRoutes() {
 
         <Route path="/academics/batches/edit/:id" element={<BatchForm />} />
 
-        {/* Users */}
-        <Route path="/users" element={<UserPage />} />
+        {/* Users - no users only specific roles */}
+        {/* <Route path="/users" element={<UserPage />} />
 
-        <Route path="/users/:id" element={<UserDetailPage />} />
+        <Route path="/users/:id" element={<UserDetailPage />} /> */}
 
         {/* Students */}
         <Route path="/users/students" element={<StudentsPage />} />

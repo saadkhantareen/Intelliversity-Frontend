@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { useTenant } from '@/context/TenantContext';
-import { applyFavicon } from '@/utils/tenantUtils';
+import { useTenant } from '@/features/tenant';
+import { applyFavicon } from '@/features/tenant';
 
 function extractFontName(value) {
   return value ? value.split(',')[0].trim() : null;

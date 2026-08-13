@@ -1,4 +1,4 @@
-import { api } from '@/shared/services/client';
+import { api } from '@/shared/api/client';
 
 
 const BASE = '/api/v1/academics/academic-years';

@@ -3,9 +3,9 @@ import { useTenant } from '@/features/tenant';
 
 const StudentDashboardPage = lazy(() => import('@/features/dashboard/pages/StudentDashboardPage'));
 const AdminDashboardPage = lazy(() => import('@/features/dashboard/pages/AdminDashboardPage'));
-const FacultyDashboardPage = lazy(() => import('@features/dashboard/pages/FacultyDashboardPage'));
+const FacultyDashboardPage = lazy(() => import('@/features/dashboard/pages/FacultyDashboardPage'));
 
-const PageNotFound = lazy(() => import('@/pages/errors/PageNotFound'));
+const PageNotFound = lazy(() => import('@/app/pages/errors/PageNotFound'));
 
 export default function DashboardRouter() {
   const { tenant } = useTenant();

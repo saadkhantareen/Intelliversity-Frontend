@@ -1,4 +1,4 @@
-import api from './api'; // adjust path to your api.js
+import api from '@/shared/api/client';
 
 export const ProfileService = {
   // ── Admin: Create profiles ─────────────────────────────────────────────

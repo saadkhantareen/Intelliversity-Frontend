@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useTenant } from '@/context/TenantContext';
-import { authService } from '@/services/auth.service';
+import { useTenant } from '@/features/tenant';
+import { authService } from '../api/auth.service';
 import toast from 'react-hot-toast';
 
 function ResetPasswordPage() {

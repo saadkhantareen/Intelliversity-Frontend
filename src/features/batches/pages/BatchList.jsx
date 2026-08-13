@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import BatchService from '../../services/batch.service';
+import BatchService from '../api/batch.service';
 
 const BatchList = () => {
   const [batches, setBatches] = useState([]);

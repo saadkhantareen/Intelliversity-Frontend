@@ -1,4 +1,4 @@
-import { api } from '@/shared/services/client';
+import { api } from '@/shared/api/client';
 
 
 export const authService = {
@@ -7,5 +7,4 @@ export const authService = {
   resetPassword: (uidb64, token, data) =>
     api.post(`/api/v1/accounts/reset-password/${uidb64}/${token}/`, data),
   logout: () => Promise.resolve(),
-  // logout: ()            => api.post('/logout'),
 };

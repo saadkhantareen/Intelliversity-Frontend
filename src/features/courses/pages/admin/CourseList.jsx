@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import CourseService from '../../services/course.service';
+import CourseService from '../../api/course.service';
 
 const CourseList = () => {
   const [courses, setCourses] = useState([]);

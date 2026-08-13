@@ -1,6 +1,6 @@
 import axios from 'axios';
-import api from './api';
-import { ProfileService } from './profile.service';
+import api from '@/shared/api/client';
+import { ProfileService } from '@/features/profile';
 
 const uploadService = {
   uploadToCloudinary: async (file, assetCategory) => {

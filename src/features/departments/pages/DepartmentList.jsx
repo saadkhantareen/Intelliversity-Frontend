@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DepartmentService from '../../services/department.service';
+import DepartmentService from '../api/department.service';
 
 const DepartmentList = () => {
   const [departments, setDepartments] = useState([]);
