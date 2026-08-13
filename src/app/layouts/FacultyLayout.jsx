@@ -1,5 +1,5 @@
-import DashboardShell2 from './DashboardShell';
-import { useTenant } from '@/context/TenantContext';
+import DashboardShell from './DashboardShell';
+import { useTenant } from '@/features/tenant';
 import {
   IcGrid as IcGrid2,
   IcBook as IcBook2,
@@ -9,7 +9,7 @@ import {
   IcBell as IcBell2,
   IcMessage,
   IcChart as IcChart2,
-} from './icons';
+} from '@/shared/components/icons';
 
 const FACULTY_CONFIG = {
   accent: 'var(--brand-primary)',
@@ -46,5 +46,5 @@ export default function FacultyLayout() {
     accent: branding?.theme_config?.colors?.primary || FACULTY_CONFIG.accent,
   };
 
-  return <DashboardShell2 config={resolvedConfig} />;
+  return <DashboardShell config={resolvedConfig} />;
 }

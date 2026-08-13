@@ -1,12 +1,11 @@
-import { useTenant } from '@/context/TenantContext';
+import { lazy } from 'react';
+import { useTenant } from '@/features/tenant';
 
-// Dashboards
-import DashboardPage from '@/pages/student/DashboardPage';
-import AdminDashboardPage from '@/pages/admin/Dashboard';
-import FacultyDashboardPage from '@/pages/faculty/FacultyDashboardPage'; // create if not exists
+const StudentDashboardPage = lazy(() => import('@/features/dashboard/pages/StudentDashboardPage'));
+const AdminDashboardPage = lazy(() => import('@/features/dashboard/pages/AdminDashboardPage'));
+const FacultyDashboardPage = lazy(() => import('@features/dashboard/pages/FacultyDashboardPage'));
 
-// Error
-import PageNotFound from '@/pages/errors/PageNotFound';
+const PageNotFound = lazy(() => import('@/pages/errors/PageNotFound'));
 
 export default function DashboardRouter() {
   const { tenant } = useTenant();

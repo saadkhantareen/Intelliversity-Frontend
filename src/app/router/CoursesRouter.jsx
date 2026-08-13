@@ -1,16 +1,10 @@
-import { useTenant } from '@/context/TenantContext';
+import { lazy } from 'react';
+import { useTenant } from '@/features/tenant';
 
-// Student
-import RegisteredCourses from '@/pages/student/RegisteredCourses';
-
-// Admin
-import AdminCoursesPage from '@/pages/admin/CoursePage';
-
-// (optional) Faculty
-import FacultyCoursesPage from '@/pages/faculty/FacultyCoursesPage'; // create if needed
-
-// Error
-import PageNotFound from '@/pages/errors/PageNotFound';
+const RegisteredCourses = lazy(() => import('@/features/pages/student/RegisteredCourses'));
+const AdminCoursesPage = lazy(() => import('@/features/pages/admin/CoursePage'));
+const FacultyCoursesPage = lazy(() => import('@/features/pages/faculty/FacultyCoursesPage'));
+const PageNotFound = lazy(() => import('@/app/pages/errors/PageNotFound'));
 
 export default function CoursesRouter() {
   const { tenant, isTenantLoading } = useTenant();

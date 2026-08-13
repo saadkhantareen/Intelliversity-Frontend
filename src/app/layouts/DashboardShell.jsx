@@ -1,9 +1,8 @@
-// src/components/layout/DashboardShell.jsx
 import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { useTenant } from '../../context/TenantContext';
-import { IcBell, IcMenu, IcChevronLeft, IcLogout } from './icons';
+import { useAuth } from '@/features/auth';
+import { useTenant } from '@/features/tenant';
+import { IcBell, IcMenu, IcChevronLeft, IcLogout } from '@/shared/components/icons';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 

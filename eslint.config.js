@@ -23,6 +23,7 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'import/no-cycle': ['error', { maxDepth: '∞', ignoreExternal: true }],
     },
   },
 ]);

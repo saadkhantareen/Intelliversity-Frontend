@@ -1,5 +1,5 @@
 import DashboardShell from './DashboardShell';
-import { useTenant } from '@/context/TenantContext';
+import { useTenant } from '@/features/tenant';
 import {
   IcGrid, // For Dashboard
   IcClipboard, // For Registration Card
@@ -7,7 +7,7 @@ import {
   IcChart, // For Result Card
   IcBell, // For Profile (or use a User icon if available)
   IcBook, // For SoS
-} from './icons';
+} from '@/shared/components/icons';
 
 const STUDENT_CONFIG = {
   accent: 'var(--brand-primary)',

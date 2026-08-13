@@ -1,5 +1,5 @@
-import DashboardShell3 from './DashboardShell';
-import { useTenant } from '@/context/TenantContext';
+import DashboardShell from './DashboardShell';
+import { useTenant } from '@/features/tenant';
 import {
   IcGrid as IcGrid3,
   IcUsers as IcUsers3,
@@ -10,7 +10,7 @@ import {
   IcTenant,
   IcArchive as IcArchive3,
   IcBell as IcBell3,
-} from './icons';
+} from '@/shared/components/icons';
 
 const ADMIN_CONFIG = {
   accent: 'var(--brand-primary)',
