@@ -1,4 +1,5 @@
-import { api } from './api';
+import { api } from '@/shared/services/client';
+
 
 const BASE = '/api/v1/academics/terms';
 

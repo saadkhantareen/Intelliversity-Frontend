@@ -158,7 +158,7 @@ function StatCard({ label, value, icon, tone }) {
 // ──────────────────────────────────────
 // Main Dashboard
 // ──────────────────────────────────────
-const DashboardPage = () => {
+export default function AdminDashboardPage() {
   const [data, setData] = useState(DEMO_DATA);
   const [loading, setLoading] = useState(false); // change to true when fetching real data
 
@@ -306,5 +306,3 @@ const DashboardPage = () => {
     </div>
   );
 };
-
-export default DashboardPage;

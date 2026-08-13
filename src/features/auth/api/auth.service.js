@@ -1,4 +1,5 @@
-import { api } from './api';
+import { api } from '@/shared/services/client';
+
 
 export const authService = {
   login: (credentials) => api.post('/api/v1/accounts/login/', credentials),

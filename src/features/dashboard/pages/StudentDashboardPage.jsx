@@ -1,4 +1,4 @@
-function StudentDashboardPage() {
+export default function StudentDashboardPage() {
   return (
     <div className="p-6" style={{ color: 'var(--brand-text)' }}>
       <div
@@ -19,4 +19,3 @@ function StudentDashboardPage() {
   );
 }
 
-export default StudentDashboardPage;
