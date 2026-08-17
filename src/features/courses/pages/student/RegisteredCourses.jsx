@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { courseService } from '../../api/courseService';
+import CourseService from '../../api/course.service';
 
 /**
  * AttendanceBar Component
@@ -23,7 +23,7 @@ export default function RegisteredCourses() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    courseService
+    CourseService
       .getRegisteredCourses()
       .then((data) => {
         setCourses(data);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import CourseService from '../../api/course.service';
-import DepartmentService from '@/features/departments';
+import { DepartmentService } from '@/features/departments';
 
 const CourseForm = () => {
   const { id } = useParams();
