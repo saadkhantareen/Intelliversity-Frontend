@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import BatchService from '../api/batch.service';
-import {ProgramService} from '@/features/programs';
-import {CurriculumService} from '@/features/curriculum';
-import {AcademicYearService} from '@/features/academic-year';
+import { ProgramService } from '@/features/programs';
+import { CurriculumService } from '@/features/curriculum';
+import { AcademicYearService } from '@/features/academic-year';
 
 const BatchForm = () => {
   const { id } = useParams();

@@ -1,6 +1,5 @@
 import { api } from '@/shared/api/client';
 
-
 // This matches your backend: path("api/v1/academics/", include("apps.academics.urls"))
 // Plus the 'departments' route inside those urls.
 const BASE = '/api/v1/academics/departments';

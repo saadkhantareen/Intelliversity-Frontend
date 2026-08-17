@@ -51,7 +51,7 @@ const ProgramForm = () => {
         const messages = Object.entries(errorData)
           .map(([field, m]) => `${field}: ${m}`)
           .join('\n');
-        
+
         toast.error(`Validation Error:\n${messages}`, { autoClose: 7000 });
       } else {
         toast.error('An unexpected error occurred while saving.');
@@ -162,7 +162,9 @@ const ProgramForm = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Annual Intake Capacity</label>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">
+            Annual Intake Capacity
+          </label>
           <input
             type="number"
             className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"

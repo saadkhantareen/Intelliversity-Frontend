@@ -23,8 +23,7 @@ export default function RegisteredCourses() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    CourseService
-      .getRegisteredCourses()
+    CourseService.getRegisteredCourses()
       .then((data) => {
         setCourses(data);
         setLoading(false);

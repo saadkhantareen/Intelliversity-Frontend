@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function FacultyDashboardPage () {
+export default function FacultyDashboardPage() {
   return (
     <div className="p-6" style={{ color: 'var(--brand-text)' }}>
       <div
@@ -20,4 +20,3 @@ export default function FacultyDashboardPage () {
     </div>
   );
 }
-

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import TermService from '../api/term.service';
-import {AcademicYearService} from '@/features/academic-year';
+import { AcademicYearService } from '@/features/academic-year';
 
 const TermForm = () => {
   const { id } = useParams();

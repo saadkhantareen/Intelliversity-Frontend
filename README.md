@@ -2,9 +2,8 @@
 
 A React + Vite single-page application for managing academic operations — admissions cycles, courses, curriculum, batches, terms, and role-based portals for **Admins**, **Faculty**, and **Students** — built on a scalable, feature-based architecture.
 
-
-
 ## Table of Contents
+
 - [Multi-Tenant AI Powered University Management System](#multi-tenant-ai-powered-university-management-system)
   - [Table of Contents](#table-of-contents)
   - [Tech Stack](#tech-stack)
@@ -25,20 +24,17 @@ A React + Vite single-page application for managing academic operations — admi
   - [Coding Conventions](#coding-conventions)
   - [Contributing](#contributing)
 
-
-
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Build tool | Vite |
-| UI library | React |
-| Routing | React Router (lazy-loaded, portal-based) |
-| Package manager | pnpm |
-| HTTP client | Axios (via `shared/api/client.js`) |
-| Media/Uploads | Cloudinary |
-| Styling | Global CSS (`app/styles/index.css`) — update if you use Tailwind/CSS Modules |
-
+| Layer           | Technology                                                                   |
+| --------------- | ---------------------------------------------------------------------------- |
+| Build tool      | Vite                                                                         |
+| UI library      | React                                                                        |
+| Routing         | React Router (lazy-loaded, portal-based)                                     |
+| Package manager | pnpm                                                                         |
+| HTTP client     | Axios (via `shared/api/client.js`)                                           |
+| Media/Uploads   | Cloudinary                                                                   |
+| Styling         | Global CSS (`app/styles/index.css`) — update if you use Tailwind/CSS Modules |
 
 ## Prerequisites
 
@@ -74,7 +70,6 @@ pnpm dev
 
 The app will be available at `http://localhost:5173` by default.
 
-
 ## Environment Variables
 
 Create a `.env` file at the project root (never commit this file). Typical variables for this stack:
@@ -90,16 +85,14 @@ VITE_API_TENANTS_BRANDING_URL=your-tenant-branding-url
 
 Adjust these to match your actual `.env.example` — Vite only exposes variables prefixed with `VITE_` to the client.
 
-
 ## Available Scripts
 
-| Command | Description |
-|---|---|
-| `pnpm dev` | Starts the Vite dev server with HMR |
-| `pnpm build` | Builds an optimized production bundle |
-| `pnpm preview` | Serves the production build locally |
-| `pnpm lint` | Runs ESLint across the codebase |
-
+| Command        | Description                           |
+| -------------- | ------------------------------------- |
+| `pnpm dev`     | Starts the Vite dev server with HMR   |
+| `pnpm build`   | Builds an optimized production bundle |
+| `pnpm preview` | Serves the production build locally   |
+| `pnpm lint`    | Runs ESLint across the codebase       |
 
 ## Project Architecture
 
@@ -162,27 +155,26 @@ app  →  features  →  shared
 
 Quick reference for where new files belong:
 
-| File type | Location | What it's for |
-|---|---|---|
-| **Page/Screen** | `features/<feature>/pages/` | Route-level component rendered by the router for a specific URL. |
-| **Feature-specific component** | `features/<feature>/components/` (create if needed) | UI reused only within that one feature, not exposed elsewhere. |
-| **Shared/app-wide component** | `shared/components/ui/` | Generic, reusable UI primitives (cards, fields, buttons) used across multiple features. |
-| **Icons** | `shared/components/icons.jsx` | Centralized icon components used app-wide. |
-| **Feature-specific hook** | `features/<feature>/hooks/` | Stateful logic scoped to one feature (e.g. `useCourseFilters`). |
-| **Shared hook** | `shared/hooks/` | Generic, reusable hooks with no domain knowledge (e.g. `useDebounce`). |
-| **API/service call** | `features/<feature>/api/<name>.service.js` | Functions that call endpoints relevant to that feature (e.g. `course.service.js`). |
-| **Shared API client** | `shared/api/client.js` | The single configured Axios instance (base URL, interceptors, auth headers). All services import from here. |
-| **Context/Provider (feature)** | `features/<feature>/context/` | State/context scoped to one feature (e.g. `ProfileContext`). |
-| **Global provider composition** | `app/providers/AppProviders.jsx` | Wraps the app with all top-level providers (theme, auth, tenant, query client, etc.). |
-| **Portal-level layout** | `app/layouts/` | Layout shells shared across a portal (e.g. `AdminLayout`, `StudentLayout`). |
-| **Feature-level layout** | `features/<feature>/layouts/` | Nested layout used only within a feature (e.g. `CourseDetailLayout`). |
-| **Router/route config** | `app/router/` | Route definitions and lazy-loaded route trees, one router file per major section. |
-| **Feature-specific utility** | `features/<feature>/utils/` | Pure helper functions specific to that domain (e.g. `tenantUtils.js`). |
-| **Shared utility/lib** | `shared/lib/` | Generic, reusable helpers with no domain knowledge (formatters, validators, constants). |
-| **Error/fallback page** | `app/pages/errors/` | App-wide 404s and "portal not found" style pages. |
-| **Global styles** | `app/styles/` | App-wide CSS, resets, and design tokens. |
-| **New feature module** | `features/<new-feature>/` | Create the standard subfolders (`api`, `pages`, `index.js`, and any of `hooks`, `context`, `layouts`, `utils` you actually need) — don't scaffold folders you won't use. |
-
+| File type                       | Location                                            | What it's for                                                                                                                                                            |
+| ------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Page/Screen**                 | `features/<feature>/pages/`                         | Route-level component rendered by the router for a specific URL.                                                                                                         |
+| **Feature-specific component**  | `features/<feature>/components/` (create if needed) | UI reused only within that one feature, not exposed elsewhere.                                                                                                           |
+| **Shared/app-wide component**   | `shared/components/ui/`                             | Generic, reusable UI primitives (cards, fields, buttons) used across multiple features.                                                                                  |
+| **Icons**                       | `shared/components/icons.jsx`                       | Centralized icon components used app-wide.                                                                                                                               |
+| **Feature-specific hook**       | `features/<feature>/hooks/`                         | Stateful logic scoped to one feature (e.g. `useCourseFilters`).                                                                                                          |
+| **Shared hook**                 | `shared/hooks/`                                     | Generic, reusable hooks with no domain knowledge (e.g. `useDebounce`).                                                                                                   |
+| **API/service call**            | `features/<feature>/api/<name>.service.js`          | Functions that call endpoints relevant to that feature (e.g. `course.service.js`).                                                                                       |
+| **Shared API client**           | `shared/api/client.js`                              | The single configured Axios instance (base URL, interceptors, auth headers). All services import from here.                                                              |
+| **Context/Provider (feature)**  | `features/<feature>/context/`                       | State/context scoped to one feature (e.g. `ProfileContext`).                                                                                                             |
+| **Global provider composition** | `app/providers/AppProviders.jsx`                    | Wraps the app with all top-level providers (theme, auth, tenant, query client, etc.).                                                                                    |
+| **Portal-level layout**         | `app/layouts/`                                      | Layout shells shared across a portal (e.g. `AdminLayout`, `StudentLayout`).                                                                                              |
+| **Feature-level layout**        | `features/<feature>/layouts/`                       | Nested layout used only within a feature (e.g. `CourseDetailLayout`).                                                                                                    |
+| **Router/route config**         | `app/router/`                                       | Route definitions and lazy-loaded route trees, one router file per major section.                                                                                        |
+| **Feature-specific utility**    | `features/<feature>/utils/`                         | Pure helper functions specific to that domain (e.g. `tenantUtils.js`).                                                                                                   |
+| **Shared utility/lib**          | `shared/lib/`                                       | Generic, reusable helpers with no domain knowledge (formatters, validators, constants).                                                                                  |
+| **Error/fallback page**         | `app/pages/errors/`                                 | App-wide 404s and "portal not found" style pages.                                                                                                                        |
+| **Global styles**               | `app/styles/`                                       | App-wide CSS, resets, and design tokens.                                                                                                                                 |
+| **New feature module**          | `features/<new-feature>/`                           | Create the standard subfolders (`api`, `pages`, `index.js`, and any of `hooks`, `context`, `layouts`, `utils` you actually need) — don't scaffold folders you won't use. |
 
 ## Barrel Imports/Exports
 
@@ -209,11 +201,10 @@ import CourseList from '@/features/courses/pages/admin/CourseList';
 ```
 
 **Why this matters:**
+
 - It gives each feature a clear, intentional **public contract** — internal file moves/renames don't break consumers.
 - It prevents other parts of the app from depending on implementation details (like exact file paths or internal folder structure) that should be free to change.
 - It makes it obvious, at a glance, what a feature actually offers to the rest of the app.
-
-
 
 ## Why Barrel Imports Are NOT Used in Routers
 
@@ -229,7 +220,7 @@ const CourseList = lazy(() =>
 );
 ```
 
-**Reason:** `React.lazy()` relies on Vite/Rollup being able to statically analyze each `import()` call and split it into its own chunk. A feature's `index.js` barrel re-exports *everything* from that feature in one module. If a router lazily imports through the barrel:
+**Reason:** `React.lazy()` relies on Vite/Rollup being able to statically analyze each `import()` call and split it into its own chunk. A feature's `index.js` barrel re-exports _everything_ from that feature in one module. If a router lazily imports through the barrel:
 
 - Bundlers can't cleanly split just the one page you need — they either bundle the **entire feature** into that chunk, or fail to tree-shake unused exports properly.
 - You lose the primary benefit of route-based code-splitting: shipping only the JS a given route actually needs.
@@ -237,11 +228,10 @@ const CourseList = lazy(() =>
 
 **Rule of thumb:** Barrel files are for **cross-feature/app-level consumption** (providers, non-router composition). Routers always import the specific page file directly.
 
-
-
 ## Dependency Overview & Don'ts
 
 ### Core dependencies (see `package.json` for exact versions)
+
 - `react`, `react-dom` — UI library
 - `react-router-dom` — routing
 - `axios` — HTTP client, configured once in `shared/api/client.js`
@@ -261,18 +251,15 @@ const CourseList = lazy(() =>
 - 🚫 **Don't** introduce a new state-management/data-fetching library without team discussion — stay consistent with existing patterns (Context + services, etc.).
 - 🚫 **Don't** create deep, ad-hoc folders inside a feature "just in case" — only scaffold `hooks/`, `context/`, `layouts/`, or `utils/` when the feature actually needs them.
 
-
-
 ## Coding Conventions
 
-| Convention | Rule | Example |
-|---|---|---|
-| Components/Pages | `PascalCase.jsx` | `CourseForm.jsx` |
-| Hooks | `camelCase.js`, prefixed with `use` | `useBranding.js` |
-| Services | `<domain>.service.js` | `course.service.js` |
-| Feature folders | `kebab-case` | `academic-year/` |
-| Barrel file | Always `index.js` at feature root | `features/courses/index.js` |
-
+| Convention       | Rule                                | Example                     |
+| ---------------- | ----------------------------------- | --------------------------- |
+| Components/Pages | `PascalCase.jsx`                    | `CourseForm.jsx`            |
+| Hooks            | `camelCase.js`, prefixed with `use` | `useBranding.js`            |
+| Services         | `<domain>.service.js`               | `course.service.js`         |
+| Feature folders  | `kebab-case`                        | `academic-year/`            |
+| Barrel file      | Always `index.js` at feature root   | `features/courses/index.js` |
 
 ## Contributing
 
@@ -281,5 +268,3 @@ const CourseList = lazy(() =>
 3. Keep commits focused; use clear, conventional commit messages (e.g. `feat(courses): add bulk enrollment`).
 4. Run `pnpm lint` before opening a PR.
 5. Open a PR against `staging` with a short description of what changed and why.
-
-
