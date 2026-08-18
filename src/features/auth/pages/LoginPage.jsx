@@ -47,10 +47,6 @@ export default function LoginPage() {
       // error already shown via toast in AuthContext
     }
 
-    try {
-      await login({ email, password });
-      navigate('/dashboard');
-    } catch (error) {}
   };
 
   const bgImage = tenant?.page_asset?.background_image_url;
