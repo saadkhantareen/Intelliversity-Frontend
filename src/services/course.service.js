@@ -27,6 +27,11 @@ const CourseService = {
     const response = await api.delete(`${BASE}/${id}/`);
     return response.data;
   },
+  getRegisteredCourses: async () => {
+    const response = await api.get(`${BASE}/`);
+    return response.data;
+  },
 };
 
+export const courseService = CourseService;
 export default CourseService;

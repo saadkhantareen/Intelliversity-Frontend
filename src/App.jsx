@@ -1,8 +1,10 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import ProtectedRoute from '@/components/shared/ProtectedRoute';
 import { useTenant } from './context/TenantContext';
 import { useBrandingEffects } from '@/hooks/useBrandingEffects';
+import AttendanceRoutes from './routes/AttendanceRoutes';
 
 // Auth Pages
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
@@ -147,6 +149,9 @@ function ProtectedAppRoutes() {
 
         <Route path="/users/students" element={<StudentsPage />} />
         <Route path="/users/faculty" element={<FacultyPage />} />
+
+        {/* Attendance Module */}
+        <Route path="/attendance/*" element={<AttendanceRoutes />} />
       </Route>
     </Route>
   );
@@ -157,6 +162,7 @@ export default function App() {
 
   return (
     <Suspense fallback={<FullScreenLoader />}>
+      <Toaster position="top-right" />
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />

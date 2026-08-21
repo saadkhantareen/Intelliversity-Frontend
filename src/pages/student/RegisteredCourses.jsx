@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { courseService } from '@/services/courseService';
+import { courseService } from '@/services/course.service';
 
 /**
  * AttendanceBar Component

@@ -45,6 +45,7 @@ const ADMIN_CONFIG = {
         { label: 'Batches', to: '/academics/batches', Icon: IcUsers3 },
         { label: 'Student', to: '/users/students/', Icon: IcBook3 },
         { label: 'Faculty', to: '/users/faculty/', Icon: IcBook3 },
+        { label: 'Attendance', to: '/attendance', Icon: IcBook3 },
       ],
     },
   ],

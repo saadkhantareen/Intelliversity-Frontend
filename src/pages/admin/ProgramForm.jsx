@@ -16,6 +16,7 @@ const ProgramForm = () => {
     total_fee: '',
     total_credit_hours_required: '',
     number_of_semesters: '',
+    annual_intake_capacity: '',
   });
 
   useEffect(() => {
@@ -154,6 +155,17 @@ const ProgramForm = () => {
             className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
             value={formData.number_of_semesters}
             onChange={(e) => setFormData({ ...formData, number_of_semesters: e.target.value })}
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Annual Intake Capacity</label>
+          <input
+            type="number"
+            className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+            value={formData.annual_intake_capacity}
+            onChange={(e) => setFormData({ ...formData, annual_intake_capacity: e.target.value })}
             required
           />
         </div>

@@ -3,11 +3,8 @@ import { useTenant } from '@/context/TenantContext';
 // Student
 import RegisteredCourses from '@/pages/student/RegisteredCourses';
 
-// Admin
-import AdminCoursesPage from '@/pages/admin/CoursePage';
-
-// (optional) Faculty
-import FacultyCoursesPage from '@/pages/faculty/FacultyCoursesPage'; // create if needed
+// Admin & Faculty
+import CourseList from '@/pages/admin/CourseList';
 
 // Error
 import PageNotFound from '@/pages/errors/PageNotFound';
@@ -30,10 +27,8 @@ export default function CoursesRouter() {
       return <RegisteredCourses />;
 
     case 'admin':
-      return <AdminCoursesPage />;
-
     case 'faculty':
-      return <FacultyCoursesPage />; // or temporary div
+      return <CourseList />;
 
     default:
       return <PageNotFound />;
