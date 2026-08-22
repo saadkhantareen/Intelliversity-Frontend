@@ -23,6 +23,11 @@ const BatchService = {
     const response = await api.delete(`${BASE}/${id}/`);
     return response.data;
   },
+  // In batch.service.js
+  autoGenerateSections: async (id) => {
+    const res = await api.post(`/api/v1/academics/batches/${id}/auto-generate-sections/`);
+    return res.data;
+},
 };
 
 export default BatchService;
