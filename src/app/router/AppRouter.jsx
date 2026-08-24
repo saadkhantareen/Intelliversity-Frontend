@@ -46,13 +46,21 @@ const ProgramForm = lazy(() => import('@/features/programs/pages/ProgramForm'));
 const TermList = lazy(() => import('@/features/terms/pages/TermList'));
 const TermForm = lazy(() => import('@/features/terms/pages/TermForm'));
 
+// Enrollments / Course Offerings
+const CourseOfferingList = lazy(() => import('@/features/enrollments/pages/CourseOfferingList'));
+const CourseOfferingForm = lazy(() => import('@/features/enrollments/pages/CourseOfferingForm'));
+
+// Examinations / Assessment Types & Policies
+const AssessmentTypesPage = lazy(() => import('@/features/examination/pages/AssessmentTypesPage'));
+const AssessmentPoliciesPage = lazy(() => import('@/features/examination/pages/AssessmentPoliciesPage'));
+const GradePoliciesPage = lazy(() => import('@/features/examination/pages/GradePoliciesPage'));
+const GradeScalesPage = lazy(() => import('@/features/examination/pages/GradeScalesPage'));
+
 // Users / Profile
 const StudentsPage = lazy(() => import('@/features/profile/pages/StudentsPage'));
 const FacultyPage = lazy(() => import('@/features/profile/pages/FacultyPage'));
 const StudentForm = lazy(() => import('@/features/profile/pages/StudentForm'));
 const FacultyForm = lazy(() => import('@/features/profile/pages/FacultyForm'));
-// const UserPage = lazy(() => import('@/features/profile/pages/UserPage'));
-// const UserDetailPage = lazy(() => import('@/features/profile/pages/UserDetailPage'));
 
 // Loading
 function FullScreenLoader({ text = 'Loading...' }) {
@@ -77,66 +85,57 @@ function ProtectedAppRoutes() {
 
         {/* Academic Years */}
         <Route path="/academics/academic-years" element={<AcademicYearList />} />
-
         <Route path="/academics/academic-years/create" element={<AcademicYearForm />} />
-
         <Route path="/academics/academic-years/edit/:id" element={<AcademicYearForm />} />
 
         {/* Terms */}
         <Route path="/academics/terms" element={<TermList />} />
-
         <Route path="/academics/terms/create" element={<TermForm />} />
-
         <Route path="/academics/terms/edit/:id" element={<TermForm />} />
 
         {/* Departments */}
         <Route path="/academics/departments" element={<DepartmentList />} />
-
         <Route path="/academics/departments/create" element={<DepartmentForm />} />
-
         <Route path="/academics/departments/edit/:id" element={<DepartmentForm />} />
 
         {/* Programs */}
         <Route path="/academics/programs" element={<ProgramList />} />
-
         <Route path="/academics/programs/create" element={<ProgramForm />} />
-
         <Route path="/academics/programs/edit/:id" element={<ProgramForm />} />
 
         {/* Courses */}
         <Route path="/academics/courses" element={<CourseList />} />
-
         <Route path="/academics/courses/create" element={<CourseForm />} />
-
         <Route path="/academics/courses/edit/:id" element={<CourseForm />} />
 
         {/* Curriculums */}
         <Route path="/academics/curriculums" element={<CurriculumList />} />
-
         <Route path="/academics/curriculums/create" element={<CurriculumForm />} />
-
         <Route path="/academics/curriculums/edit/:id" element={<CurriculumForm />} />
 
         {/* Batches */}
         <Route path="/academics/batches" element={<BatchList />} />
-
         <Route path="/academics/batches/create" element={<BatchForm />} />
-
         <Route path="/academics/batches/edit/:id" element={<BatchForm />} />
 
-        {/* Users - no users only specific roles */}
-        {/* <Route path="/users" element={<UserPage />} />
+        {/* Enrollments / Course Offerings */}
+        <Route path="/enrollments/course-offerings" element={<CourseOfferingList />} />
+        <Route path="/enrollments/course-offerings/create" element={<CourseOfferingForm />} />
+        <Route path="/enrollments/course-offerings/edit/:id" element={<CourseOfferingForm />} />
 
-        <Route path="/users/:id" element={<UserDetailPage />} /> */}
+        {/* Examinations */}
+        <Route path="/examinations/assessment-types" element={<AssessmentTypesPage />} />
+        <Route path="/examinations/assessment-policies" element={<AssessmentPoliciesPage />} />
+        <Route path="/examinations/grade-policies" element={<GradePoliciesPage />} />
+        <Route path="/examinations/grade-scales" element={<GradeScalesPage />} />
+
 
         {/* Students */}
         <Route path="/users/students" element={<StudentsPage />} />
-
         <Route path="/users/students/create" element={<StudentForm />} />
 
         {/* Faculty */}
         <Route path="/users/faculty" element={<FacultyPage />} />
-
         <Route path="/users/faculty/create" element={<FacultyForm />} />
 
         {/* Student */}
@@ -153,11 +152,8 @@ export default function AppRouter() {
       <Routes>
         {/* Public */}
         <Route path="/" element={<Navigate to="/login" replace />} />
-
         <Route path="/login" element={<LoginPage />} />
-
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-
         <Route path="/reset-password/:uidb64/:token" element={<ResetPasswordPage />} />
 
         {/* Protected */}
@@ -165,7 +161,6 @@ export default function AppRouter() {
 
         {/* Errors */}
         <Route path="/portal-not-found" element={<PortalNotFound />} />
-
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </Suspense>

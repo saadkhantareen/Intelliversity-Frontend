@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import BatchService from '../api/batch.service';
 import { ProgramService } from '@/features/programs';
 import { CurriculumService } from '@/features/curriculum';
-import { AcademicYearService } from '@/features/academic-year';
+import TermService from '../../terms/api/term.service';
 
 const BatchForm = () => {
   const { id } = useParams();
@@ -11,43 +11,51 @@ const BatchForm = () => {
 
   const [programs, setPrograms] = useState([]);
   const [curriculums, setCurriculums] = useState([]);
-  const [academicYears, setAcademicYears] = useState([]);
+  const [terms, setTerms] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
     program: '',
     curriculum: '',
-    start_academic_year: '',
-    start_date: '',
-    end_date: '',
-    max_students: 0,
-    is_active: true,
-    sections: [],
+    admission_term: '',
+    status: 'ACTIVE',
+    max_students: 100,
+    expected_current_semester: 1,
+    max_students_per_section: 30,
   });
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [progRes, currRes, yearRes] = await Promise.all([
+        const [progRes, currRes, termRes] = await Promise.all([
           ProgramService.getPrograms(),
           CurriculumService.getCurriculums(),
-          AcademicYearService.getYears(),
+          TermService.getTerms(),
         ]);
 
-        setPrograms(progRes);
-        setCurriculums(currRes);
-        setAcademicYears(yearRes);
+        // Normalize response payloads
+        const parsedPrograms = Array.isArray(progRes) ? progRes : progRes?.results || progRes?.data || [];
+        const parsedCurriculums = Array.isArray(currRes) ? currRes : currRes?.results || currRes?.data || [];
+        const parsedTerms = Array.isArray(termRes) ? termRes : termRes?.results || termRes?.data || [];
+
+        setPrograms(parsedPrograms);
+        setCurriculums(parsedCurriculums);
+        setTerms(parsedTerms);
 
         if (id) {
           const batchData = await BatchService.getBatchById(id);
+          const data = batchData?.data || batchData;
+
           setFormData({
-            ...batchData,
-            program:
-              typeof batchData.program === 'object' ? batchData.program.code : batchData.program,
-            curriculum:
-              currRes.find((c) => c.name === batchData.curriculum)?.id || batchData.curriculum,
-            start_academic_year: batchData.start_academic_year?.id || batchData.start_academic_year,
+            name: data.name || '',
+            program: typeof data.program === 'object' ? data.program?.code || data.program?.id : data.program || '',
+            curriculum: typeof data.curriculum === 'object' ? data.curriculum?.id : data.curriculum || '',
+            admission_term: typeof data.admission_term === 'object' ? data.admission_term?.id : data.admission_term || '',
+            status: data.status || 'ACTIVE',
+            max_students: data.max_students ?? 100,
+            expected_current_semester: data.expected_current_semester ?? 1,
+            max_students_per_section: data.max_students_per_section ?? 30,
           });
         }
       } catch (err) {
@@ -57,30 +65,20 @@ const BatchForm = () => {
     loadData();
   }, [id]);
 
-  const addSectionRow = () => {
-    setFormData({
-      ...formData,
-      sections: [...formData.sections, { name: '', total_seats: 0 }],
-    });
-  };
-
-  const removeSectionRow = (index) => {
-    const newSections = formData.sections.filter((_, i) => i !== index);
-    setFormData({ ...formData, sections: newSections });
-  };
-
-  const updateSectionRow = (index, field, value) => {
-    const newSections = [...formData.sections];
-    newSections[index][field] = value;
-    setFormData({ ...formData, sections: newSections });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    const payload = {
+      ...formData,
+      max_students: Number(formData.max_students),
+      expected_current_semester: Number(formData.expected_current_semester),
+      max_students_per_section: Number(formData.max_students_per_section),
+    };
+
     try {
-      if (id) await BatchService.updateBatch(id, formData);
-      else await BatchService.createBatch(formData);
+      if (id) await BatchService.updateBatch(id, payload);
+      else await BatchService.createBatch(payload);
       navigate('/academics/batches');
     } catch (err) {
       alert('Failed to save batch: ' + JSON.stringify(err.response?.data || 'Server Error'));
@@ -90,7 +88,7 @@ const BatchForm = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-6 bg-white shadow-xl rounded-2xl mt-10 mb-10">
+    <div className="max-w-4xl mx-auto p-6 bg-white shadow-xl rounded-2xl mt-10 mb-10">
       <div className="flex items-center justify-between mb-8 border-b pb-4">
         <h2 className="text-3xl font-bold text-gray-800">{id ? 'Update' : 'Create'} Batch</h2>
         <span className="text-sm text-gray-500 uppercase font-semibold tracking-wider">
@@ -98,8 +96,8 @@ const BatchForm = () => {
         </span>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Basic Info Section */}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Name & Status */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2">
             <label className="block text-sm font-bold text-gray-700 uppercase mb-1">
@@ -110,25 +108,27 @@ const BatchForm = () => {
               className="w-full border-2 p-3 rounded-xl focus:border-indigo-500 outline-none transition-all"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="e.g. Batch 2024 - Fall"
+              placeholder="e.g. Batch 2024 - CS"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-bold text-gray-700 uppercase mb-1">
-              Max Students
-            </label>
-            <input
-              type="number"
-              className="w-full border-2 p-3 rounded-xl focus:border-indigo-500 outline-none transition-all"
-              value={formData.max_students}
-              onChange={(e) => setFormData({ ...formData, max_students: e.target.value })}
+            <label className="block text-sm font-bold text-gray-700 uppercase mb-1">Status</label>
+            <select
+              className="w-full border-2 p-3 rounded-xl focus:border-indigo-500 outline-none bg-white transition-all"
+              value={formData.status}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
               required
-            />
+            >
+              <option value="ACTIVE">ACTIVE</option>
+              <option value="INACTIVE">INACTIVE</option>
+              <option value="COMPLETED">COMPLETED</option>
+              <option value="ARCHIVED">ARCHIVED</option>
+            </select>
           </div>
         </div>
 
-        {/* Academic Mapping Section */}
+        {/* Mappings: Program, Curriculum, Admission Term */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <label className="block text-sm font-bold text-gray-700 uppercase mb-1">Program</label>
@@ -140,12 +140,13 @@ const BatchForm = () => {
             >
               <option value="">Select Program</option>
               {programs.map((p) => (
-                <option key={p.id} value={p.code}>
-                  {p.name}
+                <option key={p.id || p.code} value={p.code || p.id}>
+                  {p.name} ({p.code || p.id})
                 </option>
               ))}
             </select>
           </div>
+
           <div>
             <label className="block text-sm font-bold text-gray-700 uppercase mb-1">
               Curriculum
@@ -164,121 +165,76 @@ const BatchForm = () => {
               ))}
             </select>
           </div>
+
           <div>
             <label className="block text-sm font-bold text-gray-700 uppercase mb-1">
-              Academic Year
+              Admission Term
             </label>
             <select
               className="w-full border-2 p-3 rounded-xl focus:border-indigo-500 outline-none bg-white transition-all"
-              value={formData.start_academic_year}
-              onChange={(e) => setFormData({ ...formData, start_academic_year: e.target.value })}
+              value={formData.admission_term}
+              onChange={(e) => setFormData({ ...formData, admission_term: e.target.value })}
               required
             >
-              <option value="">Select Year</option>
-              {academicYears.map((year) => (
-                <option key={year.id} value={year.id}>
-                  {year.name} {year.is_active ? '(Active)' : ''}
+              <option value="">Select Admission Term</option>
+              {terms.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
                 </option>
               ))}
             </select>
           </div>
         </div>
 
-        {/* Schedule Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Capacity & Semester Rules */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <label className="block text-sm font-bold text-gray-700 uppercase mb-1">
-              Batch Start Date
+              Max Students
             </label>
             <input
-              type="date"
+              type="number"
+              min="0"
               className="w-full border-2 p-3 rounded-xl focus:border-indigo-500 outline-none transition-all"
-              value={formData.start_date}
-              onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+              value={formData.max_students}
+              onChange={(e) => setFormData({ ...formData, max_students: e.target.value })}
               required
             />
           </div>
+
           <div>
             <label className="block text-sm font-bold text-gray-700 uppercase mb-1">
-              Batch End Date
+              Max Students Per Section
             </label>
             <input
-              type="date"
+              type="number"
+              min="0"
               className="w-full border-2 p-3 rounded-xl focus:border-indigo-500 outline-none transition-all"
-              value={formData.end_date}
-              onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+              value={formData.max_students_per_section}
+              onChange={(e) => setFormData({ ...formData, max_students_per_section: e.target.value })}
               required
             />
           </div>
-        </div>
 
-        {/* Section Management */}
-        <div className="border-t pt-6 bg-gray-50/50 p-6 rounded-2xl border-dashed border-2">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h3 className="text-xl font-bold text-gray-800">Batch Sections</h3>
-              <p className="text-xs text-gray-500">Add group divisions for this batch</p>
-            </div>
-            <button
-              type="button"
-              onClick={addSectionRow}
-              className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-green-700 transition-colors shadow-sm"
-            >
-              <span className="text-xl">+</span> Add Section
-            </button>
-          </div>
-
-          <div className="space-y-4">
-            {formData.sections.map((row, index) => (
-              <div
-                key={index}
-                className="flex gap-4 items-end bg-white p-4 rounded-xl shadow-sm border border-gray-200"
-              >
-                <div className="flex-1">
-                  <label className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1 block">
-                    Section Name
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full border-b-2 border-gray-100 p-2 focus:border-indigo-400 outline-none transition-all"
-                    value={row.name}
-                    onChange={(e) => updateSectionRow(index, 'name', e.target.value)}
-                    placeholder="e.g. Section A"
-                    required
-                  />
-                </div>
-                <div className="w-32">
-                  <label className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1 block">
-                    Seats
-                  </label>
-                  <input
-                    type="number"
-                    className="w-full border-b-2 border-gray-100 p-2 focus:border-indigo-400 outline-none transition-all"
-                    value={row.total_seats}
-                    onChange={(e) => updateSectionRow(index, 'total_seats', e.target.value)}
-                    required
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => removeSectionRow(index)}
-                  className="bg-red-50 text-red-500 p-2 rounded-lg hover:bg-red-500 hover:text-white transition-all"
-                  title="Remove Section"
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
-            {formData.sections.length === 0 && (
-              <p className="text-center text-gray-400 italic py-4 text-sm font-medium">
-                No sections added yet. Click "+ Add Section" to start.
-              </p>
-            )}
+          <div>
+            <label className="block text-sm font-bold text-gray-700 uppercase mb-1">
+              Expected Semester
+            </label>
+            <input
+              type="number"
+              min="0"
+              className="w-full border-2 p-3 rounded-xl focus:border-indigo-500 outline-none transition-all"
+              value={formData.expected_current_semester}
+              onChange={(e) =>
+                setFormData({ ...formData, expected_current_semester: e.target.value })
+              }
+              required
+            />
           </div>
         </div>
 
         {/* Form Actions */}
-        <div className="flex justify-end gap-4 pt-8">
+        <div className="flex justify-end gap-4 pt-6 border-t">
           <button
             type="button"
             onClick={() => navigate(-1)}
@@ -289,13 +245,13 @@ const BatchForm = () => {
           <button
             type="submit"
             disabled={loading}
-            className="px-12 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-50"
+            className="px-12 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all disabled:opacity-50"
           >
             {loading
               ? 'Processing...'
               : id
-                ? 'Update Batch Configuration'
-                : 'Confirm & Create Batch'}
+              ? 'Update Batch Configuration'
+              : 'Confirm & Create Batch'}
           </button>
         </div>
       </form>

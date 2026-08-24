@@ -12,10 +12,10 @@ const EMPTY_FORM = {
   last_name: '',
   // Profile Picture
   profile_picture_public_id: '',
-  profile_picture_url: '', // Strictly for frontend preview
+  profile_picture_url: '',
   // Student-specific
   registration_id: '',
-  section: '',
+  batch: '',
   cgpa: '',
   // Personal
   father_name: '',
@@ -35,21 +35,20 @@ const EMPTY_FORM = {
 };
 
 export default function StudentForm({ onSuccess, onCancel }) {
-  const [sections, setSections] = useState([]);
+  const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [form, setForm] = useState(EMPTY_FORM);
 
-  // Initialize Cloudinary Hook
   const { uploadToCloudinary, isUploading } = useCloudinary();
 
   useEffect(() => {
     api
-      .get('/api/v1/academics/sections/')
-      .then((res) => setSections(res.data?.results ?? res.data ?? []))
+      .get('/api/v1/academics/batches/')
+      .then((res) => setBatches(res.data?.results ?? res.data ?? []))
       .catch(() => {
-        setSections([]);
-        toast.error('Failed to load sections. Please refresh.');
+        setBatches([]);
+        toast.error('Failed to load batches. Please refresh.');
       });
   }, []);
 
@@ -58,7 +57,6 @@ export default function StudentForm({ onSuccess, onCancel }) {
     setErrors((prev) => ({ ...prev, [field]: null }));
   };
 
-  // ── Image Upload Handler ───────────────────────────────────────────────
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -70,7 +68,6 @@ export default function StudentForm({ onSuccess, onCancel }) {
     }
 
     try {
-      // Pass "profile" as the asset category
       const { public_id, secure_url } = await uploadToCloudinary(file, 'profile');
 
       setForm((prev) => ({
@@ -82,19 +79,24 @@ export default function StudentForm({ onSuccess, onCancel }) {
       toast.success('Profile picture uploaded!');
     } catch (error) {
       console.error('Upload Error:', error);
-      // The hook handles throwing the error toast, so we just catch to prevent crashes
     } finally {
-      e.target.value = null; // Reset input
+      e.target.value = null;
     }
   };
 
   function flattenErrors(data) {
     const flat = {};
-    if (data.registration_id) flat.registration_id = data.registration_id[0];
-    if (data.section) flat.section = data.section[0];
-    if (data.cgpa) flat.cgpa = data.cgpa[0];
-    if (data.non_field_errors) flat.non_field = data.non_field_errors[0];
-    if (data.detail) flat.non_field = data.detail;
+
+    if (typeof data === 'string') {
+      flat.non_field = 'A server error occurred. Please check batch selection.';
+      return flat;
+    }
+
+    if (data.registration_id) flat.registration_id = Array.isArray(data.registration_id) ? data.registration_id[0] : data.registration_id;
+    if (data.batch) flat.batch = Array.isArray(data.batch) ? data.batch[0] : data.batch;
+    if (data.cgpa) flat.cgpa = Array.isArray(data.cgpa) ? data.cgpa[0] : data.cgpa;
+    if (data.non_field_errors) flat.non_field = Array.isArray(data.non_field_errors) ? data.non_field_errors[0] : data.non_field_errors;
+    if (data.detail) flat.non_field = typeof data.detail === 'string' ? data.detail : 'Invalid request.';
 
     const bp = data.base_profile ?? {};
     if (bp.father_name) flat.father_name = bp.father_name[0];
@@ -110,7 +112,6 @@ export default function StudentForm({ onSuccess, onCancel }) {
     if (bp.country) flat.country = bp.country[0];
     if (bp.bio) flat.bio = bp.bio[0];
 
-    // Add flattening for profile picture if backend validates it
     if (bp.profile_picture_public_id)
       flat.profile_picture_public_id = bp.profile_picture_public_id[0];
 
@@ -123,18 +124,17 @@ export default function StudentForm({ onSuccess, onCancel }) {
     return flat;
   }
 
-  // Returns first error message found across all fields — shown in toast summary
   function firstError(flat) {
-    return Object.values(flat).find(Boolean) ?? 'Please fix the errors and try again.';
+    return flat.non_field || Object.values(flat).find((msg) => typeof msg === 'string') || 'Please fix the errors and try again.';
   }
 
   function buildPayload() {
     return {
       registration_id: form.registration_id.trim(),
-      section: form.section,
+      batch: form.batch,
       cgpa: form.cgpa || null,
       base_profile: {
-        profile_picture_public_id: form.profile_picture_public_id || null, // Appended to payload here
+        profile_picture_public_id: form.profile_picture_public_id || null,
         user: {
           email: form.email.trim(),
           first_name: form.first_name.trim(),
@@ -181,13 +181,12 @@ export default function StudentForm({ onSuccess, onCancel }) {
       const flat = flattenErrors(errData);
       setErrors(flat);
 
-      toast.error(firstError(flat), { id: toastId, duration: 5000 });
+      toast.error(firstError(flat), { id: toastId, duration: 4000 });
     } finally {
       setLoading(false);
     }
   }
 
-  // ── Field helpers ──────────────────────────────────────────────────────
   const inp = (id, label, type = 'text', placeholder = '', required = false) => (
     <div className="flex flex-col gap-1">
       <label className="text-sm font-medium text-gray-700">
@@ -243,7 +242,6 @@ export default function StudentForm({ onSuccess, onCancel }) {
       <div className="flex justify-between items-end border-b pb-1 mt-6 mb-3">
         <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 m-0">Account</p>
 
-        {/* Profile Picture Uploader aligned to Top Right */}
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-full border border-gray-300 bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
             {form.profile_picture_url ? (
@@ -309,23 +307,23 @@ export default function StudentForm({ onSuccess, onCancel }) {
 
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium text-gray-700">
-            Section<span className="text-red-500 ml-0.5">*</span>
+            Batch<span className="text-red-500 ml-0.5">*</span>
           </label>
           <select
-            value={form.section}
-            onChange={set('section')}
+            value={form.batch}
+            onChange={set('batch')}
             className={`border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.section ? 'border-red-400 bg-red-50' : 'border-gray-300'
+              errors.batch ? 'border-red-400 bg-red-50' : 'border-gray-300'
             }`}
           >
-            <option value="">— select section —</option>
-            {sections.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name ?? s.id}
+            <option value="">— select batch —</option>
+            {batches.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.name ?? b.title ?? b.id}
               </option>
             ))}
           </select>
-          {errors.section && <p className="text-xs text-red-500">{errors.section}</p>}
+          {errors.batch && <p className="text-xs text-red-500">{errors.batch}</p>}
         </div>
 
         {inp('cgpa', 'CGPA', 'number', '0.00 – 4.00')}

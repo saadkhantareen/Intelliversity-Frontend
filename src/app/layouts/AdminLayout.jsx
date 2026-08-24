@@ -28,7 +28,6 @@ const ADMIN_CONFIG = {
     {
       title: 'Academics',
       items: [
-        // These paths now match your App.jsx Route definitions exactly
         {
           label: 'Departments',
           to: '/academics/departments',
@@ -45,6 +44,23 @@ const ADMIN_CONFIG = {
         { label: 'Batches', to: '/academics/batches', Icon: IcUsers3 },
         { label: 'Student', to: '/users/students/', Icon: IcBook3 },
         { label: 'Faculty', to: '/users/faculty/', Icon: IcBook3 },
+      ],
+    },
+    {
+      title: 'Enrollments',
+      items: [
+        { label: 'Course Offering', to: '/enrollments/course-offerings', Icon: IcBook3 },
+        { label: 'Faculty Assignment', to: '/enrollments/faculty-assignments', Icon: IcUsers3 },
+        { label: 'Student Assignment', to: '/enrollments/student-assignments', Icon: IcUsers3 },
+      ],
+    },
+    {
+      title: 'Examination',
+      items: [
+        { label: 'Assessment Types', to: '/examinations/assessment-types', Icon: IcChart3 },
+        { label: 'Assessment Policies', to: '/examinations/assessment-policies', Icon: IcChart3 },
+        { label: 'Grade Policies', to: '/examinations/grade-policies', Icon: IcChart3 },
+        { label: 'Grade Scales', to: '/examinations/grade-scales', Icon: IcChart3 },
       ],
     },
   ],
