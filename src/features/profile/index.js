@@ -1,0 +1,12 @@
+export * from './api/profile.service';
+export * from './api/user.service';
+export * from './context/ProfileContext';
+export { default as AdminProfilePage } from './pages/AdminProfilePage';
+export { default as FacultyForm } from './pages/FacultyForm';
+export { default as FacultyPage } from './pages/FacultyPage';
+export { default as FacultyProfilePage } from './pages/FacultyProfilePage';
+export { default as StudentForm } from './pages/StudentForm';
+export { default as StudentProfilePage } from './pages/StudentProfilePage';
+export { default as StudentsPage } from './pages/StudentsPage';
+// export { default as UserDetailPage } from './pages/UserDetailPage';
+// export { default as UserPage } from './pages/UserPage';
