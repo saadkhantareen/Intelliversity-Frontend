@@ -142,7 +142,7 @@ const BatchList = () => {
                 </td>
                 <td className="px-6 py-4 text-center">
                   <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-bold border border-gray-200">
-                    {b.max_students ?? 0} Total / {b.max_students_per_section ?? 0} per sec
+                    {b.capacity ?? 0}
                   </span>
                 </td>
                 <td className="px-6 py-4 text-center text-sm font-semibold text-gray-700">

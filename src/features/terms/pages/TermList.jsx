@@ -1,165 +1,134 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import TermService from '../api/term.service';
+import { Link, useSearchParams } from "react-router-dom";
+import { useAcademicYears } from "../../academic-year/hooks/useAcademicYears";
+import TermTable from "../components/TermTable";
+import { useTerms } from "../hooks/useTerms";
 
 const TermList = () => {
-  const [terms, setTerms] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedAcademicYearId = searchParams.get("academicYear") ?? "";
+  const {
+    academicYears,
+    isLoading: isLoadingAcademicYears,
+    error: academicYearsError,
+  } = useAcademicYears();
+  const {
+    terms,
+    isLoading: isLoadingTerms,
+    error: termsError,
+    activatingId,
+    deletingId,
+    activateTerm,
+    deleteTerm,
+  } = useTerms();
 
-  useEffect(() => {
-    loadTerms();
-  }, []);
+  const handleAcademicYearFilter = (event) => {
+    const { value } = event.target;
+    setSearchParams(value ? { academicYear: value } : {});
+  };
 
-  const loadTerms = async () => {
+  const handleActivate = async (id) => {
     try {
-      const data = await TermService.getTerms();
-      setTerms(data.data || data);
-    } catch (err) {
-      console.error('Failed to fetch terms:', err);
-    } finally {
-      setLoading(false);
+      await activateTerm(id);
+    } catch {
+      // The hook exposes a readable request error in the page-level alert.
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this term?')) {
-      try {
-        await TermService.deleteTerm(id);
-        setTerms((prev) => prev.filter((term) => term.id !== id));
-      } catch (err) {
-        alert('Failed to delete term.');
-        console.error(err);
-      }
-    }
-  };
-
-  // Handle term activation using the dedicated activation service endpoint
-  const handleToggleActive = async (term) => {
-    if (term.is_active) {
-      alert('This term is already active.');
-      return;
-    }
+    if (!window.confirm("Are you sure you want to delete this term?")) return;
 
     try {
-      // Calls the backend activation action (utilizing TermActivateSerializer)
-      await TermService.activateTerm(term.id);
-      
-      // Reload the terms list to reflect the newly active term and automatic deactivation of others
-      loadTerms();
-    } catch (err) {
-      alert('Failed to activate term: ' + JSON.stringify(err.response?.data || err.message));
-      console.error(err);
+      await deleteTerm(id);
+    } catch {
+      // The hook exposes a readable request error in the page-level alert.
     }
   };
 
-  const getAcademicYearLabel = (term) => {
-    if (!term.academic_year && !term.academic_year_name && !term.academic_year_detail) {
-      return 'N/A';
-    }
-    if (typeof term.academic_year === 'object' && term.academic_year !== null) {
-      return term.academic_year.name || term.academic_year.year_name || 'N/A';
-    }
-    if (typeof term.academic_year_detail === 'object' && term.academic_year_detail !== null) {
-      return term.academic_year_detail.name || 'N/A';
-    }
-    if (term.academic_year_name) return term.academic_year_name;
-    return String(term.academic_year);
-  };
+  const addTermHref = selectedAcademicYearId
+    ? `/academics/terms/create?academicYear=${selectedAcademicYearId}`
+    : "/academics/terms/create";
+  const error = termsError || academicYearsError;
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
-      <div className="flex justify-between items-center mb-8">
+    <section
+      className="mx-auto w-full max-w-[1180px] px-4 pb-14 pt-8 sm:px-6 lg:px-8"
+      aria-labelledby="terms-title"
+    >
+      <header className="mb-7 flex flex-col items-start justify-between gap-4 sm:flex-row sm:gap-6">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900">Academic Terms</h1>
-          <p className="text-gray-500 text-sm mt-1">Manage semesters, statuses, and deadlines</p>
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.08em] text-slate-600">
+            Academic setup
+          </p>
+          <h1
+            id="terms-title"
+            className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl"
+          >
+            Terms
+          </h1>
+          <p className="mt-2.5 max-w-2xl text-[0.9375rem] leading-6 text-slate-500">
+            Configure term periods, fee milestones, faculty assignments, and
+            student registration dates.
+          </p>
         </div>
-        <button
-          onClick={() => navigate('/academics/terms/create')}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition-all"
+        <Link
+          className="inline-flex min-h-10 w-full items-center justify-center rounded-md border border-blue-700 bg-blue-700 px-3.5 py-2.5 text-sm font-semibold text-white transition-colors duration-150 hover:border-blue-800 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:ring-offset-2 motion-reduce:transition-none sm:w-auto"
+          to={addTermHref}
         >
-          + Add Term
-        </button>
-      </div>
+          Add term
+        </Link>
+      </header>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-gray-50/50 border-b border-gray-200 text-gray-500 text-xs uppercase font-bold tracking-wider">
-              <th className="px-6 py-4">Term Name</th>
-              <th className="px-6 py-4">Academic Year</th>
-              <th className="px-6 py-4 text-center">Status</th>
-              <th className="px-6 py-4">Duration</th>
-              <th className="px-6 py-4">Key Deadlines</th>
-              <th className="px-6 py-4 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {terms.map((term) => (
-              <tr key={term.id} className="hover:bg-indigo-50/20 transition-colors">
-                <td className="px-6 py-4">
-                  <div className="font-bold text-gray-900">{term.name}</div>
-                  <div className="text-xs font-medium text-gray-400 uppercase mt-0.5">
-                    Type: {term.term_type}
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <span className="inline-block px-3 py-1 bg-amber-50 text-amber-700 rounded-xl text-xs font-bold border border-amber-200">
-                    {getAcademicYearLabel(term)}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-center">
-                  <button
-                    onClick={() => handleToggleActive(term)}
-                    className={`px-3 py-1 rounded-full text-xs font-bold transition-all border ${
-                      term.is_active
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 cursor-default'
-                        : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200 cursor-pointer'
-                    }`}
-                    title={term.is_active ? 'Active Term' : 'Click to activate this term'}
-                  >
-                    {term.is_active ? '● Active' : '○ Make Active'}
-                  </button>
-                </td>
-                <td className="px-6 py-4 text-sm font-medium text-gray-600">
-                  {term.start_date} <span className="text-gray-300 mx-1">→</span> {term.end_date}
-                </td>
-                <td className="px-6 py-4 text-xs text-gray-500 space-y-1">
-                  <div><span className="font-semibold text-gray-700">Reg:</span> {term.course_registration_start_date}</div>
-                  <div><span className="font-semibold text-gray-700">Fee Due:</span> {term.fee_deadline}</div>
-                </td>
-                <td className="px-6 py-4 text-right">
-                  <div className="flex justify-end gap-3">
-                    <button
-                      onClick={() => navigate(`/academics/terms/edit/${term.id}`)}
-                      className="text-indigo-600 hover:text-indigo-900 font-bold text-sm"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(term.id)}
-                      className="text-rose-500 hover:text-rose-700 font-bold text-sm"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
+      {error && (
+        <p
+          className="mb-5 border-l-[3px] border-red-700 bg-red-50 px-3.5 py-3 text-sm leading-5 text-red-800"
+          role="alert"
+        >
+          {error}
+        </p>
+      )}
+
+      <div className="mb-4 flex justify-stretch sm:justify-end">
+        <label
+          className="grid w-full gap-1.5 text-[0.8125rem] font-semibold text-slate-700 sm:w-auto"
+          htmlFor="terms-academic-year-filter"
+        >
+          <span>Academic year</span>
+          <select
+            id="terms-academic-year-filter"
+            value={selectedAcademicYearId}
+            onChange={handleAcademicYearFilter}
+            disabled={isLoadingAcademicYears}
+            className="min-h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-[0.9375rem] font-normal text-slate-800 outline-none transition-colors duration-150 hover:border-slate-400 focus:border-blue-700 focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400 motion-reduce:transition-none sm:min-w-[244px]"
+          >
+            <option value="">All academic years</option>
+            {academicYears.map((academicYear) => (
+              <option key={academicYear.id} value={academicYear.id}>
+                {academicYear.name}
+              </option>
             ))}
-          </tbody>
-        </table>
+          </select>
+        </label>
+      </div>
 
-        {loading && (
-          <div className="p-12 text-center text-gray-400 font-medium">Loading terms...</div>
-        )}
-
-        {!loading && terms.length === 0 && (
-          <div className="p-12 text-center text-gray-400 font-medium">
-            No terms found. Click "+ Add Term" to create one.
+      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+        {isLoadingTerms ? (
+          <div
+            className="grid min-h-[180px] place-content-center px-8 py-8 text-sm text-slate-500"
+            role="status"
+          >
+            Loading terms…
           </div>
+        ) : (
+          <TermTable
+            terms={terms}
+            activatingId={activatingId}
+            deletingId={deletingId}
+            onActivate={handleActivate}
+            onDelete={handleDelete}
+          />
         )}
       </div>
-    </div>
+    </section>
   );
 };
 

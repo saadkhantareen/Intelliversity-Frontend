@@ -41,6 +41,7 @@ const ADMIN_CONFIG = {
           to: '/academics/academic-years',
           Icon: IcArchive3,
         },
+        { label: 'Terms', to: '/academics/terms', Icon: IcArchive3 },
         { label: 'Batches', to: '/academics/batches', Icon: IcUsers3 },
         { label: 'Student', to: '/users/students/', Icon: IcBook3 },
         { label: 'Faculty', to: '/users/faculty/', Icon: IcBook3 },

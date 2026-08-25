@@ -1,127 +1,116 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import AcademicYearService from '../api/academic-year.service';
+import { useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import AcademicYearFormFields from "../components/AcademicYearFormFields";
+import { useAcademicYear } from "../hooks/useAcademicYear";
+import { validateAcademicYearDates } from "../utils/academicYear.utils";
 
 const AcademicYearForm = () => {
-  const { id } = useParams();
+  const { id: academicYearId } = useParams();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const isEditMode = Boolean(academicYearId);
+  const { values, setValues, isLoading, isSaving, error, saveAcademicYear } =
+    useAcademicYear(academicYearId);
+  const [validationError, setValidationError] = useState("");
 
-  const [formData, setFormData] = useState({
-    name: '',
-    start_date: '',
-    end_date: '',
-    is_active: false,
-  });
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setValues((currentValues) => ({ ...currentValues, [name]: value }));
+    setValidationError("");
+  };
 
-  useEffect(() => {
-    if (id) {
-      AcademicYearService.getYearById(id).then((data) => {
-        setFormData({
-          name: data.name || '',
-          start_date: data.start_date || '',
-          end_date: data.end_date || '',
-          is_active: data.is_active || false,
-        });
-      });
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const dateError = validateAcademicYearDates(values);
+    if (dateError) {
+      setValidationError(dateError);
+      return;
     }
-  }, [id]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
     try {
-      if (id) {
-        await AcademicYearService.updateYear(id, formData);
-      } else {
-        await AcademicYearService.createYear(formData);
-      }
-      navigate('/academics/academic-years');
-    } catch (err) {
-      alert('Error: ' + JSON.stringify(err.response?.data || err.message));
-    } finally {
-      setLoading(false);
+      await saveAcademicYear(values);
+      navigate("/academics/academic-years");
+    } catch {
+      // The hook supplies a user-facing request error.
     }
   };
 
+  if (isLoading) {
+    return (
+      <section className="mx-auto w-full max-w-[860px] px-4 pb-14 pt-8 sm:px-6 lg:px-8">
+        <div
+          className="grid min-h-[180px] place-content-center px-8 py-8 text-sm text-slate-500"
+          role="status"
+        >
+          Loading academic year…
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <div className="max-w-4xl mx-auto p-8 bg-white shadow-2xl rounded-3xl mt-10 mb-20 border border-gray-100">
-      <div className="flex items-center justify-between mb-8 pb-4 border-b">
-        <h2 className="text-3xl font-extrabold text-gray-900">
-          {id ? 'Edit' : 'Define'} Academic Year
-        </h2>
-        <div className="flex items-center bg-indigo-50 px-4 py-2 rounded-full">
-          <input
-            type="checkbox"
-            className="h-5 w-5 text-indigo-600 rounded"
-            checked={formData.is_active}
-            onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-          />
-          <span className="ml-2 text-sm font-bold text-indigo-700 uppercase tracking-tight">
-            Year Active
-          </span>
-        </div>
-      </div>
+    <section
+      className="mx-auto w-full max-w-[860px] px-4 pb-14 pt-8 sm:px-6 lg:px-8"
+      aria-labelledby="academic-year-form-title"
+    >
+      <header className="mb-6">
+        <p className="mb-2 text-xs font-bold uppercase tracking-[0.08em] text-slate-600">
+          Academic setup
+        </p>
+        <h1
+          id="academic-year-form-title"
+          className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl"
+        >
+          {isEditMode ? "Edit academic year" : "Add academic year"}
+        </h1>
+        <p className="mt-2.5 max-w-2xl text-[0.9375rem] leading-6 text-slate-500">
+          {isEditMode
+            ? "Update the name or boundaries for this academic year."
+            : "Set the official date range that will contain your terms."}
+        </p>
+      </header>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-6 bg-gray-50 rounded-2xl">
-          <div>
-            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">
-              Year Title
-            </label>
-            <input
-              type="text"
-              className="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-indigo-500 outline-none transition-all bg-white"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="e.g. 2026-2027"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">
-              Cycle Start
-            </label>
-            <input
-              type="date"
-              className="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-indigo-500 outline-none bg-white"
-              value={formData.start_date}
-              onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">
-              Cycle End
-            </label>
-            <input
-              type="date"
-              className="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-indigo-500 outline-none bg-white"
-              value={formData.end_date}
-              onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-              required
-            />
-          </div>
-        </div>
+      <form
+        className="overflow-hidden rounded-lg border border-slate-200 bg-white p-5 sm:p-7"
+        onSubmit={handleSubmit}
+        noValidate
+      >
+        {(validationError || error) && (
+          <p
+            className="mb-5 border-l-[3px] border-red-700 bg-red-50 px-3.5 py-3 text-sm leading-5 text-red-800"
+            role="alert"
+          >
+            {validationError || error}
+          </p>
+        )}
 
-        <div className="flex justify-end gap-4 pt-6 border-t border-gray-100">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="px-8 py-3 text-gray-500 font-bold hover:text-gray-800 transition-colors"
+        <AcademicYearFormFields
+          values={values}
+          onChange={handleChange}
+          disabled={isSaving}
+        />
+
+        <footer className="mt-8 flex flex-col-reverse gap-2.5 border-t border-slate-200 pt-5 sm:flex-row sm:justify-end">
+          <Link
+            className="inline-flex min-h-10 items-center justify-center rounded-md border border-slate-300 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:border-slate-400 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:ring-offset-2 motion-reduce:transition-none"
+            to="/academics/academic-years"
           >
             Cancel
-          </button>
+          </Link>
           <button
+            className="inline-flex min-h-10 items-center justify-center rounded-md border border-blue-700 bg-blue-700 px-3.5 py-2.5 text-sm font-semibold text-white transition-colors duration-150 hover:border-blue-800 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none"
             type="submit"
-            disabled={loading}
-            className="px-12 py-4 bg-indigo-600 text-white rounded-2xl font-bold shadow-xl hover:bg-indigo-700 transition-all"
+            disabled={isSaving}
           >
-            {loading ? 'Saving...' : id ? 'Update Academic Year' : 'Save Academic Year'}
+            {isSaving
+              ? "Saving…"
+              : isEditMode
+                ? "Save changes"
+                : "Create academic year"}
           </button>
-        </div>
+        </footer>
       </form>
-    </div>
+    </section>
   );
 };
 

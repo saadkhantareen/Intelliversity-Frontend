@@ -19,10 +19,7 @@ const BatchForm = () => {
     program: '',
     curriculum: '',
     admission_term: '',
-    status: 'ACTIVE',
-    max_students: 100,
-    expected_current_semester: 1,
-    max_students_per_section: 30,
+    per_section_capacity: 30,
   });
 
   useEffect(() => {
@@ -53,9 +50,8 @@ const BatchForm = () => {
             curriculum: typeof data.curriculum === 'object' ? data.curriculum?.id : data.curriculum || '',
             admission_term: typeof data.admission_term === 'object' ? data.admission_term?.id : data.admission_term || '',
             status: data.status || 'ACTIVE',
-            max_students: data.max_students ?? 100,
             expected_current_semester: data.expected_current_semester ?? 1,
-            max_students_per_section: data.max_students_per_section ?? 30,
+            per_section_capacity: data.per_section_capacity ?? 30,
           });
         }
       } catch (err) {
@@ -71,9 +67,7 @@ const BatchForm = () => {
 
     const payload = {
       ...formData,
-      max_students: Number(formData.max_students),
-      expected_current_semester: Number(formData.expected_current_semester),
-      max_students_per_section: Number(formData.max_students_per_section),
+      per_section_capacity: Number(formData.per_section_capacity),
     };
 
     try {
@@ -111,20 +105,6 @@ const BatchForm = () => {
               placeholder="e.g. Batch 2024 - CS"
               required
             />
-          </div>
-          <div>
-            <label className="block text-sm font-bold text-gray-700 uppercase mb-1">Status</label>
-            <select
-              className="w-full border-2 p-3 rounded-xl focus:border-indigo-500 outline-none bg-white transition-all"
-              value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-              required
-            >
-              <option value="ACTIVE">ACTIVE</option>
-              <option value="INACTIVE">INACTIVE</option>
-              <option value="COMPLETED">COMPLETED</option>
-              <option value="ARCHIVED">ARCHIVED</option>
-            </select>
           </div>
         </div>
 
@@ -188,49 +168,21 @@ const BatchForm = () => {
 
         {/* Capacity & Semester Rules */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
           <div>
             <label className="block text-sm font-bold text-gray-700 uppercase mb-1">
-              Max Students
+              Per Section Capacity
             </label>
             <input
               type="number"
               min="0"
               className="w-full border-2 p-3 rounded-xl focus:border-indigo-500 outline-none transition-all"
-              value={formData.max_students}
-              onChange={(e) => setFormData({ ...formData, max_students: e.target.value })}
+              value={formData.per_section_capacity}
+              onChange={(e) => setFormData({ ...formData, per_section_capacity: e.target.value })}
               required
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-bold text-gray-700 uppercase mb-1">
-              Max Students Per Section
-            </label>
-            <input
-              type="number"
-              min="0"
-              className="w-full border-2 p-3 rounded-xl focus:border-indigo-500 outline-none transition-all"
-              value={formData.max_students_per_section}
-              onChange={(e) => setFormData({ ...formData, max_students_per_section: e.target.value })}
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-bold text-gray-700 uppercase mb-1">
-              Expected Semester
-            </label>
-            <input
-              type="number"
-              min="0"
-              className="w-full border-2 p-3 rounded-xl focus:border-indigo-500 outline-none transition-all"
-              value={formData.expected_current_semester}
-              onChange={(e) =>
-                setFormData({ ...formData, expected_current_semester: e.target.value })
-              }
-              required
-            />
-          </div>
         </div>
 
         {/* Form Actions */}
