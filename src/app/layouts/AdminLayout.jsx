@@ -52,7 +52,7 @@ const ADMIN_CONFIG = {
       items: [
         { label: 'Course Offering', to: '/enrollments/course-offerings', Icon: IcBook3 },
         { label: 'Faculty Assignment', to: '/enrollments/faculty-assignments', Icon: IcUsers3 },
-        { label: 'Student Assignment', to: '/enrollments/student-assignments', Icon: IcUsers3 },
+        { label: 'Student Enrollment', to: '/enrollments/student-enrollments', Icon: IcUsers3 },
       ],
     },
     {

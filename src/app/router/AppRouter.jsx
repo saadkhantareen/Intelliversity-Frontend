@@ -47,12 +47,30 @@ const TermList = lazy(() => import('@/features/terms/pages/TermList'));
 const TermForm = lazy(() => import('@/features/terms/pages/TermForm'));
 
 // Enrollments / Course Offerings
-const CourseOfferingList = lazy(() => import('@/features/enrollments/pages/CourseOfferingList'));
-const CourseOfferingForm = lazy(() => import('@/features/enrollments/pages/CourseOfferingForm'));
+const CourseOfferingList = lazy(
+  () => import('@/features/enrollments/pages/admin/CourseOfferingList')
+);
+const CourseOfferingForm = lazy(
+  () => import('@/features/enrollments/pages/admin/CourseOfferingForm')
+);
+
+// Faculty Assignments
+const FacultyAssignmentList = lazy(
+  () => import('@/features/enrollments/pages/admin/FacultyAssignmentList')
+);
+const FacultyAssignmentForm = lazy(
+  () => import('@/features/enrollments/pages/admin/FacultyAssignmentForm')
+);
+
+// Student Enrollments
+const EnrollmentList = lazy(() => import('@/features/enrollments/pages/admin/EnrollmentList'));
+const EnrollmentForm = lazy(() => import('@/features/enrollments/pages/admin/EnrollmentForm'));
 
 // Examinations / Assessment Types & Policies
 const AssessmentTypesPage = lazy(() => import('@/features/examination/pages/AssessmentTypesPage'));
-const AssessmentPoliciesPage = lazy(() => import('@/features/examination/pages/AssessmentPoliciesPage'));
+const AssessmentPoliciesPage = lazy(
+  () => import('@/features/examination/pages/AssessmentPoliciesPage')
+);
 const GradePoliciesPage = lazy(() => import('@/features/examination/pages/GradePoliciesPage'));
 const GradeScalesPage = lazy(() => import('@/features/examination/pages/GradeScalesPage'));
 
@@ -123,12 +141,24 @@ function ProtectedAppRoutes() {
         <Route path="/enrollments/course-offerings/create" element={<CourseOfferingForm />} />
         <Route path="/enrollments/course-offerings/edit/:id" element={<CourseOfferingForm />} />
 
+        {/* Faculty Assignments */}
+        <Route path="/enrollments/faculty-assignments" element={<FacultyAssignmentList />} />
+        <Route path="/enrollments/faculty-assignments/create" element={<FacultyAssignmentForm />} />
+        <Route
+          path="/enrollments/faculty-assignments/edit/:id"
+          element={<FacultyAssignmentForm />}
+        />
+
+        {/* Student Enrollments */}
+        <Route path="/enrollments/student-enrollments" element={<EnrollmentList />} />
+        <Route path="/enrollments/student-enrollments/create" element={<EnrollmentForm />} />
+        <Route path="/enrollments/student-enrollments/edit/:id" element={<EnrollmentForm />} />
+
         {/* Examinations */}
         <Route path="/examinations/assessment-types" element={<AssessmentTypesPage />} />
         <Route path="/examinations/assessment-policies" element={<AssessmentPoliciesPage />} />
         <Route path="/examinations/grade-policies" element={<GradePoliciesPage />} />
         <Route path="/examinations/grade-scales" element={<GradeScalesPage />} />
-
 
         {/* Students */}
         <Route path="/users/students" element={<StudentsPage />} />

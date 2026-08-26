@@ -1,32 +1,32 @@
 import { api } from '@/shared/api/client';
 
-const BASE = '/api/v1/enrollments/course-offerings';
+const BASE = '/api/v1/enrollments/student-enrollments';
 
-const CourseOfferingService = {
-  getCourseOfferings: async () => {
+const EnrollmentService = {
+  getEnrollments: async () => {
     const response = await api.get(`${BASE}/`);
     return response.data;
   },
 
-  getCourseOfferingById: async (id) => {
+  getEnrollmentById: async (id) => {
     const response = await api.get(`${BASE}/${id}/`);
     return response.data;
   },
 
-  createCourseOffering: async (data) => {
+  createEnrollment: async (data) => {
     const response = await api.post(`${BASE}/`, data);
     return response.data;
   },
 
-  updateCourseOffering: async (id, data) => {
+  updateEnrollment: async (id, data) => {
     const response = await api.patch(`${BASE}/${id}/`, data);
     return response.data;
   },
 
-  deleteCourseOffering: async (id) => {
+  deleteEnrollment: async (id) => {
     const response = await api.delete(`${BASE}/${id}/`);
     return response.data;
   },
 };
 
-export default CourseOfferingService;
+export default EnrollmentService;
