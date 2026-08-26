@@ -6,10 +6,10 @@ export default function GradeScalesPage() {
   const [scales, setScales] = useState([]);
   const [gradePolicies, setGradePolicies] = useState([]);
   const [loading, setLoading] = useState(false);
-  
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  
+
   const [formData, setFormData] = useState({
     grade_policy: '',
     grade: '',
@@ -41,7 +41,14 @@ export default function GradeScalesPage() {
 
   const handleOpenCreateModal = () => {
     setEditingId(null);
-    setFormData({ grade_policy: '', grade: '', min_percentage: '', max_percentage: '', grade_points: '', remarks: '' });
+    setFormData({
+      grade_policy: '',
+      grade: '',
+      min_percentage: '',
+      max_percentage: '',
+      grade_points: '',
+      remarks: '',
+    });
     setIsModalOpen(true);
   };
 
@@ -91,7 +98,9 @@ export default function GradeScalesPage() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Grade Scales</h1>
-          <p className="text-sm text-gray-500">Define percentage boundaries and points mapped to grade policies.</p>
+          <p className="text-sm text-gray-500">
+            Define percentage boundaries and points mapped to grade policies.
+          </p>
         </div>
         <button
           onClick={handleOpenCreateModal}
@@ -105,38 +114,72 @@ export default function GradeScalesPage() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grade</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grade Policy</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Min %</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Max %</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grade Points</th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Grade
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Grade Policy
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Min %
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Max %
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Grade Points
+              </th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {loading ? (
               <tr>
-                <td colSpan="6" className="text-center py-6 text-gray-500">Loading...</td>
+                <td colSpan="6" className="text-center py-6 text-gray-500">
+                  Loading...
+                </td>
               </tr>
             ) : scales.length === 0 ? (
               <tr>
-                <td colSpan="6" className="text-center py-6 text-gray-500">No grade scales found.</td>
+                <td colSpan="6" className="text-center py-6 text-gray-500">
+                  No grade scales found.
+                </td>
               </tr>
             ) : (
               scales.map((item) => {
                 const matchedPolicy = gradePolicies.find((p) => p.id === item.grade_policy);
                 return (
                   <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{item.grade}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                      {item.grade}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {matchedPolicy?.name || item.grade_policy}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.min_percentage}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.max_percentage}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.grade_points}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {item.min_percentage}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {item.max_percentage}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {item.grade_points}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button onClick={() => handleOpenEditModal(item)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
-                      <button onClick={() => handleDelete(item.id)} className="text-red-600 hover:text-red-900">Delete</button>
+                      <button
+                        onClick={() => handleOpenEditModal(item)}
+                        className="text-indigo-600 hover:text-indigo-900 mr-4"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 );
@@ -163,7 +206,9 @@ export default function GradeScalesPage() {
                 >
                   <option value="">Select Grade Policy</option>
                   {gradePolicies.map((policy) => (
-                    <option key={policy.id} value={policy.id}>{policy.name}</option>
+                    <option key={policy.id} value={policy.id}>
+                      {policy.name}
+                    </option>
                   ))}
                 </select>
               </div>

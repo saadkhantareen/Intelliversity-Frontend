@@ -1,25 +1,17 @@
-import { Link } from "react-router-dom";
-import { formatDate } from "../utils/academicYear.utils";
+import { Link } from 'react-router-dom';
+import { formatDate } from '../utils/academicYear.utils';
 
 const actionButtonClassName =
-  "inline-flex min-h-8 items-center justify-center rounded px-2 py-1.5 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none";
+  'inline-flex min-h-8 items-center justify-center rounded px-2 py-1.5 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none';
 
-const AcademicYearTable = ({
-  academicYears,
-  activatingId,
-  deletingId,
-  onActivate,
-  onDelete,
-}) => {
+const AcademicYearTable = ({ academicYears, activatingId, deletingId, onActivate, onDelete }) => {
   if (!academicYears.length) {
     return (
       <div className="grid min-h-[180px] place-content-center px-8 py-8 text-center text-sm text-slate-500">
         <p className="mb-1 text-sm font-semibold text-slate-700">
           No academic years have been added yet.
         </p>
-        <span className="text-sm">
-          Create an academic year before configuring its terms.
-        </span>
+        <span className="text-sm">Create an academic year before configuring its terms.</span>
       </div>
     );
   }
@@ -86,11 +78,11 @@ const AcademicYearTable = ({
                   <span
                     className={`inline-flex min-h-6 items-center rounded-full px-2 py-[3px] text-xs font-bold ${
                       academicYear.is_active
-                        ? "bg-emerald-50 text-emerald-700"
-                        : "bg-slate-100 text-slate-500"
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : 'bg-slate-100 text-slate-500'
                     }`}
                   >
-                    {academicYear.is_active ? "Active" : "Inactive"}
+                    {academicYear.is_active ? 'Active' : 'Inactive'}
                   </span>
                 </td>
                 <td className="px-[18px] py-4 text-right">
@@ -113,7 +105,7 @@ const AcademicYearTable = ({
                       onClick={() => onDelete(academicYear.id)}
                       disabled={isActivating || isDeleting}
                     >
-                      {isDeleting ? "Deleting…" : "Delete"}
+                      {isDeleting ? 'Deleting…' : 'Delete'}
                     </button>
                     {!academicYear.is_active && (
                       <button
@@ -122,7 +114,7 @@ const AcademicYearTable = ({
                         onClick={() => onActivate(academicYear.id)}
                         disabled={isActivating || isDeleting}
                       >
-                        {isActivating ? "Activating…" : "Set active"}
+                        {isActivating ? 'Activating…' : 'Set active'}
                       </button>
                     )}
                   </div>

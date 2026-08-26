@@ -1,6 +1,6 @@
-import { api } from "@/shared/api/client";
+import { api } from '@/shared/api/client';
 
-const BASE = "/api/v1/academics/academic-years";
+const BASE = '/api/v1/academics/academic-years';
 
 const AcademicYearService = {
   getYears: async () => {

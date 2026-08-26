@@ -27,7 +27,13 @@ const BatchService = {
   autoGenerateSections: async (id) => {
     const res = await api.post(`/api/v1/academics/batches/${id}/auto-generate-sections/`);
     return res.data;
-},
+  },
+  getSectionsByBatch: async (batchId) => {
+    const response = await api.get(`/api/v1/academics/sections/`, {
+      params: { batch: batchId },
+    });
+    return response.data;
+  },
 };
 
 export default BatchService;

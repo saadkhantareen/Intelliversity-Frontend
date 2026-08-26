@@ -8,11 +8,11 @@ export default function AssessmentPoliciesPage() {
   const [assessmentTypes, setAssessmentTypes] = useState([]);
   const [terms, setTerms] = useState([]);
   const [loading, setLoading] = useState(false);
-  
+
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  
+
   // Form states matching your API schema
   const [formData, setFormData] = useState({
     term: '',
@@ -94,7 +94,9 @@ export default function AssessmentPoliciesPage() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Assessment Policies</h1>
-          <p className="text-sm text-gray-500">Define weightage and counts for assessment types per term.</p>
+          <p className="text-sm text-gray-500">
+            Define weightage and counts for assessment types per term.
+          </p>
         </div>
         <button
           onClick={handleOpenCreateModal}
@@ -109,21 +111,35 @@ export default function AssessmentPoliciesPage() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assessment Type</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Term</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Count</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Weightage (%)</th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Assessment Type
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Term
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Count
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Total Weightage (%)
+              </th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {loading ? (
               <tr>
-                <td colSpan="5" className="text-center py-6 text-gray-500">Loading...</td>
+                <td colSpan="5" className="text-center py-6 text-gray-500">
+                  Loading...
+                </td>
               </tr>
             ) : policies.length === 0 ? (
               <tr>
-                <td colSpan="5" className="text-center py-6 text-gray-500">No assessment policies found.</td>
+                <td colSpan="5" className="text-center py-6 text-gray-500">
+                  No assessment policies found.
+                </td>
               </tr>
             ) : (
               policies.map((item) => {
@@ -136,11 +152,25 @@ export default function AssessmentPoliciesPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {matchedTerm?.name || matchedTerm?.title || item.term}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.number_of_assessments}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{item.total_weightage}%</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {item.number_of_assessments}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                      {item.total_weightage}%
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button onClick={() => handleOpenEditModal(item)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
-                      <button onClick={() => handleDelete(item.id)} className="text-red-600 hover:text-red-900">Delete</button>
+                      <button
+                        onClick={() => handleOpenEditModal(item)}
+                        className="text-indigo-600 hover:text-indigo-900 mr-4"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 );
@@ -168,7 +198,9 @@ export default function AssessmentPoliciesPage() {
                 >
                   <option value="">Select Assessment Type</option>
                   {assessmentTypes.map((type) => (
-                    <option key={type.id} value={type.id}>{type.name}</option>
+                    <option key={type.id} value={type.id}>
+                      {type.name}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -189,18 +221,27 @@ export default function AssessmentPoliciesPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Number of Assessments</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Number of Assessments
+                </label>
                 <input
                   type="number"
                   required
                   min="1"
                   value={formData.number_of_assessments}
-                  onChange={(e) => setFormData({ ...formData, number_of_assessments: parseInt(e.target.value) || 1 })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      number_of_assessments: parseInt(e.target.value) || 1,
+                    })
+                  }
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Total Weightage (%)</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Total Weightage (%)
+                </label>
                 <input
                   type="text"
                   required

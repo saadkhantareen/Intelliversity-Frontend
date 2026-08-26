@@ -32,9 +32,15 @@ const BatchForm = () => {
         ]);
 
         // Normalize response payloads
-        const parsedPrograms = Array.isArray(progRes) ? progRes : progRes?.results || progRes?.data || [];
-        const parsedCurriculums = Array.isArray(currRes) ? currRes : currRes?.results || currRes?.data || [];
-        const parsedTerms = Array.isArray(termRes) ? termRes : termRes?.results || termRes?.data || [];
+        const parsedPrograms = Array.isArray(progRes)
+          ? progRes
+          : progRes?.results || progRes?.data || [];
+        const parsedCurriculums = Array.isArray(currRes)
+          ? currRes
+          : currRes?.results || currRes?.data || [];
+        const parsedTerms = Array.isArray(termRes)
+          ? termRes
+          : termRes?.results || termRes?.data || [];
 
         setPrograms(parsedPrograms);
         setCurriculums(parsedCurriculums);
@@ -46,9 +52,16 @@ const BatchForm = () => {
 
           setFormData({
             name: data.name || '',
-            program: typeof data.program === 'object' ? data.program?.code || data.program?.id : data.program || '',
-            curriculum: typeof data.curriculum === 'object' ? data.curriculum?.id : data.curriculum || '',
-            admission_term: typeof data.admission_term === 'object' ? data.admission_term?.id : data.admission_term || '',
+            program:
+              typeof data.program === 'object'
+                ? data.program?.code || data.program?.id
+                : data.program || '',
+            curriculum:
+              typeof data.curriculum === 'object' ? data.curriculum?.id : data.curriculum || '',
+            admission_term:
+              typeof data.admission_term === 'object'
+                ? data.admission_term?.id
+                : data.admission_term || '',
             status: data.status || 'ACTIVE',
             expected_current_semester: data.expected_current_semester ?? 1,
             per_section_capacity: data.per_section_capacity ?? 30,
@@ -168,7 +181,6 @@ const BatchForm = () => {
 
         {/* Capacity & Semester Rules */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
           <div>
             <label className="block text-sm font-bold text-gray-700 uppercase mb-1">
               Per Section Capacity
@@ -182,7 +194,6 @@ const BatchForm = () => {
               required
             />
           </div>
-
         </div>
 
         {/* Form Actions */}
@@ -202,8 +213,8 @@ const BatchForm = () => {
             {loading
               ? 'Processing...'
               : id
-              ? 'Update Batch Configuration'
-              : 'Confirm & Create Batch'}
+                ? 'Update Batch Configuration'
+                : 'Confirm & Create Batch'}
           </button>
         </div>
       </form>

@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom";
-import AcademicYearTable from "../components/AcademicYearTable";
-import { useAcademicYears } from "../hooks/useAcademicYears";
+import { Link } from 'react-router-dom';
+import AcademicYearTable from '../components/AcademicYearTable';
+import { useAcademicYears } from '../hooks/useAcademicYears';
 
 const AcademicYearList = () => {
   const {
@@ -22,9 +22,7 @@ const AcademicYearList = () => {
   };
 
   const handleDelete = async (id) => {
-    if (
-      !window.confirm("Are you sure you want to delete this academic year?")
-    ) {
+    if (!window.confirm('Are you sure you want to delete this academic year?')) {
       return;
     }
 
@@ -52,8 +50,7 @@ const AcademicYearList = () => {
             Academic years
           </h1>
           <p className="mt-2.5 max-w-2xl text-[0.9375rem] leading-6 text-slate-500">
-            Define the institutional calendar, then add the terms that belong to
-            each academic year.
+            Define the institutional calendar, then add the terms that belong to each academic year.
           </p>
         </div>
         <Link

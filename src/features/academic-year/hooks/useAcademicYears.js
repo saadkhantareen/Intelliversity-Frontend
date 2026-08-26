@@ -1,27 +1,22 @@
-import { useCallback, useEffect, useState } from "react";
-import AcademicYearService from "../api/academic-year.service";
+import { useCallback, useEffect, useState } from 'react';
+import AcademicYearService from '../api/academic-year.service';
 
 export const useAcademicYears = () => {
   const [academicYears, setAcademicYears] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [activatingId, setActivatingId] = useState("");
-  const [deletingId, setDeletingId] = useState("");
+  const [error, setError] = useState('');
+  const [activatingId, setActivatingId] = useState('');
+  const [deletingId, setDeletingId] = useState('');
 
   const loadAcademicYears = useCallback(async () => {
     setIsLoading(true);
-    setError("");
+    setError('');
 
     try {
       const response = await AcademicYearService.getYears();
-      setAcademicYears(
-        Array.isArray(response) ? response : (response.results ?? []),
-      );
+      setAcademicYears(Array.isArray(response) ? response : (response.results ?? []));
     } catch (requestError) {
-      setError(
-        requestError.response?.data?.detail ??
-          "Academic years could not be loaded.",
-      );
+      setError(requestError.response?.data?.detail ?? 'Academic years could not be loaded.');
     } finally {
       setIsLoading(false);
     }
@@ -30,43 +25,39 @@ export const useAcademicYears = () => {
   const activateAcademicYear = useCallback(
     async (id) => {
       setActivatingId(id);
-      setError("");
+      setError('');
 
       try {
         await AcademicYearService.activateYear(id);
         await loadAcademicYears();
       } catch (requestError) {
         setError(
-          requestError.response?.data?.detail ??
-            "The academic year could not be activated.",
+          requestError.response?.data?.detail ?? 'The academic year could not be activated.'
         );
         throw requestError;
       } finally {
-        setActivatingId("");
+        setActivatingId('');
       }
     },
-    [loadAcademicYears],
+    [loadAcademicYears]
   );
 
   const deleteAcademicYear = useCallback(
     async (id) => {
       setDeletingId(id);
-      setError("");
+      setError('');
 
       try {
         await AcademicYearService.deleteYear(id);
         await loadAcademicYears();
       } catch (requestError) {
-        setError(
-          requestError.response?.data?.detail ??
-            "The academic year could not be deleted.",
-        );
+        setError(requestError.response?.data?.detail ?? 'The academic year could not be deleted.');
         throw requestError;
       } finally {
-        setDeletingId("");
+        setDeletingId('');
       }
     },
-    [loadAcademicYears],
+    [loadAcademicYears]
   );
 
   useEffect(() => {

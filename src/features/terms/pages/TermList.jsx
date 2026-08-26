@@ -1,11 +1,11 @@
-import { Link, useSearchParams } from "react-router-dom";
-import { useAcademicYears } from "../../academic-year/hooks/useAcademicYears";
-import TermTable from "../components/TermTable";
-import { useTerms } from "../hooks/useTerms";
+import { Link, useSearchParams } from 'react-router-dom';
+import { useAcademicYears } from '../../academic-year/hooks/useAcademicYears';
+import TermTable from '../components/TermTable';
+import { useTerms } from '../hooks/useTerms';
 
 const TermList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const selectedAcademicYearId = searchParams.get("academicYear") ?? "";
+  const selectedAcademicYearId = searchParams.get('academicYear') ?? '';
   const {
     academicYears,
     isLoading: isLoadingAcademicYears,
@@ -35,7 +35,7 @@ const TermList = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this term?")) return;
+    if (!window.confirm('Are you sure you want to delete this term?')) return;
 
     try {
       await deleteTerm(id);
@@ -46,7 +46,7 @@ const TermList = () => {
 
   const addTermHref = selectedAcademicYearId
     ? `/academics/terms/create?academicYear=${selectedAcademicYearId}`
-    : "/academics/terms/create";
+    : '/academics/terms/create';
   const error = termsError || academicYearsError;
 
   return (
@@ -66,8 +66,8 @@ const TermList = () => {
             Terms
           </h1>
           <p className="mt-2.5 max-w-2xl text-[0.9375rem] leading-6 text-slate-500">
-            Configure term periods, fee milestones, faculty assignments, and
-            student registration dates.
+            Configure term periods, fee milestones, faculty assignments, and student registration
+            dates.
           </p>
         </div>
         <Link

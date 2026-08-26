@@ -1,11 +1,10 @@
-import TermFormSection from "./TermFormSection";
-import { TERM_TYPE_OPTIONS } from "../utils/term.utils";
+import TermFormSection from './TermFormSection';
+import { TERM_TYPE_OPTIONS } from '../utils/term.utils';
 
 const inputClassName =
-  "min-h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-[0.9375rem] font-normal text-slate-800 outline-none transition-colors duration-150 hover:border-slate-400 focus:border-blue-700 focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400 motion-reduce:transition-none";
+  'min-h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-[0.9375rem] font-normal text-slate-800 outline-none transition-colors duration-150 hover:border-slate-400 focus:border-blue-700 focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400 motion-reduce:transition-none';
 
-const fieldLabelClassName =
-  "grid gap-1.5 text-[0.8125rem] font-semibold text-slate-700";
+const fieldLabelClassName = 'grid gap-1.5 text-[0.8125rem] font-semibold text-slate-700';
 
 const DateField = ({ id, label, name, value, onChange, disabled, min }) => (
   <label className={fieldLabelClassName} htmlFor={id}>
@@ -32,10 +31,7 @@ const TermFormFields = ({ values, academicYears, onChange, disabled }) => {
         title="Term details"
         description="Choose the academic year and define the core term period."
       >
-        <label
-          className={`${fieldLabelClassName} sm:col-span-2`}
-          htmlFor="term-academic-year"
-        >
+        <label className={`${fieldLabelClassName} sm:col-span-2`} htmlFor="term-academic-year">
           <span>Academic year</span>
           <select
             id="term-academic-year"

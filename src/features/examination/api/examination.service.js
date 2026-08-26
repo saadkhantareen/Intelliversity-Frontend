@@ -24,7 +24,6 @@ const ExaminationService = {
     return response.data;
   },
 
-
   // Assessment Policies CRUD
   getAssessmentPolicies: async (params = {}) => {
     const response = await api.get(`${BASE}/assessment-policies/`, { params });

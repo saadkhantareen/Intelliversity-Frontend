@@ -46,7 +46,6 @@ export default function LoginPage() {
     } catch (error) {
       // error already shown via toast in AuthContext
     }
-
   };
 
   const bgImage = tenant?.page_asset?.background_image_url;

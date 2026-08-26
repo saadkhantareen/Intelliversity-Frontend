@@ -7,10 +7,10 @@ export default function GradePoliciesPage() {
   const [policies, setPolicies] = useState([]);
   const [terms, setTerms] = useState([]);
   const [loading, setLoading] = useState(false);
-  
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  
+
   const [formData, setFormData] = useState({
     term: '',
     name: '',
@@ -86,7 +86,9 @@ export default function GradePoliciesPage() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Grade Policies</h1>
-          <p className="text-sm text-gray-500">Configure grading policies mapped to specific terms.</p>
+          <p className="text-sm text-gray-500">
+            Configure grading policies mapped to specific terms.
+          </p>
         </div>
         <button
           onClick={handleOpenCreateModal}
@@ -100,34 +102,58 @@ export default function GradePoliciesPage() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Policy Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Term</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Policy Name
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Term
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Description
+              </th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {loading ? (
               <tr>
-                <td colSpan="4" className="text-center py-6 text-gray-500">Loading...</td>
+                <td colSpan="4" className="text-center py-6 text-gray-500">
+                  Loading...
+                </td>
               </tr>
             ) : policies.length === 0 ? (
               <tr>
-                <td colSpan="4" className="text-center py-6 text-gray-500">No grade policies found.</td>
+                <td colSpan="4" className="text-center py-6 text-gray-500">
+                  No grade policies found.
+                </td>
               </tr>
             ) : (
               policies.map((item) => {
                 const matchedTerm = terms.find((t) => t.id === item.term);
                 return (
                   <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {item.name}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {matchedTerm?.name || matchedTerm?.title || item.term}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">{item.description}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button onClick={() => handleOpenEditModal(item)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
-                      <button onClick={() => handleDelete(item.id)} className="text-red-600 hover:text-red-900">Delete</button>
+                      <button
+                        onClick={() => handleOpenEditModal(item)}
+                        className="text-indigo-600 hover:text-indigo-900 mr-4"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 );

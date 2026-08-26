@@ -1,21 +1,16 @@
-import { useState } from "react";
-import {
-  Link,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
-import { useAcademicYears } from "../../academic-year/hooks/useAcademicYears";
-import TermFormFields from "../components/TermFormFields";
-import { useTerm } from "../hooks/useTerm";
-import { validateTermDates } from "../utils/term.utils";
+import { useState } from 'react';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useAcademicYears } from '../../academic-year/hooks/useAcademicYears';
+import TermFormFields from '../components/TermFormFields';
+import { useTerm } from '../hooks/useTerm';
+import { validateTermDates } from '../utils/term.utils';
 
 const TermForm = () => {
   const { id: termId } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const isEditMode = Boolean(termId);
-  const defaultAcademicYearId = searchParams.get("academicYear") ?? "";
+  const defaultAcademicYearId = searchParams.get('academicYear') ?? '';
   const {
     academicYears,
     isLoading: isLoadingAcademicYears,
@@ -23,14 +18,14 @@ const TermForm = () => {
   } = useAcademicYears();
   const { values, setValues, isLoading, isSaving, error, saveTerm } = useTerm(
     termId,
-    defaultAcademicYearId,
+    defaultAcademicYearId
   );
-  const [validationError, setValidationError] = useState("");
+  const [validationError, setValidationError] = useState('');
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setValues((currentValues) => ({ ...currentValues, [name]: value }));
-    setValidationError("");
+    setValidationError('');
   };
 
   const handleSubmit = async (event) => {
@@ -47,7 +42,7 @@ const TermForm = () => {
       navigate(
         values.academic_year
           ? `/academics/terms?academicYear=${values.academic_year}`
-          : "/academics/terms",
+          : '/academics/terms'
       );
     } catch {
       // The hook supplies a user-facing request error.
@@ -83,12 +78,12 @@ const TermForm = () => {
           id="term-form-title"
           className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl"
         >
-          {isEditMode ? "Edit term" : "Add term"}
+          {isEditMode ? 'Edit term' : 'Add term'}
         </h1>
         <p className="mt-2.5 max-w-2xl text-[0.9375rem] leading-6 text-slate-500">
           {isEditMode
-            ? "Update the term schedule and operational deadlines."
-            : "Build a complete operational calendar for an academic year."}
+            ? 'Update the term schedule and operational deadlines.'
+            : 'Build a complete operational calendar for an academic year.'}
         </p>
       </header>
 
@@ -134,7 +129,7 @@ const TermForm = () => {
             type="submit"
             disabled={isSaving || !hasAcademicYears}
           >
-            {isSaving ? "Saving…" : isEditMode ? "Save changes" : "Create term"}
+            {isSaving ? 'Saving…' : isEditMode ? 'Save changes' : 'Create term'}
           </button>
         </footer>
       </form>

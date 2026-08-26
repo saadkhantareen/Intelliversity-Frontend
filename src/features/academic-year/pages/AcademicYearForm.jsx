@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import AcademicYearFormFields from "../components/AcademicYearFormFields";
-import { useAcademicYear } from "../hooks/useAcademicYear";
-import { validateAcademicYearDates } from "../utils/academicYear.utils";
+import { useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import AcademicYearFormFields from '../components/AcademicYearFormFields';
+import { useAcademicYear } from '../hooks/useAcademicYear';
+import { validateAcademicYearDates } from '../utils/academicYear.utils';
 
 const AcademicYearForm = () => {
   const { id: academicYearId } = useParams();
@@ -10,12 +10,12 @@ const AcademicYearForm = () => {
   const isEditMode = Boolean(academicYearId);
   const { values, setValues, isLoading, isSaving, error, saveAcademicYear } =
     useAcademicYear(academicYearId);
-  const [validationError, setValidationError] = useState("");
+  const [validationError, setValidationError] = useState('');
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setValues((currentValues) => ({ ...currentValues, [name]: value }));
-    setValidationError("");
+    setValidationError('');
   };
 
   const handleSubmit = async (event) => {
@@ -29,7 +29,7 @@ const AcademicYearForm = () => {
 
     try {
       await saveAcademicYear(values);
-      navigate("/academics/academic-years");
+      navigate('/academics/academic-years');
     } catch {
       // The hook supplies a user-facing request error.
     }
@@ -61,12 +61,12 @@ const AcademicYearForm = () => {
           id="academic-year-form-title"
           className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl"
         >
-          {isEditMode ? "Edit academic year" : "Add academic year"}
+          {isEditMode ? 'Edit academic year' : 'Add academic year'}
         </h1>
         <p className="mt-2.5 max-w-2xl text-[0.9375rem] leading-6 text-slate-500">
           {isEditMode
-            ? "Update the name or boundaries for this academic year."
-            : "Set the official date range that will contain your terms."}
+            ? 'Update the name or boundaries for this academic year.'
+            : 'Set the official date range that will contain your terms.'}
         </p>
       </header>
 
@@ -84,11 +84,7 @@ const AcademicYearForm = () => {
           </p>
         )}
 
-        <AcademicYearFormFields
-          values={values}
-          onChange={handleChange}
-          disabled={isSaving}
-        />
+        <AcademicYearFormFields values={values} onChange={handleChange} disabled={isSaving} />
 
         <footer className="mt-8 flex flex-col-reverse gap-2.5 border-t border-slate-200 pt-5 sm:flex-row sm:justify-end">
           <Link
@@ -102,11 +98,7 @@ const AcademicYearForm = () => {
             type="submit"
             disabled={isSaving}
           >
-            {isSaving
-              ? "Saving…"
-              : isEditMode
-                ? "Save changes"
-                : "Create academic year"}
+            {isSaving ? 'Saving…' : isEditMode ? 'Save changes' : 'Create academic year'}
           </button>
         </footer>
       </form>

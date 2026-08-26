@@ -1,17 +1,17 @@
-import { useCallback, useEffect, useState } from "react";
-import AcademicYearService from "../api/academic-year.service";
+import { useCallback, useEffect, useState } from 'react';
+import AcademicYearService from '../api/academic-year.service';
 
 const INITIAL_VALUES = {
-  name: "",
-  start_date: "",
-  end_date: "",
+  name: '',
+  start_date: '',
+  end_date: '',
 };
 
 export const useAcademicYear = (academicYearId) => {
   const [values, setValues] = useState(INITIAL_VALUES);
   const [isLoading, setIsLoading] = useState(Boolean(academicYearId));
   const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!academicYearId) return;
@@ -20,25 +20,21 @@ export const useAcademicYear = (academicYearId) => {
 
     const loadAcademicYear = async () => {
       setIsLoading(true);
-      setError("");
+      setError('');
 
       try {
-        const academicYear =
-          await AcademicYearService.getYearById(academicYearId);
+        const academicYear = await AcademicYearService.getYearById(academicYearId);
 
         if (isMounted) {
           setValues({
-            name: academicYear.name ?? "",
-            start_date: academicYear.start_date ?? "",
-            end_date: academicYear.end_date ?? "",
+            name: academicYear.name ?? '',
+            start_date: academicYear.start_date ?? '',
+            end_date: academicYear.end_date ?? '',
           });
         }
       } catch (requestError) {
         if (isMounted) {
-          setError(
-            requestError.response?.data?.detail ??
-              "The academic year could not be loaded.",
-          );
+          setError(requestError.response?.data?.detail ?? 'The academic year could not be loaded.');
         }
       } finally {
         if (isMounted) setIsLoading(false);
@@ -55,7 +51,7 @@ export const useAcademicYear = (academicYearId) => {
   const saveAcademicYear = useCallback(
     async (data) => {
       setIsSaving(true);
-      setError("");
+      setError('');
 
       try {
         if (academicYearId) {
@@ -65,15 +61,14 @@ export const useAcademicYear = (academicYearId) => {
         return await AcademicYearService.createYear(data);
       } catch (requestError) {
         const message =
-          requestError.response?.data?.detail ??
-          "The academic year could not be saved.";
+          requestError.response?.data?.detail ?? 'The academic year could not be saved.';
         setError(message);
         throw requestError;
       } finally {
         setIsSaving(false);
       }
     },
-    [academicYearId],
+    [academicYearId]
   );
 
   return {

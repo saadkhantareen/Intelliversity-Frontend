@@ -5,11 +5,11 @@ import ExaminationService from '@/features/examination/api/examination.service';
 export default function AssessmentTypesPage() {
   const [assessmentTypes, setAssessmentTypes] = useState([]);
   const [loading, setLoading] = useState(false);
-  
+
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  
+
   // Form states matching your API schema
   const [formData, setFormData] = useState({
     name: '',
@@ -85,7 +85,9 @@ export default function AssessmentTypesPage() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Assessment Types</h1>
-          <p className="text-sm text-gray-500">Configure exams, quizzes, assignments, and weights.</p>
+          <p className="text-sm text-gray-500">
+            Configure exams, quizzes, assignments, and weights.
+          </p>
         </div>
         <button
           onClick={handleOpenCreateModal}
@@ -100,36 +102,68 @@ export default function AssessmentTypesPage() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Name
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Code
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Description
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {loading ? (
               <tr>
-                <td colSpan="5" className="text-center py-6 text-gray-500">Loading...</td>
+                <td colSpan="5" className="text-center py-6 text-gray-500">
+                  Loading...
+                </td>
               </tr>
             ) : assessmentTypes.length === 0 ? (
               <tr>
-                <td colSpan="5" className="text-center py-6 text-gray-500">No assessment types found.</td>
+                <td colSpan="5" className="text-center py-6 text-gray-500">
+                  No assessment types found.
+                </td>
               </tr>
             ) : (
               assessmentTypes.map((item) => (
                 <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">{item.code}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{item.description || '—'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {item.name}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+                    {item.code}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                    {item.description || '—'}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                    <span
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+                    >
                       {item.is_active ? 'Active' : 'Inactive'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button onClick={() => handleOpenEditModal(item)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
-                    <button onClick={() => handleDelete(item.id)} className="text-red-600 hover:text-red-900">Delete</button>
+                    <button
+                      onClick={() => handleOpenEditModal(item)}
+                      className="text-indigo-600 hover:text-indigo-900 mr-4"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(item.id)}
+                      className="text-red-600 hover:text-red-900"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))
@@ -186,7 +220,9 @@ export default function AssessmentTypesPage() {
                   onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <label htmlFor="is_active" className="ml-2 block text-sm text-gray-900">Is Active</label>
+                <label htmlFor="is_active" className="ml-2 block text-sm text-gray-900">
+                  Is Active
+                </label>
               </div>
               <div className="flex justify-end space-x-3 mt-6">
                 <button

@@ -39,8 +39,7 @@ const BatchList = () => {
       } catch (err) {
         console.error('Failed to auto-generate sections:', err);
         alert(
-          'Failed to generate sections: ' +
-            JSON.stringify(err.response?.data || 'Server Error')
+          'Failed to generate sections: ' + JSON.stringify(err.response?.data || 'Server Error')
         );
       } finally {
         setGeneratingId(null);

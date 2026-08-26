@@ -92,11 +92,18 @@ export default function StudentForm({ onSuccess, onCancel }) {
       return flat;
     }
 
-    if (data.registration_id) flat.registration_id = Array.isArray(data.registration_id) ? data.registration_id[0] : data.registration_id;
+    if (data.registration_id)
+      flat.registration_id = Array.isArray(data.registration_id)
+        ? data.registration_id[0]
+        : data.registration_id;
     if (data.batch) flat.batch = Array.isArray(data.batch) ? data.batch[0] : data.batch;
     if (data.cgpa) flat.cgpa = Array.isArray(data.cgpa) ? data.cgpa[0] : data.cgpa;
-    if (data.non_field_errors) flat.non_field = Array.isArray(data.non_field_errors) ? data.non_field_errors[0] : data.non_field_errors;
-    if (data.detail) flat.non_field = typeof data.detail === 'string' ? data.detail : 'Invalid request.';
+    if (data.non_field_errors)
+      flat.non_field = Array.isArray(data.non_field_errors)
+        ? data.non_field_errors[0]
+        : data.non_field_errors;
+    if (data.detail)
+      flat.non_field = typeof data.detail === 'string' ? data.detail : 'Invalid request.';
 
     const bp = data.base_profile ?? {};
     if (bp.father_name) flat.father_name = bp.father_name[0];
@@ -125,7 +132,11 @@ export default function StudentForm({ onSuccess, onCancel }) {
   }
 
   function firstError(flat) {
-    return flat.non_field || Object.values(flat).find((msg) => typeof msg === 'string') || 'Please fix the errors and try again.';
+    return (
+      flat.non_field ||
+      Object.values(flat).find((msg) => typeof msg === 'string') ||
+      'Please fix the errors and try again.'
+    );
   }
 
   function buildPayload() {
