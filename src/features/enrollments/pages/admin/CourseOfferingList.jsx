@@ -2,10 +2,40 @@ import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import CourseOfferingTable from '../../components/CourseOfferingTable';
 import { useCourseOfferings } from '../../hooks/useCourseOfferings';
+import CourseOfferingService from '../../api/course-offering.service';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const CourseOfferingList = () => {
-  const { courseOfferings, isLoading, error, deletingId, deleteCourseOffering } =
+  const { courseOfferings, isLoading, error, deletingId, loadCourseOfferings, deleteCourseOffering } =
     useCourseOfferings();
+  
+  const [generating, setGenerating] = useState(false);
+  const navigate = useNavigate();
+
+  const handleAutoGenerate = async () => {
+    if (
+      !window.confirm(
+        'Are you sure you want to auto-generate course offerings across all active batches?'
+      )
+    )
+      return;
+
+    try {
+      setGenerating(true);
+      await CourseOfferingService.autoGenerateOfferings();
+      alert('Course offerings auto-generated successfully!');
+      await loadCourseOfferings();
+    } catch (err) {
+      console.error('Failed to auto-generate offerings:', err);
+      alert(
+        'Auto-generation failed: ' +
+          JSON.stringify(err.response?.data || 'Server Error')
+      );
+    } finally {
+      setGenerating(false);
+    }
+  };
 
   const handleDelete = async (id) => {
     const shouldDelete = window.confirm(
@@ -41,12 +71,21 @@ const CourseOfferingList = () => {
             Assign courses to a term, batch, section, and faculty member for delivery.
           </p>
         </div>
-        <Link
-          className="inline-flex min-h-10 w-full items-center justify-center rounded-md border border-blue-700 bg-blue-700 px-3.5 py-2.5 text-sm font-semibold text-white transition-colors duration-150 hover:border-blue-800 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:ring-offset-2 motion-reduce:transition-none sm:w-auto"
-          to="/enrollments/course-offerings/create"
-        >
-          Add course offering
-        </Link>
+        <div className="flex gap-3">
+          <button
+            onClick={handleAutoGenerate}
+            disabled={generating}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-2.5 rounded-xl font-bold shadow-md transition-all disabled:opacity-50"
+          >
+            {generating ? 'Generating...' : '⚡ Auto-Generate Offerings'}
+          </button>
+          <button
+            onClick={() => navigate('/enrollments/course-offerings/create')}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-2.5 rounded-xl font-bold shadow-md transition-all"
+          >
+            + Create Offering
+          </button>
+        </div>
       </header>
 
       {error && (

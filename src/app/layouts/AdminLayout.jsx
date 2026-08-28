@@ -22,7 +22,9 @@ const ADMIN_CONFIG = {
       title: 'Management',
       items: [
         { label: 'Dashboard', to: '/dashboard', Icon: IcGrid3 },
-        // { label: "Profile", to: "/profile", Icon: IcGrid3 },
+        { label: 'Policies', to: '/policies', Icon: IcSettings },
+        { label: "Profile", to: "/profile", Icon: IcGrid3 },
+
       ],
     },
     {

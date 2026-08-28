@@ -27,6 +27,21 @@ const CourseOfferingService = {
     const response = await api.delete(`${BASE}/${id}/`);
     return response.data;
   },
+
+  autoGenerateOfferings: async (data = {}) => {
+    const response = await api.post(`${BASE}/generate-offerings/`, data);
+    return response.data;
+  },
+
+  getFacultyAvailableCourseOfferings: async () => {
+    const response = await api.get(`${BASE}/me/faculty/`);
+    return response.data;
+  },
+
+  getStudentAvailableCourseOfferings: async () => {
+    const response = await api.get(`${BASE}/me/student/`);
+    return response.data;
+  },
 };
 
 export default CourseOfferingService;

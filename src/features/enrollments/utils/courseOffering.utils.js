@@ -26,6 +26,7 @@ export const INITIAL_COURSE_OFFERING_VALUES = {
   batch_id: '',
   section_id: '',
   faculty_id: '',
+  capacity: '',
 };
 
 export const getCourseOfferingFormValues = (courseOffering) => ({
@@ -34,12 +35,20 @@ export const getCourseOfferingFormValues = (courseOffering) => ({
   batch_id: courseOffering?.batch_id ?? courseOffering?.batch?.id ?? '',
   section_id: courseOffering?.section_id ?? courseOffering?.section?.id ?? '',
   faculty_id: courseOffering?.faculty_id ?? courseOffering?.faculty?.id ?? '',
+  capacity: courseOffering?.capacity ?? '',
 });
 
-export const getCourseOfferingPayload = ({ course_id, term_id, section_id, faculty_id }) => ({
+export const getCourseOfferingPayload = ({
   course_id,
   term_id,
   section_id,
+  faculty_id,
+  capacity,
+}) => ({
+  course_id,
+  term_id,
+  section_id,
+  capacity: Number(capacity),
   ...(faculty_id ? { faculty_id } : {}),
 });
 
@@ -48,6 +57,7 @@ export const validateCourseOffering = (values) => {
   if (!values.term_id) return 'Select a term.';
   if (!values.batch_id) return 'Select a batch before selecting a section.';
   if (!values.section_id) return 'Select a section.';
+  if (!values.capacity || Number(values.capacity) < 1) return 'Enter a capacity of at least 1.';
 
   return '';
 };

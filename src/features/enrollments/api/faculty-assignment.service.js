@@ -27,6 +27,26 @@ const FacultyAssignmentService = {
     const response = await api.delete(`${BASE}/${id}/`);
     return response.data;
   },
+
+  // for faculty portal
+
+  getFacultyAssignedCourses: async () => {
+    const response = await api.get(`${BASE}/`);
+    return response.data;
+  },
+
+  assignFacultyCourse: async (courseOfferingId) => {
+    const response = await api.post(`${BASE}/`, {
+      course_offering: courseOfferingId,
+      status: 'pending',
+    });
+    return response.data;
+  },
+
+  deleteFacultyAssignedCourse: async (assignmentId) => {
+    const response = await api.delete(`${BASE}/${assignmentId}/`);
+    return response.data;
+  },
 };
 
 export default FacultyAssignmentService;

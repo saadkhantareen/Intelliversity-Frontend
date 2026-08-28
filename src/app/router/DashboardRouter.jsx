@@ -14,7 +14,7 @@ export default function DashboardRouter() {
 
   switch (tenant.portal_name) {
     case 'student':
-      return <DashboardPage />;
+      return <StudentDashboardPage />;
 
     case 'admin':
       return <AdminDashboardPage />;

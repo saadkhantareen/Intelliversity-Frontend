@@ -65,6 +65,22 @@ const CourseOfferingFormFields = ({
         </select>
       </label>
 
+      <label className={fieldLabelClassName} htmlFor="course-offering-capacity">
+        <span>Capacity</span>
+        <input
+          id="course-offering-capacity"
+          name="capacity"
+          type="number"
+          min="1"
+          step="1"
+          value={values.capacity}
+          onChange={onChange}
+          required
+          disabled={disabled}
+          className={inputClassName}
+        />
+      </label>
+
       <label className={fieldLabelClassName} htmlFor="course-offering-faculty">
         <span>Faculty member (optional)</span>
         <select

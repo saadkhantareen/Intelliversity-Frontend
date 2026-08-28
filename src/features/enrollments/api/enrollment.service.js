@@ -27,6 +27,25 @@ const EnrollmentService = {
     const response = await api.delete(`${BASE}/${id}/`);
     return response.data;
   },
+
+  // for student portal
+  getStudentRegisteredCourses: async () => {
+    const response = await api.get(`${BASE}/`);
+    return response.data;
+  },
+
+  registerStudentCourse: async (courseOfferingId) => {
+    const response = await api.post(`${BASE}/`, {
+      course_offering: courseOfferingId,
+      status: 'enrolled',
+    });
+    return response.data;
+  },
+
+  deleteStudentRegisteredCourse: async (enrollmentId) => {
+    const response = await api.delete(`${BASE}/${enrollmentId}/`);
+    return response.data;
+  },
 };
 
 export default EnrollmentService;

@@ -6,8 +6,8 @@ import PortalRouter from './PortalRouter';
 import ProfileRouter from './ProfileRouter';
 
 import DashboardRouter from './DashboardRouter';
-import CoursesRouter from './CoursesRouter';
 
+const PoliciesPage = lazy(() => import('@/features/policies/pages/AcademicPolicyPage'));
 // Public pages
 const LoginPage = lazy(() => import('@/features/auth/pages/LoginPage'));
 const ForgotPasswordPage = lazy(() => import('@/features/auth/pages/ForgotPasswordPage'));
@@ -28,7 +28,6 @@ const BatchForm = lazy(() => import('@/features/batches/pages/BatchForm'));
 // Courses
 const CourseList = lazy(() => import('@/features/courses/pages/admin/CourseList'));
 const CourseForm = lazy(() => import('@/features/courses/pages/admin/CourseForm'));
-const RegisteredCourses = lazy(() => import('@/features/courses/pages/student/RegisteredCourses'));
 
 // Curriculum
 const CurriculumList = lazy(() => import('@/features/curriculum/pages/CurriculumList'));
@@ -61,10 +60,16 @@ const FacultyAssignmentList = lazy(
 const FacultyAssignmentForm = lazy(
   () => import('@/features/enrollments/pages/admin/FacultyAssignmentForm')
 );
+const FacultyAssignmentPage = lazy(
+  () => import('@/features/enrollments/pages/faculty/FacultyAssignmentPage')
+);
 
 // Student Enrollments
 const EnrollmentList = lazy(() => import('@/features/enrollments/pages/admin/EnrollmentList'));
 const EnrollmentForm = lazy(() => import('@/features/enrollments/pages/admin/EnrollmentForm'));
+const StudentRegistrationPage = lazy(
+  () => import('@/features/enrollments/pages/student/StudentRegistrationPage')
+);
 
 // Examinations / Assessment Types & Policies
 const AssessmentTypesPage = lazy(() => import('@/features/examination/pages/AssessmentTypesPage'));
@@ -97,9 +102,7 @@ function ProtectedAppRoutes() {
         {/* Shared */}
         <Route path="/profile" element={<ProfileRouter />} />
         <Route path="/dashboard" element={<DashboardRouter />} />
-
-        {/* Courses */}
-        <Route path="/courses" element={<CoursesRouter />} />
+        <Route path="/policies" element={<PoliciesPage />} />
 
         {/* Academic Years */}
         <Route path="/academics/academic-years" element={<AcademicYearList />} />
@@ -148,11 +151,13 @@ function ProtectedAppRoutes() {
           path="/enrollments/faculty-assignments/edit/:id"
           element={<FacultyAssignmentForm />}
         />
+        <Route path="/courses" element={<FacultyAssignmentPage />} />
 
         {/* Student Enrollments */}
         <Route path="/enrollments/student-enrollments" element={<EnrollmentList />} />
         <Route path="/enrollments/student-enrollments/create" element={<EnrollmentForm />} />
         <Route path="/enrollments/student-enrollments/edit/:id" element={<EnrollmentForm />} />
+        <Route path="/registration" element={<StudentRegistrationPage />} />
 
         {/* Examinations */}
         <Route path="/examinations/assessment-types" element={<AssessmentTypesPage />} />
@@ -167,9 +172,6 @@ function ProtectedAppRoutes() {
         {/* Faculty */}
         <Route path="/users/faculty" element={<FacultyPage />} />
         <Route path="/users/faculty/create" element={<FacultyForm />} />
-
-        {/* Student */}
-        <Route path="/registered-courses" element={<RegisteredCourses />} />
       </Route>
     </Route>
   );

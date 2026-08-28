@@ -19,7 +19,7 @@ const CourseOfferingTable = ({ courseOfferings, deletingId, onDelete }) => {
 
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-[1050px] w-full border-collapse text-left">
+      <table className="min-w-[1140px] w-full border-collapse text-left">
         <thead>
           <tr>
             <th
@@ -33,6 +33,12 @@ const CourseOfferingTable = ({ courseOfferings, deletingId, onDelete }) => {
               className="whitespace-nowrap bg-slate-50 px-[18px] py-4 text-xs font-bold uppercase tracking-[0.04em] text-slate-600"
             >
               Term
+            </th>
+            <th
+              scope="col"
+              className="whitespace-nowrap bg-slate-50 px-[18px] py-4 text-xs font-bold uppercase tracking-[0.04em] text-slate-600"
+            >
+              Capacity
             </th>
             <th
               scope="col"
@@ -82,6 +88,9 @@ const CourseOfferingTable = ({ courseOfferings, deletingId, onDelete }) => {
                 </td>
                 <td className="px-[18px] py-4 text-sm text-slate-600">
                   {courseOffering.term?.name || '—'}
+                </td>
+                <td className="px-[18px] py-4 text-sm text-slate-600">
+                  {courseOffering.capacity ?? '—'}
                 </td>
                 <td className="px-[18px] py-4 text-sm text-slate-600">
                   <strong className="block font-semibold text-slate-800">
