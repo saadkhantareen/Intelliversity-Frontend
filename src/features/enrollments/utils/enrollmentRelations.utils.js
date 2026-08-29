@@ -8,8 +8,13 @@ export const getCollection = (response) => {
 export const getProfileLabel = (profile) => {
   if (profile?.name) return profile.name;
 
-  const fullName = [profile?.first_name, profile?.last_name].filter(Boolean).join(' ');
-  return fullName || profile?.full_name || profile?.email || 'Unnamed profile';
+  const user = profile?.base_profile?.user ?? profile;
+  const fullName = [user?.first_name, user?.last_name].filter(Boolean).join(' ');
+  const name = fullName || profile?.full_name || user?.email;
+  const registrationId = profile?.registration_id;
+
+  if (name && registrationId) return `${name} (${registrationId})`;
+  return name || registrationId || 'Unnamed profile';
 };
 
 export const getCourseOfferingLabel = (courseOffering) => {
@@ -77,14 +82,16 @@ export const INITIAL_ENROLLMENT_VALUES = {
 };
 
 export const getFacultyAssignmentValues = (facultyAssignment) => ({
-  course_offering: facultyAssignment?.course_offering ?? '',
-  faculty: facultyAssignment?.faculty ?? '',
+  course_offering:
+    facultyAssignment?.course_offering_id ?? facultyAssignment?.course_offering?.id ?? facultyAssignment?.course_offering ?? '',
+  faculty: facultyAssignment?.faculty_id ?? facultyAssignment?.faculty?.id ?? facultyAssignment?.faculty ?? '',
   status: facultyAssignment?.status ?? 'pending',
 });
 
 export const getEnrollmentValues = (enrollment) => ({
-  course_offering: enrollment?.course_offering ?? '',
-  student: enrollment?.student ?? '',
+  course_offering:
+    enrollment?.course_offering_id ?? enrollment?.course_offering?.id ?? enrollment?.course_offering ?? '',
+  student: enrollment?.student_id ?? enrollment?.student?.id ?? enrollment?.student ?? '',
   status: enrollment?.status ?? 'enrolled',
 });
 

@@ -1,9 +1,6 @@
 import { Link } from 'react-router-dom';
 import {
   FACULTY_ASSIGNMENT_STATUS_OPTIONS,
-  getCourseOfferingLabel,
-  getEntityNameById,
-  getProfileLabel,
   getStatusClassName,
   getStatusLabel,
 } from '../utils/enrollmentRelations.utils';
@@ -13,8 +10,6 @@ const actionButtonClassName =
 
 const FacultyAssignmentTable = ({
   facultyAssignments,
-  courseOfferings,
-  faculties,
   deletingId,
   onDelete,
 }) => {
@@ -33,14 +28,32 @@ const FacultyAssignmentTable = ({
 
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-[840px] w-full border-collapse text-left">
+      <table className="min-w-[1080px] w-full border-collapse text-left">
         <thead>
           <tr>
             <th
               scope="col"
               className="whitespace-nowrap bg-slate-50 px-[18px] py-4 text-xs font-bold uppercase tracking-[0.04em] text-slate-600"
             >
-              Course offering
+              Course
+            </th>
+            <th
+              scope="col"
+              className="whitespace-nowrap bg-slate-50 px-[18px] py-4 text-xs font-bold uppercase tracking-[0.04em] text-slate-600"
+            >
+              Term
+            </th>
+            <th
+              scope="col"
+              className="whitespace-nowrap bg-slate-50 px-[18px] py-4 text-xs font-bold uppercase tracking-[0.04em] text-slate-600"
+            >
+              Batch
+            </th>
+            <th
+              scope="col"
+              className="whitespace-nowrap bg-slate-50 px-[18px] py-4 text-xs font-bold uppercase tracking-[0.04em] text-slate-600"
+            >
+              Section
             </th>
             <th
               scope="col"
@@ -65,16 +78,6 @@ const FacultyAssignmentTable = ({
         <tbody>
           {facultyAssignments.map((facultyAssignment) => {
             const isDeleting = deletingId === facultyAssignment.id;
-            const courseOfferingName = getEntityNameById(
-              courseOfferings,
-              facultyAssignment.course_offering,
-              getCourseOfferingLabel
-            );
-            const facultyName = getEntityNameById(
-              faculties,
-              facultyAssignment.faculty,
-              getProfileLabel
-            );
 
             return (
               <tr
@@ -82,9 +85,20 @@ const FacultyAssignmentTable = ({
                 className="border-b border-slate-200 last:border-b-0 hover:bg-blue-50/30"
               >
                 <td className="max-w-[410px] px-[18px] py-4 text-sm leading-5 text-slate-700">
-                  {courseOfferingName}
+                  {facultyAssignment.course_name || '—'}
                 </td>
-                <td className="px-[18px] py-4 text-sm text-slate-600">{facultyName}</td>
+                <td className="px-[18px] py-4 text-sm text-slate-600">
+                  {facultyAssignment.term_name || '—'}
+                </td>
+                <td className="px-[18px] py-4 text-sm text-slate-600">
+                  {facultyAssignment.batch_name || '—'}
+                </td>
+                <td className="px-[18px] py-4 text-sm text-slate-600">
+                  {facultyAssignment.section_name || '—'}
+                </td>
+                <td className="px-[18px] py-4 text-sm text-slate-600">
+                  {facultyAssignment.faculty_name || '—'}
+                </td>
                 <td className="px-[18px] py-4 text-sm text-slate-600">
                   <span
                     className={`inline-flex min-h-6 items-center rounded-full px-2 py-[3px] text-xs font-bold ${getStatusClassName(

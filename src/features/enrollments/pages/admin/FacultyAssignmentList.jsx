@@ -1,18 +1,11 @@
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import FacultyAssignmentTable from '../../components/FacultyAssignmentTable';
-import { useEnrollmentRelationLookups } from '../../hooks/useEnrollmentRelationLookups';
 import { useFacultyAssignments } from '../../hooks/useFacultyAssignments';
 
 const FacultyAssignmentList = () => {
   const { facultyAssignments, isLoading, error, deletingId, deleteFacultyAssignment } =
     useFacultyAssignments();
-  const {
-    courseOfferings,
-    profiles: faculties,
-    isLoading: isLoadingLookups,
-    error: lookupsError,
-  } = useEnrollmentRelationLookups('faculty');
 
   const handleDelete = async (id) => {
     const shouldDelete = window.confirm(
@@ -27,8 +20,6 @@ const FacultyAssignmentList = () => {
       // The hook exposes the request error in the page-level alert.
     }
   };
-
-  const pageError = error || lookupsError;
 
   return (
     <section
@@ -58,17 +49,17 @@ const FacultyAssignmentList = () => {
         </Link>
       </header>
 
-      {pageError && (
+      {error && (
         <p
           className="mb-5 border-l-[3px] border-red-700 bg-red-50 px-3.5 py-3 text-sm leading-5 text-red-800"
           role="alert"
         >
-          {pageError}
+          {error}
         </p>
       )}
 
       <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-        {isLoading || isLoadingLookups ? (
+        {isLoading ? (
           <div
             className="grid min-h-[180px] place-content-center px-8 py-8 text-sm text-slate-500"
             role="status"
@@ -78,8 +69,6 @@ const FacultyAssignmentList = () => {
         ) : (
           <FacultyAssignmentTable
             facultyAssignments={facultyAssignments}
-            courseOfferings={courseOfferings}
-            faculties={faculties}
             deletingId={deletingId}
             onDelete={handleDelete}
           />

@@ -9,10 +9,13 @@ export const getCourseLabel = (course) => {
 };
 
 export const getFacultyLabel = (faculty) => {
-  if (faculty?.name) return faculty.name;
+  const user = faculty?.base_profile?.user ?? faculty;
+  const fullName = [user?.first_name, user?.last_name].filter(Boolean).join(' ');
+  const name = fullName || faculty?.name || faculty?.full_name || user?.email;
+  const registrationId = faculty?.registration_id;
 
-  const fullName = [faculty?.first_name, faculty?.last_name].filter(Boolean).join(' ');
-  return fullName || faculty?.full_name || faculty?.email || 'Unnamed faculty member';
+  if (name && registrationId) return `${name} (${registrationId})`;
+  return name || registrationId || 'Unnamed faculty member';
 };
 
 export const getBatchLabel = (batch) => {

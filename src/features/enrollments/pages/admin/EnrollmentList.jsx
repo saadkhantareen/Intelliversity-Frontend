@@ -1,17 +1,10 @@
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import EnrollmentTable from '../../components/EnrollmentTable';
-import { useEnrollmentRelationLookups } from '../../hooks/useEnrollmentRelationLookups';
 import { useEnrollments } from '../../hooks/useEnrollments';
 
 const EnrollmentList = () => {
   const { enrollments, isLoading, error, deletingId, deleteEnrollment } = useEnrollments();
-  const {
-    courseOfferings,
-    profiles: students,
-    isLoading: isLoadingLookups,
-    error: lookupsError,
-  } = useEnrollmentRelationLookups('student');
 
   const handleDelete = async (id) => {
     const shouldDelete = window.confirm('Delete this enrollment? This action cannot be undone.');
@@ -24,8 +17,6 @@ const EnrollmentList = () => {
       // The hook exposes the request error in the page-level alert.
     }
   };
-
-  const pageError = error || lookupsError;
 
   return (
     <section
@@ -55,17 +46,17 @@ const EnrollmentList = () => {
         </Link>
       </header>
 
-      {pageError && (
+      {error && (
         <p
           className="mb-5 border-l-[3px] border-red-700 bg-red-50 px-3.5 py-3 text-sm leading-5 text-red-800"
           role="alert"
         >
-          {pageError}
+          {error}
         </p>
       )}
 
       <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-        {isLoading || isLoadingLookups ? (
+        {isLoading ? (
           <div
             className="grid min-h-[180px] place-content-center px-8 py-8 text-sm text-slate-500"
             role="status"
@@ -75,8 +66,6 @@ const EnrollmentList = () => {
         ) : (
           <EnrollmentTable
             enrollments={enrollments}
-            courseOfferings={courseOfferings}
-            students={students}
             deletingId={deletingId}
             onDelete={handleDelete}
           />
