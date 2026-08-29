@@ -39,8 +39,8 @@ const EnrollmentFormFields = ({ values, courseOfferings, students, onChange, dis
         <span>Student</span>
         <select
           id="enrollment-student"
-          name="student"
-          value={values.student}
+          name="student_id"
+          value={values.student_id}
           onChange={onChange}
           required
           disabled={disabled}

@@ -45,8 +45,8 @@ const FacultyAssignmentFormFields = ({
         <span>Faculty member</span>
         <select
           id="faculty-assignment-faculty"
-          name="faculty"
-          value={values.faculty}
+          name="faculty_id"
+          value={values.faculty_id}
           onChange={onChange}
           required
           disabled={disabled}

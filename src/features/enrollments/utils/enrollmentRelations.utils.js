@@ -71,45 +71,52 @@ export const getStatusClassName = (status) => {
 
 export const INITIAL_FACULTY_ASSIGNMENT_VALUES = {
   course_offering: '',
-  faculty: '',
+  faculty_id: '',
   status: 'pending',
 };
 
 export const INITIAL_ENROLLMENT_VALUES = {
   course_offering: '',
-  student: '',
+  student_id: '',
   status: 'enrolled',
 };
 
 export const getFacultyAssignmentValues = (facultyAssignment) => ({
   course_offering:
-    facultyAssignment?.course_offering_id ?? facultyAssignment?.course_offering?.id ?? facultyAssignment?.course_offering ?? '',
-  faculty: facultyAssignment?.faculty_id ?? facultyAssignment?.faculty?.id ?? facultyAssignment?.faculty ?? '',
+    facultyAssignment?.course_offering_id ??
+    facultyAssignment?.course_offering?.id ??
+    facultyAssignment?.course_offering ??
+    '',
+  faculty_id:
+    facultyAssignment?.faculty_id ?? facultyAssignment?.faculty?.id ?? facultyAssignment?.faculty ?? '',
   status: facultyAssignment?.status ?? 'pending',
 });
 
 export const getEnrollmentValues = (enrollment) => ({
   course_offering:
-    enrollment?.course_offering_id ?? enrollment?.course_offering?.id ?? enrollment?.course_offering ?? '',
-  student: enrollment?.student_id ?? enrollment?.student?.id ?? enrollment?.student ?? '',
+    enrollment?.course_offering_id ??
+    enrollment?.course_offering?.id ??
+    enrollment?.course_offering ??
+    '',
+  student_id: enrollment?.student_id ?? enrollment?.student?.id ?? enrollment?.student ?? '',
   status: enrollment?.status ?? 'enrolled',
 });
 
-export const getFacultyAssignmentPayload = ({ course_offering, faculty, status }) => ({
-  course_offering,
-  faculty,
+export const getFacultyAssignmentPayload = ({ course_offering, faculty_id, status }) => ({
+  course_offering: course_offering,
+  faculty_id,
   status,
 });
 
-export const getEnrollmentPayload = ({ course_offering, student, status }) => ({
-  course_offering,
-  student,
+export const getEnrollmentPayload = ({ course_offering, student_id, status }) => ({
+  course_offering_id: course_offering,
+  student_id,
   status,
 });
 
 export const validateFacultyAssignment = (values) => {
   if (!values.course_offering) return 'Select a course offering.';
-  if (!values.faculty) return 'Select a faculty member.';
+  if (!values.faculty_id) return 'Select a faculty member.';
   if (!values.status) return 'Select an assignment status.';
 
   return '';
@@ -117,7 +124,7 @@ export const validateFacultyAssignment = (values) => {
 
 export const validateEnrollment = (values) => {
   if (!values.course_offering) return 'Select a course offering.';
-  if (!values.student) return 'Select a student.';
+  if (!values.student_id) return 'Select a student.';
   if (!values.status) return 'Select an enrollment status.';
 
   return '';
