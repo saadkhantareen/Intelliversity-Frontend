@@ -20,7 +20,7 @@ const STUDENT_CONFIG = {
       items: [
         { label: 'Dashboard', to: '/dashboard', Icon: IcGrid },
         { label: 'Profile', to: '/profile', Icon: IcBell },
-        { label: 'View Courses', to: '/courses', Icon: IcBook },
+        { label: 'View Courses', to: '/view-courses', Icon: IcBook },
         { label: 'Registration', to: '/registration', Icon: IcClipboard },
         { label: 'Fees', to: '/fees', Icon: IcArchive },
         { label: 'Result Card', to: '/results', Icon: IcChart },

@@ -1,128 +1,82 @@
-import { getStatusClassName } from "../utils/enrollmentRelations.utils";
-
-const actionButtonClassName =
-  "inline-flex min-h-8 items-center justify-center rounded px-2 py-1.5 text-sm font-semibold text-red-700 transition-colors duration-150 hover:bg-red-50 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-200 disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none";
+import React from 'react';
 
 const CurrentPortalCoursesTable = ({
-  records,
-  showFaculty,
+  records = [],
   actionId,
-  actionLabel,
-  actionInProgressLabel,
-  emptyTitle,
-  emptyDescription,
+  actionLabel = "Remove",
+  actionInProgressLabel = "Removing…",
+  emptyTitle = "No courses found.",
+  emptyDescription = "There are no courses to display here.",
   onAction,
+  secondaryActionLabel,
+  onSecondaryAction,
 }) => {
-  if (!records.length) {
+  if (records.length === 0) {
     return (
-      <div className="grid min-h-[168px] place-content-center px-8 py-8 text-center text-sm text-slate-500">
-        <p className="mb-1 text-sm font-semibold text-slate-700">
-          {emptyTitle}
-        </p>
-        <span className="text-sm">{emptyDescription}</span>
+      <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center">
+        <h3 className="text-sm font-bold text-slate-800">{emptyTitle}</h3>
+        <p className="mt-1 text-xs text-slate-500">{emptyDescription}</p>
       </div>
     );
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table
-        className={`w-full border-collapse text-left ${showFaculty ? "min-w-[1010px]" : "min-w-[860px]"}`}
-      >
+    <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+      <table className="w-full text-left border-collapse">
         <thead>
-          <tr>
-            <th
-              scope="col"
-              className="whitespace-nowrap bg-slate-50 px-[18px] py-4 text-xs font-bold uppercase tracking-[0.04em] text-slate-600"
-            >
-              Course
-            </th>
-            <th
-              scope="col"
-              className="whitespace-nowrap bg-slate-50 px-[18px] py-4 text-xs font-bold uppercase tracking-[0.04em] text-slate-600"
-            >
-              Term
-            </th>
-            <th
-              scope="col"
-              className="whitespace-nowrap bg-slate-50 px-[18px] py-4 text-xs font-bold uppercase tracking-[0.04em] text-slate-600"
-            >
-              Batch
-            </th>
-            <th
-              scope="col"
-              className="whitespace-nowrap bg-slate-50 px-[18px] py-4 text-xs font-bold uppercase tracking-[0.04em] text-slate-600"
-            >
-              Section
-            </th>
-            {showFaculty && (
-              <th
-                scope="col"
-                className="whitespace-nowrap bg-slate-50 px-[18px] py-4 text-xs font-bold uppercase tracking-[0.04em] text-slate-600"
-              >
-                Faculty
-              </th>
-            )}
-            <th
-              scope="col"
-              className="whitespace-nowrap bg-slate-50 px-[18px] py-4 text-xs font-bold uppercase tracking-[0.04em] text-slate-600"
-            >
-              Status
-            </th>
-            <th
-              scope="col"
-              className="whitespace-nowrap bg-slate-50 px-[18px] py-4 text-right text-xs font-bold uppercase tracking-[0.04em] text-slate-600"
-            >
-              Action
-            </th>
+          <tr className="border-b border-slate-200 bg-slate-50 text-xs font-bold uppercase tracking-wider text-slate-500">
+            <th className="py-3.5 px-4">Course</th>
+            <th className="py-3.5 px-4">Term</th>
+            <th className="py-3.5 px-4">Batch</th>
+            <th className="py-3.5 px-4">Section</th>
+            <th className="py-3.5 px-4">Status</th>
+            <th className="py-3.5 px-4 text-right">Action</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-slate-100 text-sm">
           {records.map((record) => {
-            const isActing = actionId === record.id;
+            // Handle structure whether course info is flattened or nested under course_offering
+            const courseName = record.course_offering_details?.course_name || record.course_name || record.course_code || "PF";
+            const termName = record.course_offering_details?.term_name || record.term_name || record.term || "—";
+            const batchName = record.course_offering_details?.batch_name || record.batch_name || "—";
+            const sectionName = record.course_offering_details?.section_name || record.section_name || "—";
+            const status = record.status || "pending";
+            
+            const rowKey = record.id;
+            const isProcessing = actionId === rowKey || actionId === record.course_offering;
 
             return (
-              <tr
-                key={record.id}
-                className="border-b border-slate-200 last:border-b-0 hover:bg-blue-50/30"
-              >
-                <td className="max-w-[360px] px-[18px] py-4 text-sm leading-5 text-slate-700">
-                  <strong className="block font-semibold text-slate-800">
-                    {record.course_name || "—"}
-                  </strong>
-                </td>
-                <td className="px-[18px] py-4 text-sm text-slate-600">
-                  {record.term_name || "—"}
-                </td>
-                <td className="px-[18px] py-4 text-sm text-slate-600">
-                  {record.batch_name || "—"}
-                </td>
-                <td className="px-[18px] py-4 text-sm text-slate-600">
-                  {record.section_name || "—"}
-                </td>
-                {showFaculty && (
-                  <td className="px-[18px] py-4 text-sm text-slate-600">
-                    {record.faculty_name || "Not assigned"}
-                  </td>
-                )}
-                <td className="px-[18px] py-4 text-sm text-slate-600">
-                  <span
-                    className={`inline-flex min-h-6 items-center rounded-full px-2 py-[3px] text-xs font-bold ${getStatusClassName(
-                      record.status,
-                    )}`}
-                  >
-                    {record.status || "—"}
+              <tr key={rowKey} className="hover:bg-slate-50/60 transition-colors">
+                <td className="py-4 px-4 font-bold text-slate-900">{courseName}</td>
+                <td className="py-4 px-4 text-slate-600">{termName}</td>
+                <td className="py-4 px-4 text-slate-600">{batchName}</td>
+                <td className="py-4 px-4 text-slate-600">{sectionName}</td>
+                <td className="py-4 px-4">
+                  <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-bold text-amber-800 border border-amber-200/60">
+                    {status}
                   </span>
                 </td>
-                <td className="px-[18px] py-4 text-right">
-                  <button
-                    className={actionButtonClassName}
-                    type="button"
-                    onClick={() => onAction(record.id)}
-                    disabled={isActing}
-                  >
-                    {isActing ? actionInProgressLabel : actionLabel}
-                  </button>
+                <td className="py-4 px-4 text-right space-x-2">
+                  {/* Secondary Action: Show Students */}
+                  {onSecondaryAction && (
+                    <button
+                      onClick={() => onSecondaryAction(record)}
+                      className="inline-flex items-center px-3 py-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+                    >
+                      {secondaryActionLabel || "Show students"}
+                    </button>
+                  )}
+
+                  {/* Primary Action: Remove */}
+                  {onAction && (
+                    <button
+                      onClick={() => onAction(record.id)}
+                      disabled={isProcessing}
+                      className="inline-flex items-center px-3 py-1.5 text-xs font-bold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200/60 rounded-lg transition-colors disabled:opacity-50"
+                    >
+                      {isProcessing ? actionInProgressLabel : actionLabel}
+                    </button>
+                  )}
                 </td>
               </tr>
             );

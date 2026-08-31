@@ -1,9 +1,11 @@
+import { useNavigate } from "react-router-dom";
 import AvailableCourseOfferingsTable from "../../components/AvailableCourseOfferingsTable";
 import CurrentPortalCoursesTable from "../../components/CurrentPortalCoursesTable";
 import PortalCourseSection from "../../components/PortalCourseSection";
 import { useFacultyCoursePortal } from "../../hooks/useFacultyCoursePortal";
 
 const FacultyAssignmentPage = () => {
+  const navigate = useNavigate();
   const {
     availableCourses,
     assignedCourses,
@@ -35,6 +37,16 @@ const FacultyAssignmentPage = () => {
       // The hook exposes the request error in the page-level alert.
     }
   };
+
+const handleShowStudents = (record) => {
+  if (!record.course_offering_id) {
+    window.alert("Could not determine the course offering for this assignment.");
+    return;
+  }
+  navigate(`/courses/${record.course_offering_id}/students`, {
+    state: { courseRecord: record },
+  });
+};
 
   return (
     <section
@@ -111,6 +123,8 @@ const FacultyAssignmentPage = () => {
               emptyTitle="No courses have been assigned."
               emptyDescription="Use the available courses section to submit a new assignment."
               onAction={handleRemoveAssignedCourse}
+              secondaryActionLabel="Show students"
+              onSecondaryAction={handleShowStudents}
             />
           </PortalCourseSection>
         </div>

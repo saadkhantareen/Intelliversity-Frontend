@@ -7,6 +7,9 @@ import ProfileRouter from './ProfileRouter';
 
 import DashboardRouter from './DashboardRouter';
 
+
+
+
 const PoliciesPage = lazy(() => import('@/features/policies/pages/AcademicPolicyPage'));
 // Public pages
 const LoginPage = lazy(() => import('@/features/auth/pages/LoginPage'));
@@ -63,12 +66,19 @@ const FacultyAssignmentForm = lazy(
 const FacultyAssignmentPage = lazy(
   () => import('@/features/enrollments/pages/faculty/FacultyAssignmentPage')
 );
+const FacultyCourseStudentsPage = lazy(
+  () => import('@/features/enrollments/pages/faculty/FacultyCourseStudentsPage')
+);
 
 // Student Enrollments
 const EnrollmentList = lazy(() => import('@/features/enrollments/pages/admin/EnrollmentList'));
 const EnrollmentForm = lazy(() => import('@/features/enrollments/pages/admin/EnrollmentForm'));
 const StudentRegistrationPage = lazy(
   () => import('@/features/enrollments/pages/student/StudentRegistrationPage')
+);
+// Yahan naya page lazy load kiya gaya hai (path apne folder structure ke mutabiq adjust kar lein)
+const ViewAssignedCoursesPage = lazy(
+  () => import('@/features/enrollments/pages/student/ViewAssignedCoursesPage')
 );
 
 // Examinations / Assessment Types & Policies
@@ -78,6 +88,22 @@ const AssessmentPoliciesPage = lazy(
 );
 const GradePoliciesPage = lazy(() => import('@/features/examination/pages/GradePoliciesPage'));
 const GradeScalesPage = lazy(() => import('@/features/examination/pages/GradeScalesPage'));
+const FacultyStudentMarksPage = lazy(
+  () => import('@/features/examination/pages/faculty/FacultyStudentMarksPage')
+);
+
+
+const FacultyCourseAssessmentsPage = lazy(
+  () => import('@/features/examination/pages/faculty/FacultyCourseAssessmentsPage')
+);
+const FacultyCreateAssessmentPage = lazy(
+  () => import('@/features/examination/pages/faculty/FacultyCreateAssessmentPage')
+);
+const FacultyBulkGradeEntryPage = lazy(
+  () => import('@/features/examination/pages/faculty/FacultyBulkGradeEntryPage')
+);
+
+const StudentMarksPage = lazy(() => import('@/features/examination/pages/student/StudentMarksPage'));
 
 // Users / Profile
 const StudentsPage = lazy(() => import('@/features/profile/pages/StudentsPage'));
@@ -152,22 +178,42 @@ function ProtectedAppRoutes() {
           element={<FacultyAssignmentForm />}
         />
         <Route path="/courses" element={<FacultyAssignmentPage />} />
+        <Route
+          path="/courses/:courseOfferingId/students"
+          element={<FacultyCourseStudentsPage />}
+        />
 
         {/* Student Enrollments */}
         <Route path="/enrollments/student-enrollments" element={<EnrollmentList />} />
         <Route path="/enrollments/student-enrollments/create" element={<EnrollmentForm />} />
         <Route path="/enrollments/student-enrollments/edit/:id" element={<EnrollmentForm />} />
         <Route path="/registration" element={<StudentRegistrationPage />} />
+       
+        
+        {/* Naya route yahan add kar diya gaya hai */}
+        <Route path="/view-courses" element={<ViewAssignedCoursesPage />} />
 
         {/* Examinations */}
         <Route path="/examinations/assessment-types" element={<AssessmentTypesPage />} />
         <Route path="/examinations/assessment-policies" element={<AssessmentPoliciesPage />} />
         <Route path="/examinations/grade-policies" element={<GradePoliciesPage />} />
         <Route path="/examinations/grade-scales" element={<GradeScalesPage />} />
+        <Route
+          path="/courses/:courseOfferingId/students/:studentId/marks"
+          element={<FacultyStudentMarksPage />}
+        />
+        <Route path="/courses/:courseOfferingId/assessments" element={<FacultyCourseAssessmentsPage />} />
+        <Route path="/courses/:courseOfferingId/assessments/new" element={<FacultyCreateAssessmentPage />} />
+        <Route
+          path="/courses/:courseOfferingId/assessments/:assessmentId/grades"
+          element={<FacultyBulkGradeEntryPage />}
+        />
+        <Route path="/student-marks" element={<StudentMarksPage />} />
 
         {/* Students */}
         <Route path="/users/students" element={<StudentsPage />} />
         <Route path="/users/students/create" element={<StudentForm />} />
+         <Route path="/student-marks/:courseOfferingId" element={<StudentMarksPage />} />
 
         {/* Faculty */}
         <Route path="/users/faculty" element={<FacultyPage />} />

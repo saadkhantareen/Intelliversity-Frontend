@@ -1,6 +1,10 @@
-export { default as CourseOfferingForm } from './pages/admin/CourseOfferingForm';
-export { default as CourseOfferingList } from './pages/admin/CourseOfferingList';
-export { default as FacultyAssignmentForm } from './pages/admin/FacultyAssignmentForm';
-export { default as FacultyAssignmentList } from './pages/admin/FacultyAssignmentList';
-export { default as EnrollmentForm } from './pages/admin/EnrollmentForm';
-export { default as EnrollmentList } from './pages/admin/EnrollmentList';
+export { default as AssessmentTypesPage } from './pages/AssessmentTypesPage';
+export { default as AssessmentPoliciesPage } from './pages/AssessmentPoliciesPage';
+export { default as GradePoliciesPage } from './pages/GradePoliciesPage';
+export { default as GradeScalesPage } from './pages/GradeScalesPage';
+export { default as FacultyStudentMarksPage } from './pages/faculty/FacultyStudentMarksPage';
+export { default as FacultyCourseAssessmentsPage } from './pages/faculty/FacultyCourseAssessmentsPage';
+export { default as FacultyCreateAssessmentPage } from './pages/faculty/FacultyCreateAssessmentPage';
+export { default as FacultyBulkGradeEntryPage } from './pages/faculty/FacultyBulkGradeEntryPage';
+export { default as ViewAssignedCoursesPage } from './pages/student/ViewAssignedCoursesPage';
+export { default as ExaminationService } from './api/examination.service';

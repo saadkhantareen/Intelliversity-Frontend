@@ -86,6 +86,64 @@ const ExaminationService = {
     const response = await api.delete(`${BASE}/grade-scales/${id}/`);
     return response.data;
   },
+
+  // ── Faculty: Assessments (Quiz 1, Midterm 1...) tied to a course offering ──
+  getAssessmentsByCourseOffering: async (courseOfferingId) => {
+    const response = await api.get(`${BASE}/faculty/assessments/`, {
+      params: { course_offering: courseOfferingId },
+    });
+    return response.data;
+  },
+
+  createAssessment: async (data) => {
+    const response = await api.post(`${BASE}/faculty/assessments/`, data);
+    return response.data;
+  },
+
+  updateAssessment: async (id, data) => {
+    const response = await api.patch(`${BASE}/faculty/assessments/${id}/`, data);
+    return response.data;
+  },
+
+  deleteAssessment: async (id) => {
+    const response = await api.delete(`${BASE}/faculty/assessments/${id}/`);
+    return response.data;
+  },
+
+  // Bulk gradebook helpers (map to @action routes on FacultyAssessmentViewSet)
+  getGradebook: async (assessmentId) => {
+    const response = await api.get(`${BASE}/faculty/assessments/${assessmentId}/gradebook/`);
+    return response.data;
+  },
+
+  bulkGrade: async (assessmentId, data) => {
+    const response = await api.post(`${BASE}/faculty/assessments/${assessmentId}/bulk-grade/`, data);
+    return response.data;
+  },
+
+  // ── Faculty: individual student marks ──
+  getStudentAssessmentsByAssessment: async (assessmentId) => {
+    const response = await api.get(`${BASE}/faculty/student-assessments/`, {
+      params: { assessment: assessmentId },
+    });
+    return response.data;
+  },
+
+  createStudentAssessment: async (data) => {
+    const response = await api.post(`${BASE}/faculty/student-assessments/`, data);
+    return response.data;
+  },
+
+  updateStudentAssessment: async (id, data) => {
+    const response = await api.patch(`${BASE}/faculty/student-assessments/${id}/`, data);
+    return response.data;
+  },
+
+  // ── Student: view published course marks/assessments ──
+  getStudentAssessments: async (params = {}) => {
+    const response = await api.get(`${BASE}/student-assessments/`, { params });
+    return response.data;
+  },
 };
 
 export default ExaminationService;

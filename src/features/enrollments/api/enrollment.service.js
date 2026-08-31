@@ -46,6 +46,14 @@ const EnrollmentService = {
     const response = await api.delete(`${BASE}/${enrollmentId}/`);
     return response.data;
   },
+
+  // Get students for a specific course offering using course_offering_id
+  getStudentsByCourseOffering: async (courseOfferingId) => {
+    const response = await api.get('/api/v1/enrollments/students/', {
+      params: { course_offering_id: courseOfferingId },
+    });
+    return response.data;
+  },
 };
 
 export default EnrollmentService;

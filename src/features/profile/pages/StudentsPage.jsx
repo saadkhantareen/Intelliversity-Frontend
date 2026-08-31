@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
+import api from '@/shared/api/client';
 import { ProfileService } from '../api/profile.service';
 import StudentForm from './StudentForm';
 
@@ -133,6 +134,7 @@ function DeleteModal({ student, onConfirm, onCancel, loading }) {
 
 // ── Edit Modal ─────────────────────────────────────────────────────────────
 function EditModal({ student, onClose, onSaved }) {
+  const [sections, setSections] = useState([]);
   const [form, setForm] = useState({
     first_name: student?.base_profile?.user?.first_name ?? '',
     last_name: student?.base_profile?.user?.last_name ?? '',
@@ -140,9 +142,24 @@ function EditModal({ student, onClose, onSaved }) {
     city: student?.base_profile?.city ?? '',
     country: student?.base_profile?.country ?? '',
     cgpa: student?.cgpa ?? '',
+    section: student?.section?.id ?? student?.section ?? '',
     bio: student?.base_profile?.bio ?? '',
   });
   const [saving, setSaving] = useState(false);
+
+  // Fetch sections list on mount
+  useEffect(() => {
+    async function fetchSections() {
+      try {
+        const res = await api.get('/api/v1/academics/sections/');
+        const data = res.data ?? res;
+        setSections(Array.isArray(data) ? data : []);
+      } catch {
+        toast.error('Failed to load sections.');
+      }
+    }
+    fetchSections();
+  }, []);
 
   const set = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
 
@@ -152,6 +169,8 @@ function EditModal({ student, onClose, onSaved }) {
     try {
       const payload = {
         cgpa: form.cgpa || null,
+        section: form.section || null,
+        section_id: form.section || null,
         base_profile: {
           phone_number: form.phone_number || null,
           city: form.city || null,
@@ -163,14 +182,21 @@ function EditModal({ student, onClose, onSaved }) {
           },
         },
       };
+
+      console.log('Sending student update payload:', payload);
+
       const updated = await ProfileService.updateStudent(student.id, payload);
+      
+      console.log('Received updated student response:', updated);
+
       toast.success('Student updated successfully!', {
         id: toastId,
         duration: 3000,
       });
       onSaved(updated);
     } catch (err) {
-      const msg = err.response?.data?.detail ?? 'Failed to update student.';
+      console.error('Update error response:', err.response?.data);
+      const msg = err.response?.data?.detail ?? JSON.stringify(err.response?.data) ?? 'Failed to update student.';
       toast.error(msg, { id: toastId, duration: 4000 });
     } finally {
       setSaving(false);
@@ -207,6 +233,23 @@ function EditModal({ student, onClose, onSaved }) {
             {inp('phone_number', 'Phone number')}
             {inp('cgpa', 'CGPA', 'number')}
           </div>
+
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Section</label>
+            <select
+              value={form.section}
+              onChange={set('section')}
+              className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            >
+              <option value="">— Select section —</option>
+              {sections.map((sec) => (
+                <option key={sec.id} value={sec.id}>
+                  {sec.name ?? sec.title ?? `Section ${sec.id}`}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             {inp('city', 'City')}
             {inp('country', 'Country')}
@@ -274,7 +317,6 @@ export default function StudentsPage() {
         page_size: PAGE_SIZE,
         search: debouncedSearch,
       });
-      console.log('students response:', JSON.stringify(res, null, 2)); // ← add this
 
       // Handle both paginated { results, count } and plain array
       if (Array.isArray(res)) {
@@ -321,7 +363,6 @@ export default function StudentsPage() {
     `${s.base_profile?.user?.first_name ?? ''} ${s.base_profile?.user?.last_name ?? ''}`.trim() ||
     '—';
   const getEmail = (s) => s.base_profile?.user?.email ?? '—';
-  const getSection = (s) => s.section?.name ?? s.section ?? '—';
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -432,7 +473,7 @@ export default function StudentsPage() {
                       <td className="px-5 py-3 text-gray-500">{getEmail(s)}</td>
                       <td className="px-5 py-3">
                         <span className="inline-block px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs font-medium">
-                          {s.section_name}
+                          {s.section_name ?? s.section?.name ?? s.section ?? '—'}
                         </span>
                       </td>
                       <td className="px-5 py-3 text-gray-600">{s.cgpa ?? '—'}</td>
@@ -445,10 +486,7 @@ export default function StudentsPage() {
                             <EditIcon /> Edit
                           </button>
                           <button
-                            onClick={() => {
-                              console.log('delete clicked', s.id, s); // ← add this
-                              setDeleteTarget(s);
-                            }}
+                            onClick={() => setDeleteTarget(s)}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
                           >
                             <TrashIcon /> Delete
