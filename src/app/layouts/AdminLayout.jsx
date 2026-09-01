@@ -58,6 +58,16 @@ const ADMIN_CONFIG = {
       ],
     },
     {
+      title: 'Attendance',
+      items: [
+        { label: 'Attendance Policies', to: '/attendance/policies', Icon: IcSettings },
+        { label: 'Generate Sessions', to: '/attendance/generate', Icon: IcArchive3 },
+        { label: 'Class Sessions', to: '/attendance/sessions', Icon: IcBook3 },
+        { label: 'Defaulters Report', to: '/attendance/reports/defaulters', Icon: IcChart3 },
+        { label: 'Compliance Report', to: '/attendance/reports/compliance', Icon: IcChart3 },
+      ],
+    },
+    {
       title: 'Examination',
       items: [
         { label: 'Assessment Types', to: '/examinations/assessment-types', Icon: IcChart3 },

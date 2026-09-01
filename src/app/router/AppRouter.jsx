@@ -111,6 +111,9 @@ const FacultyPage = lazy(() => import('@/features/profile/pages/FacultyPage'));
 const StudentForm = lazy(() => import('@/features/profile/pages/StudentForm'));
 const FacultyForm = lazy(() => import('@/features/profile/pages/FacultyForm'));
 
+// Attendance
+const AttendanceRoutes = lazy(() => import('@/features/attendance'));
+
 // Loading
 function FullScreenLoader({ text = 'Loading...' }) {
   return (
@@ -218,6 +221,9 @@ function ProtectedAppRoutes() {
         {/* Faculty */}
         <Route path="/users/faculty" element={<FacultyPage />} />
         <Route path="/users/faculty/create" element={<FacultyForm />} />
+
+        {/* Attendance */}
+        <Route path="/attendance/*" element={<AttendanceRoutes />} />
       </Route>
     </Route>
   );

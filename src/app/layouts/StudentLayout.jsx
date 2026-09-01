@@ -25,6 +25,7 @@ const STUDENT_CONFIG = {
         { label: 'Fees', to: '/fees', Icon: IcArchive },
         { label: 'Result Card', to: '/results', Icon: IcChart },
         { label: 'SoS', to: '/sos', Icon: IcBook },
+        { label: 'My Attendance', to: '/attendance', Icon: IcBook },
       ],
     },
   ],
