@@ -78,7 +78,7 @@ const TermTable = ({ terms, activatingId, deletingId, onActivate, onDelete }) =>
                   </span>
                 </td>
                 <td className="px-[18px] py-4 text-sm leading-5 text-slate-600">
-                  {term.academic_year ?? '—'}
+                  {term.academic_year_name ?? term.academic_year ?? '—'}
                 </td>
                 <td className="px-[18px] py-4 text-sm leading-5 text-slate-600">
                   {formatDate(term.start_date)} – {formatDate(term.end_date)}

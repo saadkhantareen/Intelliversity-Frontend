@@ -109,7 +109,7 @@ export const getFacultyAssignmentPayload = ({ course_offering, faculty_id, statu
 });
 
 export const getEnrollmentPayload = ({ course_offering, student_id, status }) => ({
-  course_offering_id: course_offering,
+  course_offering: course_offering,
   student_id,
   status,
 });
