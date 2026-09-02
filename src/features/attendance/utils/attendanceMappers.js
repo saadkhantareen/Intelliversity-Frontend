@@ -108,6 +108,7 @@ export function sessionIsMarked(s) {
 
 export function sessionOfferingLabel(s) {
   const explicit = pick(s, [
+    "course_offering_label",
     "course_offering_display",
     "course_offering_name",
     "offering_title",
@@ -125,11 +126,19 @@ export function offeringId(o) {
 
 export function offeringLabel(o) {
   if (!o) return "—";
-  if (typeof o === "string") return o;
+  const isUuid = (val) =>
+    typeof val === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+
+  if (typeof o === "string") {
+    if (isUuid(o)) return `Offering #${o.substring(0, 8)}…`;
+    return o;
+  }
   const explicit = pick(o, [
     "display_name",
     "title",
     "course_offering_display",
+    "course_offering_label",
     "course_offering_name",
     "name",
   ]);
@@ -145,7 +154,9 @@ export function offeringLabel(o) {
     return meta ? `${base} (${meta})` : base;
   }
   if (typeof o.course === "string" && o.course) return o.course;
-  return `Offering #${offeringId(o) ?? "?"}`;
+  const rawId = offeringId(o);
+  if (isUuid(rawId)) return `Offering #${rawId.substring(0, 8)}…`;
+  return `Offering #${rawId ?? "?"}`;
 }
 
 export function termId(t) {
