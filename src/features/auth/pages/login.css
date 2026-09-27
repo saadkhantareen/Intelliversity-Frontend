@@ -1,0 +1,1148 @@
+/* ==========================================================================
+   Intelliversity login page — tenant-aware dark glass surface
+   All selectors are scoped under `.login-page` so nothing here can leak into
+   other features. Keyframes are prefixed `login-` because @keyframes is global.
+   ========================================================================== */
+
+.login-page {
+  --login-ink: #f5f4ff;
+  /* Nudged from #a9a7be: the brighter aurora lifted the background under this
+     token, and it needed headroom to clear WCAG AA 4.5:1 where the aurora is at
+     its brightest. Still clearly below the primary text, so the hierarchy holds. */
+  --login-muted: #bcb9cf;
+  --login-line: rgba(255, 255, 255, 0.13);
+  --login-panel: rgba(17, 16, 28, 0.64);
+  --login-panel-strong: rgba(13, 12, 22, 0.9);
+  --login-field-bg: rgba(7, 6, 14, 0.34);
+  --login-field-bg-focus: rgba(7, 6, 14, 0.52);
+  --login-focus: #d8d3ff;
+  --login-danger: #fda4af;
+  --login-danger-border: rgba(248, 113, 113, 0.75);
+  --login-accent: #7b61ff;
+  --login-accent-deep: #6450df;
+  --login-accent-ink: #ffffff;
+  --login-accent-soft: rgba(123, 97, 255, 0.16);
+  --login-ease-in: cubic-bezier(0.16, 1, 0.3, 1);
+  --login-ease-out: cubic-bezier(0.7, 0, 0.84, 0);
+  --eye-x: 0px;
+  --eye-y: 0px;
+
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  /* No global `overflow: hidden` here: on short viewports, at high zoom, or when
+     the soft keyboard opens, the document must be able to scroll normally
+     rather than clipping the identity row or the sign-in form. Decorative
+     layers are `position: fixed`, so nothing needs clipping. */
+  isolation: isolate;
+  color: var(--login-ink);
+  background: #0b0a10;
+}
+
+/* --- Background layers ----------------------------------------------------
+   Intended model, all inside the isolated page root:
+     z-index 0  Ribbon Glow (the ONE renderer - canvas, or its static fallback)
+     z-index 1  noise texture / minimal readability treatment
+     z-index 2  the content grid
+   The ribbon deliberately does NOT use a negative z-index: a negative value
+   only paints above the root's own background because `isolation: isolate`
+   happens to create a stacking context, and it silently disappears if that
+   ever changes. Both columns sit above it on transparent backgrounds, so the
+   ribbon is continuous across the whole page with no column seam. */
+
+.login-page .login-ribbon,
+.login-page .login-ribbon-static,
+.login-page .login-noise {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.login-page .login-ribbon,
+.login-page .login-ribbon-static {
+  z-index: 0;
+  display: block;
+}
+
+/* Static base surface, shared by the WebGL canvas (so a frame that has not been
+   drawn yet is never a bright hole) and the fallback layer. */
+.login-page .login-ribbon,
+.login-page .login-ribbon-static {
+  background:
+    radial-gradient(60% 85% at 68% 48%, rgba(123, 97, 255, 0.3), transparent 70%),
+    radial-gradient(45% 60% at 18% 78%, rgba(47, 211, 242, 0.16), transparent 72%),
+    linear-gradient(160deg, #14121f 0%, #0b0a10 55%, #0b0a10 100%);
+}
+
+@supports (background: color-mix(in srgb, red 50%, transparent)) {
+  .login-page .login-ribbon,
+  .login-page .login-ribbon-static {
+    background:
+      radial-gradient(
+        60% 85% at 68% 48%,
+        color-mix(in srgb, var(--login-accent) 30%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(45% 60% at 18% 78%, rgba(47, 211, 242, 0.16), transparent 72%),
+      linear-gradient(160deg, #14121f 0%, #0b0a10 55%, #0b0a10 100%);
+  }
+}
+
+/* Noise/texture pass. Kept deliberately light (0.12, soft-light) — it is the
+   only layer above the ribbon, and anything heavier measurably mutes the
+   ribbon's cyan/violet cores. */
+.login-page .login-noise {
+  z-index: 1;
+  opacity: 0.12;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.18'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+}
+
+/* --- Layout -------------------------------------------------------------- */
+
+.login-page .login-layout {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(420px, 0.85fr);
+  /* Preserves the ~55/45 relationship. The gap doubles as the clear separation
+     between the copy and the form card: 48px at the narrow end of the range
+     and up to 144px on wide desktops, always comfortably above the 40px floor. */
+  gap: clamp(3rem, 7vw, 9rem);
+  align-items: center;
+  width: min(1440px, 100%);
+  min-height: 100vh;
+  min-height: 100svh;
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 5.5rem);
+}
+
+/* --- Left brand panel -----------------------------------------------------
+   Composition, in priority order:
+     1. small institution identity at the top of the content region
+     2. one restrained two-line headline
+     3. one short supporting sentence
+   The wrapper is fully transparent - no border, no shadow, no blur, no separate
+   surface - so the shared ribbon stays visible through it. */
+
+.login-page .login-brand-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* Stretches to the grid row (so the identity can sit level with the card's
+     top edge) while the card itself keeps its own centred placement. Pure flex
+     alignment - no absolute coordinates. */
+  align-self: stretch;
+  min-width: 0;
+}
+
+/* Readability scrim, and nothing more.
+   The ribbon is now genuinely visible, which means the brightest ribbon cores
+   can land behind the headline. This is a purely decorative dark wash with no
+   hue of its own, so it can never be mistaken for a second decorative layer.
+
+   The old scrim was a single left-anchored linear ramp peaking at 0.34. That was
+   measured against the OLD, much dimmer ribbon. With the brighter aurora the
+   muted supporting line dropped to 4.18:1 on desktop and 2.83:1 on mobile -
+   below WCAG AA. So the scrim now has a second, focused layer: a radial that
+   darkens exactly the lower-left block where the headline and supporting line
+   sit, on top of the original horizontal ramp. Both are neutral and both fade to
+   fully transparent, so the ribbon still reads through everywhere else.
+
+   It is inset flush with the panel on purpose. A negative horizontal inset used
+   to reach under the card, but on narrow screens that pushed the page's
+   scrollWidth past the viewport and produced a horizontal scrollbar. */
+.login-page .login-brand-panel::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  content: '';
+  background:
+    radial-gradient(
+      75% 58% at 24% 62%,
+      rgba(9, 8, 15, 0.66) 0%,
+      rgba(9, 8, 15, 0.4) 46%,
+      rgba(9, 8, 15, 0) 80%
+    ),
+    linear-gradient(
+      100deg,
+      rgba(9, 8, 15, 0.42) 0%,
+      rgba(9, 8, 15, 0.24) 42%,
+      rgba(9, 8, 15, 0) 75%
+    );
+  pointer-events: none;
+}
+
+/* --- Institution identity ------------------------------------------------ */
+
+.login-page .login-brand-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: login-brand-enter 240ms var(--login-ease-in) both;
+}
+
+.login-page .login-brand-mark {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  flex: 0 0 auto;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.06);
+  /* The previous wrapper glow is gone: the brief asks for a quiet academic
+     identity, and a coloured halo fought with the ribbon. */
+}
+
+/* `contain` shows the FULL mark rather than cropping it to the box. */
+.login-page .login-brand-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.login-page .login-brand-identity-text {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.login-page .login-brand-name {
+  color: #f4f2fa;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.25;
+  /* Long institution names wrap onto a second line. They are never clipped to a
+     single line - the meaningful name must always be readable. */
+  overflow-wrap: anywhere;
+}
+
+.login-page .login-brand-portal {
+  color: #b6b2c5;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: normal;
+  line-height: 1.3;
+  text-transform: none;
+}
+
+/* --- Hero copy ------------------------------------------------------------
+   `margin: auto 0` centres the copy in the space left under the identity
+   (with a small upward bias from the padding), so on a comfortable wide
+   desktop the headline starts around 35-42% down the visible content area
+   without any hardcoded viewport offsets. */
+
+.login-page .login-brand-copy {
+  max-width: 440px;
+  margin: auto 0;
+  padding: clamp(2rem, 6vh, 4.5rem) 0 clamp(1.5rem, 5vh, 4rem);
+  animation: login-brand-enter 250ms var(--login-ease-in) 40ms both;
+}
+
+.login-page .login-brand-heading {
+  max-width: 100%;
+  margin: 0;
+  font-family: inherit;
+  font-size: clamp(44px, 4vw, 60px);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+  text-wrap: pretty;
+}
+
+/* Each line is its own block span so the two-line break is structural, not a
+   <br>. No `white-space: nowrap`, no clipping: if the active tenant font
+   genuinely needs more room the line wraps naturally. */
+.login-page .login-brand-heading-line {
+  display: block;
+}
+
+.login-page .login-brand-heading-line--primary {
+  color: #f4f2fa;
+}
+
+.login-page .login-brand-heading-line--muted {
+  color: #c5baf8;
+}
+
+.login-page .login-brand-supporting {
+  max-width: 36ch;
+  margin: 20px 0 0;
+  color: #b6b2c5;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.65;
+}
+
+/* --- Glass card ---------------------------------------------------------- */
+
+.login-page .login-card {
+  width: 100%;
+  max-width: 31rem;
+  justify-self: end;
+  border: 1px solid var(--login-line);
+  border-radius: 1.65rem;
+  background: var(--login-panel);
+  box-shadow:
+    0 2rem 6rem rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.login-page .login-card-inner {
+  padding: clamp(1.35rem, 3vw, 2.35rem);
+}
+
+.login-page .login-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  margin-bottom: 1.8rem;
+}
+
+.login-page .login-header h2 {
+  margin: 0.35rem 0;
+  color: white;
+  font-size: clamp(1.75rem, 3vw, 2.2rem);
+  font-weight: 650;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+
+.login-page .login-subtitle {
+  margin: 0;
+  color: var(--login-muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.login-page .login-kicker {
+  color: #b4a9ff;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+}
+
+/* --- Eyes mascot --------------------------------------------------------- */
+/* Deliberately NOT rotated: the pupils translate with plain CSS variables so
+   the JS clamp maths stays trivial and both eyes track together. */
+
+.login-page .eyes-mascot {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  height: 2.65rem;
+  padding: 0.45rem;
+  flex: 0 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 0.8rem;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.login-page .login-eye {
+  position: relative;
+  display: block;
+  width: 0.78rem;
+  height: 1.18rem;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.login-page .login-eye-pupil {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.4rem;
+  height: 0.4rem;
+  margin: -0.2rem 0 0 -0.2rem;
+  border-radius: 50%;
+  background: #0b0a10;
+  transform: translate3d(var(--eye-x), var(--eye-y), 0);
+  will-change: transform;
+}
+
+/* --- Fields -------------------------------------------------------------- */
+
+.login-page .field-group {
+  margin-bottom: 1rem;
+}
+
+.login-page .field-label {
+  display: block;
+  margin: 0 0 0.48rem 0.05rem;
+  color: #dedbed;
+  font-size: 0.74rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+.login-page .field-shell,
+.login-page .institution-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0.8rem;
+  background: var(--login-field-bg);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+.login-page .field-shell:focus-within,
+.login-page .institution-control:focus-within {
+  border-color: rgba(180, 169, 255, 0.8);
+  background: var(--login-field-bg-focus);
+  box-shadow: 0 0 0 3px rgba(123, 97, 255, 0.17);
+}
+
+.login-page .field-shell-error {
+  border-color: var(--login-danger-border);
+}
+
+/* Vanish-on-submit feedback for a field that failed validation. */
+.login-page .login-field-vanish {
+  animation: login-field-vanish 260ms var(--login-ease-out) both;
+}
+
+.login-page .field-icon {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  margin-left: 0.88rem;
+  color: #89869f;
+}
+
+.login-page .login-input {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.75rem 0.9rem;
+  color: var(--login-ink);
+  outline: none;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 0.85rem;
+}
+
+.login-page .login-input::placeholder {
+  color: #77738e;
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease;
+}
+
+.login-page .login-input:focus::placeholder {
+  opacity: 0.35;
+}
+
+/* Chrome autofill would otherwise paint an opaque light background */
+.login-page .login-input:-webkit-autofill,
+.login-page .login-input:-webkit-autofill:hover,
+.login-page .login-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--login-ink);
+  -webkit-box-shadow: 0 0 0 1000px rgba(11, 10, 16, 0.92) inset;
+  transition: background-color 9999s ease-out;
+}
+
+.login-page .icon-button {
+  display: grid;
+  width: 2.7rem;
+  height: 2.9rem;
+  place-items: center;
+  flex: 0 0 auto;
+  color: #918da8;
+  border: 0;
+  border-radius: 0.7rem;
+  background: transparent;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.login-page .icon-button:hover,
+.login-page .icon-button:focus-visible {
+  color: white;
+}
+
+.login-page .field-error {
+  margin: 0.38rem 0 0 0.1rem;
+  color: var(--login-danger);
+  font-size: 0.7rem;
+}
+
+/* --- Institution control ------------------------------------------------- */
+
+.login-page .institution-group {
+  position: relative;
+  z-index: 3;
+}
+
+.login-page .institution-input {
+  padding-left: 0.75rem;
+  padding-right: 2.6rem;
+}
+
+/* Read-only current-institution pill (no verified discovery endpoint yet). */
+.login-page .institution-pill {
+  display: flex;
+  width: 100%;
+  min-height: 3rem;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.6rem 0.9rem;
+  color: #e4e1ef;
+  font-size: 0.82rem;
+}
+
+.login-page .institution-pill strong {
+  overflow: hidden;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.login-page .institution-pill .institution-pill-portal {
+  color: var(--login-muted);
+  font-size: 0.68rem;
+  white-space: nowrap;
+}
+
+.login-page .selector-chevron {
+  position: absolute;
+  right: 0.85rem;
+  color: #89869f;
+  pointer-events: none;
+  transition: transform 150ms ease;
+}
+
+.login-page .selector-chevron-open {
+  transform: rotate(180deg);
+}
+
+.login-page .institution-options {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  right: 0;
+  left: 0;
+  max-height: 15rem;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0.85rem;
+  background: var(--login-panel-strong);
+  box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+.login-page .institution-option {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.72rem 0.85rem;
+  color: #e4e1ef;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 0.8rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.login-page .institution-option:hover,
+.login-page .institution-option[aria-selected='true'],
+.login-page .institution-option-active {
+  background: rgba(123, 97, 255, 0.16);
+}
+
+.login-page .institution-option svg {
+  color: #b4a9ff;
+}
+
+.login-page .institution-empty,
+.login-page .institution-hint {
+  margin: 0;
+  padding: 0.75rem 0.85rem;
+  color: #8c88a1;
+  font-size: 0.7rem;
+}
+
+.login-page .institution-hint {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.63rem;
+}
+
+/* Hint under the read-only pill (no discovery endpoint available yet). */
+.login-page .institution-static-hint {
+  margin: 0.45rem 0 0 0.05rem;
+  color: #8c88a1;
+  font-size: 0.66rem;
+  line-height: 1.4;
+}
+
+/* --- Form meta + alerts -------------------------------------------------- */
+
+.login-page .form-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1.15rem 0 1.3rem;
+}
+
+.login-page .remember-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.48rem;
+  color: var(--login-muted);
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+/* The native checkbox stays the single source of truth: it is visually hidden
+   but still focusable and still toggled by Space, and the indicator is driven
+   purely by the :checked adjacent-sibling selector, so the two can never fall
+   out of sync. */
+.login-page .remember-label input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.login-page .custom-checkbox {
+  display: grid;
+  width: 1.05rem;
+  height: 1.05rem;
+  place-items: center;
+  flex: 0 0 auto;
+  color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.23);
+  border-radius: 0.32rem;
+  background: rgba(255, 255, 255, 0.04);
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.login-page .custom-checkbox svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* The check path is drawn on by animating its dash offset - a deliberate,
+   single-pass transition in the spirit of the Motion/Radix reference. No
+   bounce, no overshoot, no layout movement, and it runs once per state change.
+   Path length is 14.5 units for "M3.4 8.4 L6.5 11.4 L12.6 4.8". */
+.login-page .custom-checkbox-path {
+  stroke-dasharray: 14.5;
+  stroke-dashoffset: 14.5;
+  transition: stroke-dashoffset 200ms var(--login-ease-in);
+}
+
+.login-page .remember-label input:checked + .custom-checkbox {
+  color: var(--login-accent-ink);
+  border-color: var(--login-accent);
+  background: var(--login-accent);
+}
+
+.login-page .remember-label input:checked + .custom-checkbox .custom-checkbox-path {
+  stroke-dashoffset: 0;
+}
+
+.login-page .remember-label input:focus-visible + .custom-checkbox {
+  outline: 2px solid var(--login-focus);
+  outline-offset: 3px;
+}
+
+.login-page .text-link,
+.login-page .footer-links a,
+.login-page .demo-link {
+  color: #b9b0ff;
+  text-decoration: none;
+}
+
+.login-page .text-link {
+  font-size: 0.72rem;
+  font-weight: 650;
+}
+
+.login-page .text-link:hover,
+.login-page .footer-links a:hover,
+.login-page .demo-link:hover {
+  color: white;
+  text-decoration: underline;
+}
+
+/* Google/Microsoft sign-in, the "or continue with" divider, the provider buttons
+   and the SSO-only notice were removed from the card. Their rules are deleted
+   here too; none of these classes are used anywhere else in the app. */
+
+.login-page .login-alert {
+  margin: 0 0 1rem;
+  padding: 0.7rem 0.8rem;
+  color: #fecdd3;
+  border: 1px solid rgba(251, 113, 133, 0.25);
+  border-radius: 0.65rem;
+  background: rgba(159, 18, 57, 0.2);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+/* --- Primary CTA: React-native liquid glass --------------------------------
+   Interpretation of the Framer "Liquid Glass Buttons" reference, written in
+   plain CSS. The button stays ONE real <button type="submit">; this block only
+   changes how it looks.
+
+   Layers, bottom to top:
+     body       dark translucent navy/violet glass (frosted) with a small
+                institution-brand tint mixed in - never a transparent outline
+     refraction restrained cyan/violet edge refraction, driven by the
+                --login-glass-x / --login-glass-y custom properties the button
+                writes from pointer position, and clipped by overflow: hidden
+     sheen      a soft top-edge reflection
+   The pseudo-elements are decorative and sit at z-index 0 while the label is
+   z-index 1, so the reflection can never sit over the "Sign in" text. */
+
+.login-page .primary-button {
+  display: inline-flex;
+  width: 100%;
+  min-height: 3.1rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.78rem 1rem;
+}
+
+.login-page .login-glass-button {
+  --login-glass-x: 50%;
+  --login-glass-y: 0%;
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: var(--login-accent-ink);
+  border: 0;
+  border-radius: 0.9rem;
+  /* Real glass, not a coloured slab.
+
+     The previous body was a near-opaque navy/violet ramp (alpha 0.74-0.84) that
+     the @supports block then tinted further with the tenant accent, so the
+     button read as a solid blue button rather than something you can see the
+     background through. The reference is a translucent lens: you are meant to
+     see the aurora *through* it.
+
+     So the body is now a low-alpha WHITE wash. White is what makes it read as
+     glass on a dark surface, and it keeps the aurora visible underneath. The
+     tenant accent is demoted to the refraction sheen in ::before only, so the
+     institution still shows up in the button without becoming the button's
+     colour. */
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.13) 0%,
+    rgba(255, 255, 255, 0.05) 42%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  /* The blur + saturate is what actually sells the refraction: it bends and
+     intensifies the ribbon passing behind the button. */
+  backdrop-filter: blur(20px) saturate(190%) brightness(1.12);
+  -webkit-backdrop-filter: blur(20px) saturate(190%) brightness(1.12);
+  /* The crisp inset ring is the single strongest glass cue - a hard bright edge
+     with a soft cast shadow under it, exactly as in the reference. */
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.26),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -1.5px 0 rgba(255, 255, 255, 0.1),
+    0 0.75rem 2.1rem rgba(0, 0, 0, 0.5);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 200ms var(--login-ease-in),
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+}
+
+/* Label + spinner sit above every decorative layer. */
+.login-page .login-glass-button > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Refraction highlight that follows the pointer in both axes. This is the lens
+   effect from the reference: a tight, bright specular core with a soft coloured
+   fringe, not an evenly coloured blob. The core is near-white (light catching
+   the glass) and the fringe carries the cyan/violet dispersion, so the button
+   reads as a lens even when the pointer is elsewhere.
+   At rest the custom properties sit at the top-centre, which reads as a
+   top-edge sheen until the pointer arrives. */
+.login-page .login-glass-button::before {
+  position: absolute;
+  z-index: 0;
+  top: var(--login-glass-y);
+  left: var(--login-glass-x);
+  width: 60%;
+  height: 190%;
+  content: '';
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 255, 255, 0.4),
+    rgba(160, 200, 255, 0.2) 32%,
+    rgba(47, 211, 242, 0.16) 58%,
+    rgba(123, 97, 255, 0.1) 78%,
+    transparent 100%
+  );
+  opacity: 0.62;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: opacity 200ms ease;
+}
+
+/* Soft top-edge reflection: a wide, very low-contrast wash rather than a band
+   with a visible edge, so it reads as light catching the top of the glass. */
+.login-page .login-glass-button::after {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 62%;
+  content: '';
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.05) 45%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.login-page .primary-button:hover:not(:disabled) {
+  /* Brighten the rim rather than the border: the button no longer has a border
+     to tint, and on glass the edge highlight is what carries the hover state. */
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.72),
+    inset 0 -1.5px 0 rgba(255, 255, 255, 0.14),
+    0 0.95rem 2.3rem rgba(0, 0, 0, 0.56);
+  /* At most a 1px lift: no dramatic tilt, no cursor-chasing translation. */
+  transform: translateY(-1px);
+}
+
+.login-page .primary-button:hover:not(:disabled)::before {
+  opacity: 0.9;
+}
+
+/* Pointer-down compresses by 1px. No elastic spring, no overshoot. */
+.login-page .primary-button:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1.5px 0 rgba(255, 255, 255, 0.08),
+    0 0.4rem 1rem rgba(0, 0, 0, 0.45);
+}
+
+/* The focus ring is a real outline, independent of any glass reflection, and
+   the focus target itself never moves. */
+.login-page .primary-button:focus-visible,
+.login-page .demo-link:focus-visible,
+.login-page .footer-links a:focus-visible,
+.login-page .text-link:focus-visible,
+.login-page .icon-button:focus-visible,
+.login-page .institution-option:focus-visible,
+.login-page .institution-input:focus-visible {
+  outline: 2px solid var(--login-focus);
+  outline-offset: 3px;
+}
+
+.login-page .primary-button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+/* Opaque/translucent fallback for engines without backdrop-filter: the submit
+   surface must never disappear. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .login-page .login-glass-button {
+    background: linear-gradient(180deg, var(--login-accent) 0%, var(--login-accent-deep) 100%);
+  }
+}
+
+.login-page .button-spinner,
+.login-page .login-spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: login-spin 700ms linear infinite;
+}
+
+/* --- Footer -------------------------------------------------------------- */
+
+.login-page .login-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-top: 1.55rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.login-page .footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+}
+
+.login-page .footer-links a,
+.login-page .demo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.22rem;
+  color: #858199;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 0.66rem;
+  cursor: pointer;
+}
+
+.login-page .demo-link {
+  color: #b9b0ff;
+  white-space: nowrap;
+}
+
+.login-page .login-support-note {
+  margin: 1.4rem 0 0;
+  padding-top: 1rem;
+  color: #858199;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+  font-size: 0.68rem;
+  line-height: 1.5;
+}
+
+/* --- Loading / portal states -------------------------------------------- */
+
+.login-page .login-loading {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100svh;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  color: var(--login-muted);
+  background: #0b0a10;
+  font-size: 0.85rem;
+}
+
+/* --- Keyframes (global namespace, therefore prefixed) -------------------- */
+
+/* One restrained entrance for the left section: opacity plus at most 8px of
+   upward settling, 200-250ms on the project's existing easing curve. It only
+   animates opacity/transform, so the panel's layout space is reserved from the
+   first render and nothing reflows as the copy appears. */
+@keyframes login-brand-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Submit-time vanish pass over the field shell. It deliberately does NOT touch
+   the input's value: a rejected sign-in must leave the typed credentials in
+   place, so only the shell's edge and hint opacity move. The end state equals
+   the resting state, so a filled `both` fill leaves no residue. */
+@keyframes login-field-vanish {
+  from {
+    border-color: rgba(198, 210, 255, 0.55);
+    opacity: 0.6;
+  }
+  to {
+    border-color: rgba(255, 255, 255, 0.14);
+    opacity: 1;
+  }
+}
+
+@keyframes login-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Responsive --------------------------------------------------------- */
+
+@media (max-width: 1023px) {
+  .login-page .login-layout {
+    /* minmax(0, 1fr), not 1fr: a bare `1fr` track keeps an `auto` minimum, so a
+       wide form control would push the single column past the viewport and cause
+       horizontal scrolling on narrow phones. */
+    grid-template-columns: minmax(0, 1fr);
+    /* 28-32px between the hero copy and the card. */
+    gap: 2rem;
+    min-height: auto;
+    /* 20-24px outer gutters. */
+    padding: 1.5rem;
+  }
+
+  /* Stacked: identity first, then the short hero, then the card. No
+     desktop-height spacer and nothing to hide - the removed blocks are already
+     gone from the markup. */
+  .login-page .login-brand-panel {
+    align-self: auto;
+    padding: 0.5rem 0 0;
+  }
+
+  /* Stacked layout moves the headline and supporting line to the TOP of the
+     panel, where the desktop radial (centred at 62% height) no longer covers
+     them. Worse, the panel is only as tall as its own content on mobile, so the
+     supporting line lands on the panel's LAST row - entirely outside a radial
+     that fades to transparent at 82%. That measured 3.84:1, still under AA.
+
+     So on mobile the scrim keeps a real floor of alpha all the way to the
+     bottom edge instead of fading out. That is safe here precisely because the
+     panel is content-height: the wash stops where the panel stops and never
+     touches the card or the ribbon beside it. */
+  .login-page .login-brand-panel::before {
+    background:
+      radial-gradient(
+        130% 60% at 30% 38%,
+        rgba(9, 8, 15, 0.6) 0%,
+        rgba(9, 8, 15, 0.46) 55%,
+        rgba(9, 8, 15, 0.3) 100%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(9, 8, 15, 0.46) 0%,
+        rgba(9, 8, 15, 0.4) 58%,
+        rgba(9, 8, 15, 0.3) 100%
+      );
+  }
+
+  .login-page .login-brand-copy {
+    max-width: 100%;
+    margin: 0;
+    /* 24-28px between the identity row and the hero. */
+    padding: 1.6rem 0 0;
+  }
+
+  .login-page .login-brand-heading {
+    font-size: clamp(30px, 6vw, 40px);
+    letter-spacing: -0.02em;
+    line-height: 1.12;
+  }
+
+  .login-page .login-brand-supporting {
+    margin-top: 14px;
+    font-size: 0.94rem;
+    line-height: 1.6;
+  }
+
+  .login-page .login-card {
+    max-width: none;
+    justify-self: stretch;
+  }
+}
+
+@media (max-width: 560px) {
+  .login-page .login-layout {
+    /* 16px gutters on very narrow screens. */
+    padding: 1rem;
+  }
+
+  .login-page .login-brand-mark {
+    width: 36px;
+    height: 36px;
+  }
+
+  .login-page .login-card-inner {
+    padding: 1.25rem;
+  }
+
+  .login-page .login-header {
+    gap: 0.65rem;
+  }
+
+  .login-page .eyes-mascot {
+    transform: scale(0.88);
+    transform-origin: top left;
+    margin-right: -0.2rem;
+  }
+
+  .login-page .login-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .login-page .form-meta {
+    flex-wrap: wrap;
+  }
+}
+
+/* --- Reduced motion -----------------------------------------------------
+   The heading is static text, so it is complete on the first frame. The ribbon
+   renderer also draws a single static frame instead of animating, which is why
+   reduced motion never means a blank black background: the same visible ribbon
+   frame remains on screen, and the CSS-gradient fallback is used if WebGL2 is
+   unavailable. */
+
+@media (prefers-reduced-motion: reduce) {
+  .login-page *,
+  .login-page *::before,
+  .login-page *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  /* No hover lift and no press compression. */
+  .login-page .primary-button {
+    transform: none !important;
+  }
+
+  /* The pointer-follow refraction is a nonessential pointer effect: freeze it
+     at its resting top-centre position rather than letting it track. */
+  .login-page .login-glass-button::before {
+    left: 50% !important;
+    top: 0% !important;
+  }
+}
+
+/* Coarse pointers have no hover position to follow, so the refraction stays at
+   its resting position there too. */
+@media (pointer: coarse) {
+  .login-page .login-glass-button::before {
+    left: 50%;
+    top: 0%;
+  }
+}
+
+.login-page .login-kicker {
+  margin: 0;
+  color: var(--login-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}

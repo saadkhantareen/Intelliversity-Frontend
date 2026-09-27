@@ -1,7 +1,8 @@
-import { createContext, useContext, useState, useCallback } from 'react';
-import { authService } from '../api/auth.service';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useEffect } from 'react';
+
+import { authService } from '../api/auth.service';
+import { normalizeAuthError } from '../utils/authValidation';
 
 const AuthContext = createContext(null);
 
@@ -34,7 +35,7 @@ export function AuthProvider({ children }) {
         setToken(savedToken);
         setUser(JSON.parse(savedUser));
         setIsAuthenticated(true);
-      } catch (err) {
+      } catch {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('user');
@@ -43,11 +44,28 @@ export function AuthProvider({ children }) {
     setIsCheckingAuth(false);
   }, []);
 
+  /**
+   * Authenticate the user.
+   *
+   * Always REJECTS on failure (previously the `detail` branch returned early,
+   * which made callers treat a failed request as success and navigate to
+   * /dashboard). The thrown Error carries `isAuthError` + a normalised message
+   * so the login page can surface one inline message instead of a duplicate
+   * toast. Success/failure messaging is intentionally split:
+   *   - success -> toast here (single announcement)
+   *   - failure -> inline error on the page (proximity + recovery)
+   */
   const login = useCallback(async (credentials) => {
     setIsLoading(true);
+    setError(null);
+
     try {
       const res = await authService.login(credentials);
-      const { tokens, user, university } = res.data;
+      const { tokens, user, university } = res.data ?? {};
+
+      if (!tokens?.access || !tokens?.refresh || !user) {
+        throw new Error('Unexpected login response from the server.');
+      }
 
       localStorage.setItem('access_token', tokens.access);
       localStorage.setItem('refresh_token', tokens.refresh);
@@ -56,30 +74,17 @@ export function AuthProvider({ children }) {
       setToken(tokens.access);
       setUser({ ...user, university });
       setIsAuthenticated(true);
-      toast.success(`Welcome back, ${user.first_name}!`);
-    } catch (err) {
-      // Check for recaptcha or authentication errors - don't redirect
-      if (err.response?.data?.detail) {
-        setError(err.response.data.detail);
-        toast.error(err.response.data.detail);
-        return;
-      }
+      toast.success(`Welcome back, ${user.first_name || 'there'}!`);
 
-      const errors = err.response?.data;
-      console.log('error response:', errors);
-      const message =
-        errors?.non_field_errors?.[0]?.detail ||
-        errors?.non_field_errors?.[0] ||
-        errors?.detail ||
-        errors?.recaptcha_token?.[0] ||
-        errors?.email?.[0]?.detail ||
-        errors?.email?.[0] ||
-        errors?.password?.[0]?.detail ||
-        errors?.password?.[0] ||
-        'Login failed';
+      return { ok: true, user: { ...user, university } };
+    } catch (err) {
+      const message = normalizeAuthError(err);
       setError(message);
-      toast.error(message);
-      throw err;
+
+      const normalized = new Error(message);
+      normalized.isAuthError = true;
+      normalized.cause = err;
+      throw normalized;
     } finally {
       setIsLoading(false);
     }

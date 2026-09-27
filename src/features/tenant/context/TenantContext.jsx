@@ -18,11 +18,21 @@ export function TenantProvider({ children }) {
 
         const res = await getPortalBranding(domain);
 
-        if (res.status !== 200 || !res.data) {
+        if (res.status !== 200) {
           throw new Error('Invalid tenant response');
         }
 
         const data = res.data;
+
+        /* An unregistered domain used to come back as 200 {} rather than a 404.
+           `!res.data` does not catch that - an empty object is truthy - so tenant
+           was set to {} and every downstream `if (!tenant)` guard (DashboardRouter's
+           PageNotFound, PortalRouter's portal switch) sailed straight past it and
+           rendered a portal with no identity. Require an actual portal identity so
+           an empty payload is treated as a missing tenant, whatever the status. */
+        if (!data || typeof data !== 'object' || !data.portal_name) {
+          throw new Error('Invalid tenant response');
+        }
 
         setTenant(data);
         setBranding(data);
