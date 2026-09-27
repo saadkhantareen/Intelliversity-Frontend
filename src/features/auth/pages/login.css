@@ -52,7 +52,8 @@
 
 .login-page .login-ribbon,
 .login-page .login-ribbon-static,
-.login-page .login-noise {
+.login-page .login-noise,
+.login-page .liquid-chrome-container {
   position: fixed;
   inset: 0;
   width: 100%;
@@ -61,7 +62,8 @@
 }
 
 .login-page .login-ribbon,
-.login-page .login-ribbon-static {
+.login-page .login-ribbon-static,
+.login-page .liquid-chrome-container {
   z-index: 0;
   display: block;
 }

@@ -14,6 +14,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import PortalNotFound from '@/app/pages/errors/PortalNotFound';
 import { useTenant } from '@/features/tenant';
+import LiquidChrome from '@/shared/components/LiquidChrome';
 
 import { getRecaptchaToken } from '../api/recaptcha.service';
 import { useAuth } from '../context/AuthContext';
@@ -1330,7 +1331,14 @@ export default function LoginPage() {
 
   return (
     <main className="login-page" style={pageStyle}>
-      <RibbonGlow reducedMotion={reducedMotion} />
+      <LiquidChrome
+        baseColor={[0.1, 0.1, 0.22]}
+        speed={0.2}
+        amplitude={0.3}
+        frequencyX={3}
+        frequencyY={3}
+        interactive={!reducedMotion}
+      />
       <div className="login-noise" aria-hidden="true" />
 
       <div className="login-layout">
