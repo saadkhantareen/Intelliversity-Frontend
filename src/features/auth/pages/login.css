@@ -140,41 +140,11 @@
   min-width: 0;
 }
 
-/* Readability scrim, and nothing more.
-   The ribbon is now genuinely visible, which means the brightest ribbon cores
-   can land behind the headline. This is a purely decorative dark wash with no
-   hue of its own, so it can never be mistaken for a second decorative layer.
-
-   The old scrim was a single left-anchored linear ramp peaking at 0.34. That was
-   measured against the OLD, much dimmer ribbon. With the brighter aurora the
-   muted supporting line dropped to 4.18:1 on desktop and 2.83:1 on mobile -
-   below WCAG AA. So the scrim now has a second, focused layer: a radial that
-   darkens exactly the lower-left block where the headline and supporting line
-   sit, on top of the original horizontal ramp. Both are neutral and both fade to
-   fully transparent, so the ribbon still reads through everywhere else.
-
-   It is inset flush with the panel on purpose. A negative horizontal inset used
-   to reach under the card, but on narrow screens that pushed the page's
-   scrollWidth past the viewport and produced a horizontal scrollbar. */
+/* No scrim overlay — the LiquidChrome background is intentionally visible
+   through the left panel. Text readability is achieved purely through
+   text-shadow on the heading and supporting elements — no dark blob artifact. */
 .login-page .login-brand-panel::before {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  content: '';
-  background:
-    radial-gradient(
-      75% 58% at 24% 62%,
-      rgba(9, 8, 15, 0.66) 0%,
-      rgba(9, 8, 15, 0.4) 46%,
-      rgba(9, 8, 15, 0) 80%
-    ),
-    linear-gradient(
-      100deg,
-      rgba(9, 8, 15, 0.42) 0%,
-      rgba(9, 8, 15, 0.24) 42%,
-      rgba(9, 8, 15, 0) 75%
-    );
-  pointer-events: none;
+  display: none;
 }
 
 /* --- Institution identity ------------------------------------------------ */
@@ -188,16 +158,22 @@
 
 .login-page .login-brand-mark {
   display: grid;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   place-items: center;
   flex: 0 0 auto;
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 11px;
-  background: rgba(255, 255, 255, 0.06);
-  /* The previous wrapper glow is gone: the brief asks for a quiet academic
-     identity, and a coloured halo fought with the ribbon. */
+  border: 1px solid rgba(200, 180, 255, 0.35);
+  border-radius: 13px;
+  background: linear-gradient(
+    135deg,
+    rgba(120, 90, 255, 0.28) 0%,
+    rgba(60, 40, 160, 0.18) 100%
+  );
+  backdrop-filter: blur(8px);
+  box-shadow:
+    0 0 16px rgba(130, 100, 255, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 /* `contain` shows the FULL mark rather than cropping it to the box. */
@@ -215,23 +191,23 @@
 }
 
 .login-page .login-brand-name {
-  color: #f4f2fa;
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: normal;
+  color: #ffffff;
+  font-size: 0.98rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
   line-height: 1.25;
-  /* Long institution names wrap onto a second line. They are never clipped to a
-     single line - the meaningful name must always be readable. */
   overflow-wrap: anywhere;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
 }
 
 .login-page .login-brand-portal {
-  color: #b6b2c5;
+  color: rgba(200, 190, 255, 0.85);
   font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: normal;
+  letter-spacing: 0.01em;
   line-height: 1.3;
   text-transform: none;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
 }
 
 /* --- Hero copy ------------------------------------------------------------
@@ -251,11 +227,16 @@
   max-width: 100%;
   margin: 0;
   font-family: inherit;
-  font-size: clamp(44px, 4vw, 60px);
-  font-weight: 600;
-  letter-spacing: -0.025em;
-  line-height: 1.08;
+  font-size: clamp(48px, 5vw, 68px);
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  line-height: 1.06;
   text-wrap: pretty;
+  /* Deep multi-layer shadow gives legibility against any background */
+  text-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.85),
+    0 4px 32px rgba(0, 0, 0, 0.7),
+    0 0 64px rgba(0, 0, 0, 0.5);
 }
 
 /* Each line is its own block span so the two-line break is structural, not a
@@ -266,20 +247,28 @@
 }
 
 .login-page .login-brand-heading-line--primary {
-  color: #f4f2fa;
+  color: #ffffff;
 }
 
 .login-page .login-brand-heading-line--muted {
-  color: #c5baf8;
+  color: #c9beff;
+  /* Slight luminous violet glow on the accent line */
+  text-shadow:
+    0 0 24px rgba(180, 150, 255, 0.55),
+    0 2px 12px rgba(0, 0, 0, 0.85),
+    0 4px 32px rgba(0, 0, 0, 0.7);
 }
 
 .login-page .login-brand-supporting {
   max-width: 36ch;
-  margin: 20px 0 0;
-  color: #b6b2c5;
-  font-size: 1rem;
-  font-weight: 400;
+  margin: 24px 0 0;
+  color: rgba(240, 237, 255, 0.78);
+  font-size: 1.05rem;
+  font-weight: 450;
   line-height: 1.65;
+  text-shadow:
+    0 1px 8px rgba(0, 0, 0, 0.9),
+    0 2px 20px rgba(0, 0, 0, 0.7);
 }
 
 /* --- Glass card ---------------------------------------------------------- */

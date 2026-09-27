@@ -1354,7 +1354,49 @@ export default function LoginPage() {
               {logoUrl ? (
                 <img src={logoUrl} alt={`${institutionName} logo`} />
               ) : (
-                <GraduationCap size={22} aria-hidden="true" />
+                <svg
+                  width="26"
+                  height="26"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  {/* Shield outline */}
+                  <path
+                    d="M12 2L3 6v6c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V6L12 2z"
+                    fill="url(#shieldGrad)"
+                    stroke="rgba(200,180,255,0.5)"
+                    strokeWidth="0.6"
+                  />
+                  {/* Graduation cap shape */}
+                  <path
+                    d="M12 7.5L7 10l5 2.5 5-2.5-5-2.5z"
+                    fill="white"
+                    opacity="0.95"
+                  />
+                  <path
+                    d="M9 11.2v2.8c0 0 1 1 3 1s3-1 3-1v-2.8l-3 1.5-3-1.5z"
+                    fill="white"
+                    opacity="0.85"
+                  />
+                  <line
+                    x1="17"
+                    y1="10"
+                    x2="17"
+                    y2="13.5"
+                    stroke="white"
+                    strokeWidth="1"
+                    strokeLinecap="round"
+                    opacity="0.7"
+                  />
+                  <defs>
+                    <linearGradient id="shieldGrad" x1="3" y1="2" x2="21" y2="23" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stopColor="rgba(130,100,255,0.55)" />
+                      <stop offset="100%" stopColor="rgba(60,30,180,0.35)" />
+                    </linearGradient>
+                  </defs>
+                </svg>
               )}
             </span>
             <span className="login-brand-identity-text">
