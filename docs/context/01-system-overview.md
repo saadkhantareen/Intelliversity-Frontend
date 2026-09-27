@@ -30,6 +30,7 @@ App root hierarchy in `src/main.jsx`:
 5. `Toaster`
 
 Why this matters:
+
 - Routing is globally available.
 - Tenant metadata is resolved before page rendering logic consumes it.
 - Auth state is globally available for route guarding and login actions.
