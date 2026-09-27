@@ -20,12 +20,6 @@ function DockIcon({ item }) {
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
     >
-      {showTooltip && (
-        <div className="iv-dock-tooltip" role="tooltip">
-          {item.title}
-          <div className="iv-dock-tooltip-arrow" aria-hidden="true" />
-        </div>
-      )}
       <NavLink
         to={item.href}
         className={`iv-dock-bubble ${isActive ? 'iv-dock-bubble--active' : ''}`}
@@ -37,6 +31,13 @@ function DockIcon({ item }) {
         </span>
         {isActive && <span className="iv-dock-active-glow" />}
       </NavLink>
+
+      {showTooltip && (
+        <div className="iv-dock-tooltip" role="tooltip">
+          {item.title}
+          <div className="iv-dock-tooltip-arrow" aria-hidden="true" />
+        </div>
+      )}
     </div>
   );
 }

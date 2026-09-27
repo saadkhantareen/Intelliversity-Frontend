@@ -890,16 +890,19 @@ const css = (accent) => `
   /* Popping Floating Tooltips */
   .iv-dock-tooltip {
     position: absolute;
-    top: -42px;
-    padding: 5px 10px;
+    bottom: calc(100% + 22px);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 5px 11px;
     background: #0f172a;
     color: #ffffff;
     font-size: 11.5px;
     font-weight: 600;
-    border-radius: 7px;
+    border-radius: 8px;
     white-space: nowrap;
     pointer-events: none;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    z-index: 100;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
     animation: iv-dock-tooltip-pop 0.16s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
@@ -907,6 +910,7 @@ const css = (accent) => `
   [data-theme='dark'] .iv-dock-tooltip {
     background: #ffffff;
     color: #0f172a;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
   }
 
   .iv-dock-tooltip-arrow {
