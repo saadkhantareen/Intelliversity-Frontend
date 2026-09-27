@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { IcChevronLeft, IcLogout } from '@/shared/components/icons';
+import { IcLogout } from '@/shared/components/icons';
 
 function initials(name) {
   if (!name) return 'U';
@@ -9,7 +9,6 @@ function initials(name) {
 
 export function AceternitySidebar({
   collapsed,
-  setCollapsed,
   accentColor,
   uniLabel,
   logoUrl,
@@ -45,21 +44,6 @@ export function AceternitySidebar({
           )}
         </div>
 
-        <button
-          type="button"
-          className="iv-asb-collapse-btn iv-desktop-only"
-          onClick={() => setCollapsed((c) => !c)}
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          <span
-            className="iv-asb-collapse-icon"
-            style={{
-              transform: collapsed ? 'rotate(180deg)' : 'none',
-            }}
-          >
-            <IcChevronLeft s={15} />
-          </span>
-        </button>
       </div>
 
       {/* Navigation Sections */}

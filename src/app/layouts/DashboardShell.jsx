@@ -19,7 +19,7 @@ export function DashboardShell({ config }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [condenseProgress, setCondenseProgress] = useState(0);
   const pageRef = useRef(null);
@@ -76,11 +76,14 @@ export function DashboardShell({ config }) {
       <style>{css(accentColor)}</style>
 
       <div className="iv-root" data-portal={config.portal || 'default'}>
-        {/* Desktop Aceternity Sidebar */}
-        <aside className={`iv-sidebar-pane iv-sidebar-pane--desk ${collapsed ? 'iv-sidebar-pane--col' : ''}`}>
+        {/* Desktop Aceternity Sidebar — hover to reveal */}
+        <aside
+          className={`iv-sidebar-pane iv-sidebar-pane--desk ${collapsed ? 'iv-sidebar-pane--col' : ''}`}
+          onMouseEnter={() => setCollapsed(false)}
+          onMouseLeave={() => setCollapsed(true)}
+        >
           <AceternitySidebar
             collapsed={collapsed}
-            setCollapsed={setCollapsed}
             accentColor={accentColor}
             uniLabel={uniLabel}
             logoUrl={logoUrl}
@@ -109,7 +112,6 @@ export function DashboardShell({ config }) {
         >
           <AceternitySidebar
             collapsed={false}
-            setCollapsed={setCollapsed}
             accentColor={accentColor}
             uniLabel={uniLabel}
             logoUrl={logoUrl}
