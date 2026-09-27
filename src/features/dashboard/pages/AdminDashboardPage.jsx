@@ -1,308 +1,289 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import {
+  IcUsers,
+  IcUser,
+  IcBook,
+  IcTenant,
+  IcChart,
+} from '@/shared/components/icons';
+import BklitKpiCard from '../components/BklitKpiCard';
+import BklitAreaChart from '../components/BklitAreaChart';
+import BklitDepartmentBreakdown from '../components/BklitDepartmentBreakdown';
+import BklitActivityFeed from '../components/BklitActivityFeed';
 
-// ──────────────────────────────────────
-// Demo data — replace with API calls later
-// ──────────────────────────────────────
-const DEMO_DATA = {
-  totalStudents: 0,
-  totalFaculty: 0,
-  totalCourses: 0,
-  totalDepartments: 0,
-  recentEnrollments: [
-    { month: 'Jan', students: 0 },
-    { month: 'Feb', students: 0 },
-    { month: 'Mar', students: 0 },
-    { month: 'Apr', students: 0 },
-    { month: 'May', students: 0 },
-    { month: 'Jun', students: 0 },
-  ],
-  departmentDistribution: [
-    { name: 'Computer Science', students: 0 },
-    { name: 'Engineering', students: 0 },
-    { name: 'Business', students: 0 },
-    { name: 'Humanities', students: 0 },
-    { name: 'Mathematics', students: 0 },
-    { name: 'Physics', students: 0 },
-    { name: 'Biology', students: 0 },
-  ],
-  recentActivity: [
-    {
-      id: 1,
-      action: 'New student enrolled',
-      detail: 'Ahmed Khan — BSCS',
-      time: '10 min ago',
-      color: 'bg-green-100 text-green-700',
+// ─────────────────────────────────────────────────────────────────────────────
+// Dashboard Data Profiles (Semester / 1-Year / All-Time)
+// ─────────────────────────────────────────────────────────────────────────────
+const TIMEFRAME_DATA = {
+  '6M': {
+    stats: {
+      totalStudents: 2845,
+      totalFaculty: 168,
+      totalCourses: 324,
+      totalDepartments: 16,
+      studentsDelta: '+12.4%',
+      facultyDelta: '+4.8%',
+      coursesDelta: '+9.1%',
+      departmentsDelta: '100% active',
+      studentsSpark: [2100, 2240, 2380, 2520, 2690, 2845],
+      facultySpark: [142, 148, 152, 158, 164, 168],
+      coursesSpark: [260, 275, 288, 302, 315, 324],
+      departmentsSpark: [14, 14, 15, 15, 16, 16],
     },
-    {
-      id: 2,
-      action: 'Course updated',
-      detail: 'CS301 — Data Structures',
-      time: '1 hour ago',
-      color: 'bg-blue-100 text-blue-700',
+    enrollments: [
+      { month: 'Jan', value: 340 },
+      { month: 'Feb', value: 410 },
+      { month: 'Mar', value: 380 },
+      { month: 'Apr', value: 520 },
+      { month: 'May', value: 480 },
+      { month: 'Jun', value: 590 },
+    ],
+  },
+  '1Y': {
+    stats: {
+      totalStudents: 5420,
+      totalFaculty: 195,
+      totalCourses: 480,
+      totalDepartments: 18,
+      studentsDelta: '+21.8%',
+      facultyDelta: '+8.2%',
+      coursesDelta: '+14.6%',
+      departmentsDelta: '+2 new',
+      studentsSpark: [3800, 4100, 4400, 4750, 5100, 5420],
+      facultySpark: [160, 168, 175, 182, 190, 195],
+      coursesSpark: [360, 390, 420, 445, 465, 480],
+      departmentsSpark: [14, 15, 15, 16, 17, 18],
     },
-    {
-      id: 3,
-      action: 'Faculty profile updated',
-      detail: 'Dr. Fatima — CS Dept',
-      time: '3 hours ago',
-      color: 'bg-purple-100 text-purple-700',
+    enrollments: [
+      { month: 'Q1', value: 1150 },
+      { month: 'Q2', value: 1380 },
+      { month: 'Q3', value: 1290 },
+      { month: 'Q4', value: 1600 },
+    ],
+  },
+  All: {
+    stats: {
+      totalStudents: 14850,
+      totalFaculty: 240,
+      totalCourses: 720,
+      totalDepartments: 22,
+      studentsDelta: '+44.2%',
+      facultyDelta: '+18.0%',
+      coursesDelta: '+32.4%',
+      departmentsDelta: 'Established',
+      studentsSpark: [8500, 9800, 11200, 12600, 13700, 14850],
+      facultySpark: [180, 195, 210, 220, 232, 240],
+      coursesSpark: [450, 520, 590, 640, 680, 720],
+      departmentsSpark: [12, 14, 16, 18, 20, 22],
     },
-    {
-      id: 4,
-      action: 'New department created',
-      detail: 'Artificial Intelligence',
-      time: '5 hours ago',
-      color: 'bg-amber-100 text-amber-700',
-    },
-    {
-      id: 5,
-      action: 'Bulk upload completed',
-      detail: '150 students imported',
-      time: 'Yesterday',
-      color: 'bg-indigo-100 text-indigo-700',
-    },
-  ],
+    enrollments: [
+      { month: '2022', value: 3100 },
+      { month: '2023', value: 3800 },
+      { month: '2024', value: 4450 },
+      { month: '2025', value: 5200 },
+      { month: '2026', value: 5900 },
+    ],
+  },
 };
 
-// ──────────────────────────────────────
-// Mini bar chart component
-// ──────────────────────────────────────
-function MiniBarChart({ data, maxHeight = 120 }) {
-  const max = Math.max(...data.map((d) => d.students));
+const DEPARTMENT_DISTRIBUTION = [
+  { name: 'Computer Science & AI', students: 840 },
+  { name: 'Software Engineering', students: 620 },
+  { name: 'Electrical Engineering', students: 480 },
+  { name: 'Business Administration', students: 390 },
+  { name: 'Data Science & Cyber', students: 310 },
+  { name: 'Humanities & Social Sciences', students: 205 },
+];
 
-  return (
-    <div className="flex items-end gap-2 h-32">
-      {data.map((item) => (
-        <div key={item.month} className="flex flex-col items-center flex-1">
-          <div
-            className="w-full rounded-t-md transition-all duration-500 min-h-[4px]"
-            style={{
-              backgroundColor: 'var(--brand-accent)',
-              height: `${(item.students / max) * maxHeight}px`,
-            }}
-            title={`${item.students} students`}
-          />
-          <span className="text-xs mt-1" style={{ color: 'var(--brand-text-muted)' }}>
-            {item.month}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
+const RECENT_ACTIVITIES = [
+  {
+    id: 1,
+    action: 'New student enrollment verified',
+    detail: 'Ahmed Khan — BS Computer Science (Fall 2026)',
+    time: '2m ago',
+    dotColor: 'bg-emerald-500',
+  },
+  {
+    id: 2,
+    action: 'Course syllabus updated',
+    detail: 'CS301: Advanced Data Structures & Algorithms',
+    time: '24m ago',
+    dotColor: 'bg-blue-500',
+  },
+  {
+    id: 3,
+    action: 'Faculty evaluation report published',
+    detail: 'Dr. Fatima Tariq — CS Department',
+    time: '1h ago',
+    dotColor: 'bg-purple-500',
+  },
+  {
+    id: 4,
+    action: 'Grade scale audit completed',
+    detail: 'Standard Relative Grading Policy v2.4',
+    time: '3h ago',
+    dotColor: 'bg-amber-500',
+  },
+  {
+    id: 5,
+    action: 'Bulk section allotment generated',
+    detail: '142 students assigned to CS-4A & CS-4B',
+    time: '5h ago',
+    dotColor: 'bg-indigo-500',
+  },
+];
 
-// ──────────────────────────────────────
-// Horizontal bar chart component
-// ──────────────────────────────────────
-function HorizontalBarChart({ data }) {
-  const max = Math.max(...data.map((d) => d.students));
-
-  return (
-    <div className="space-y-3">
-      {data.map((item) => (
-        <div key={item.name}>
-          <div
-            className="flex justify-between text-xs mb-1"
-            style={{ color: 'var(--brand-text-muted)' }}
-          >
-            <span>{item.name}</span>
-            <span className="font-medium">{item.students}</span>
-          </div>
-          <div
-            className="w-full rounded-full h-2.5"
-            style={{ backgroundColor: 'var(--brand-background)' }}
-          >
-            <div
-              className="h-2.5 rounded-full transition-all duration-700"
-              style={{
-                backgroundColor: 'var(--brand-accent)',
-                width: `${(item.students / max) * 100}%`,
-              }}
-            />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ──────────────────────────────────────
-// Stat card component
-// ──────────────────────────────────────
-function StatCard({ label, value, icon, tone }) {
-  return (
-    <div
-      className="border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow"
-      style={{
-        backgroundColor: 'var(--brand-surface)',
-        borderColor: 'rgba(0, 0, 0, 0.08)',
-      }}
-    >
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm mb-1" style={{ color: 'var(--brand-text-muted)' }}>
-            {label}
-          </p>
-          <p className="text-2xl font-bold" style={{ color: 'var(--brand-text)' }}>
-            {value.toLocaleString()}
-          </p>
-        </div>
-        <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg" style={tone}>
-          {icon}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ──────────────────────────────────────
-// Main Dashboard
-// ──────────────────────────────────────
 export default function AdminDashboardPage() {
-  const [data, setData] = useState(DEMO_DATA);
-  const [loading, setLoading] = useState(false); // change to true when fetching real data
+  const [period, setPeriod] = useState('6M');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [randomOffset, setRandomOffset] = useState(0);
 
-  // ──────────────────────────────────
-  // Real API call — uncomment when backend is ready
-  // ──────────────────────────────────
-  // useEffect(() => {
-  //   const fetchDashboard = async () => {
-  //     setLoading(true);
-  //     try {
-  //       const res = await api.get('/api/v1/admin/dashboard/');
-  //       setData(res.data);
-  //     } catch {
-  //       // fallback to demo data
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  //   fetchDashboard();
-  // }, []);
+  const currentDataset = TIMEFRAME_DATA[period] || TIMEFRAME_DATA['6M'];
+  const stats = currentDataset.stats;
+
+  // Real-time pulse trigger that shifts numbers slightly to demonstrate rolling NumberFlow animation
+  const handleLivePulse = () => {
+    setIsRefreshing(true);
+    setRandomOffset((prev) => (prev === 0 ? 12 : prev === 12 ? -8 : 0));
+    setTimeout(() => setIsRefreshing(false), 600);
+  };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold" style={{ color: 'var(--brand-text)' }}>
-          Dashboard
-        </h1>
-        <p className="text-sm mt-1" style={{ color: 'var(--brand-text-muted)' }}>
-          Welcome back, Admin. Here's what's happening today.
-        </p>
-      </div>
-
-      {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard
-          label="Total Students"
-          value={data.totalStudents}
-          icon="👨‍🎓"
-          tone={{
-            backgroundColor: 'color-mix(in srgb, var(--brand-primary) 15%, transparent)',
-            color: 'var(--brand-primary)',
-          }}
-        />
-        <StatCard
-          label="Faculty Members"
-          value={data.totalFaculty}
-          icon="👩‍🏫"
-          tone={{
-            backgroundColor: 'color-mix(in srgb, var(--brand-accent) 15%, transparent)',
-            color: 'var(--brand-accent)',
-          }}
-        />
-        <StatCard
-          label="Total Courses"
-          value={data.totalCourses}
-          icon="📚"
-          tone={{
-            backgroundColor: 'color-mix(in srgb, var(--brand-secondary) 12%, transparent)',
-            color: 'var(--brand-secondary)',
-          }}
-        />
-        <StatCard
-          label="Departments"
-          value={data.totalDepartments}
-          icon="🏛️"
-          tone={{
-            backgroundColor: 'color-mix(in srgb, var(--brand-accent) 20%, transparent)',
-            color: 'var(--brand-accent)',
-          }}
-        />
-      </div>
-
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Enrollment Trend */}
-        <div
-          className="border rounded-xl p-6 shadow-sm"
-          style={{
-            backgroundColor: 'var(--brand-surface)',
-            borderColor: 'rgba(0, 0, 0, 0.08)',
-          }}
-        >
-          <h3 className="text-base font-semibold mb-4" style={{ color: 'var(--brand-text)' }}>
-            📈 Monthly Enrollments
-          </h3>
-          <MiniBarChart data={data.recentEnrollments} />
-          <div className="flex justify-between mt-3">
-            {data.recentEnrollments.map((item) => (
-              <span
-                key={item.month}
-                className="text-xs text-center"
-                style={{ color: 'var(--brand-text-muted)' }}
-              >
-                {item.students}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Department Distribution */}
-        <div
-          className="border rounded-xl p-6 shadow-sm"
-          style={{
-            backgroundColor: 'var(--brand-surface)',
-            borderColor: 'rgba(0, 0, 0, 0.08)',
-          }}
-        >
-          <h3 className="text-base font-semibold mb-4" style={{ color: 'var(--brand-text)' }}>
-            🏛️ Students by Department
-          </h3>
-          <HorizontalBarChart data={data.departmentDistribution} />
-        </div>
-      </div>
-
-      {/* Recent Activity */}
-      {/* <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-        <h3 className="text-base font-semibold text-gray-800 mb-4">
-          🕐 Recent Activity
-        </h3>
-        <div className="space-y-4">
-          {data.recentActivity.map((activity) => (
-            <div
-              key={activity.id}
-              className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0"
+    <div className="space-y-7 max-w-7xl mx-auto">
+      {/* ── Top Hero Header with Quick Timeframe Filter & Live Trigger ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2.5">
+            <h1
+              className="text-2xl font-black tracking-tight"
+              style={{ color: 'var(--brand-text, #0f172a)' }}
             >
-              <div className="flex items-center gap-3">
-                <span
-                  className={`inline-block w-2 h-2 rounded-full ${activity.color.split(' ')[0]}`}
-                />
-                <div>
-                  <p className="text-sm font-medium text-gray-800">
-                    {activity.action}
-                  </p>
-                  <p className="text-xs text-gray-500">{activity.detail}</p>
-                </div>
-              </div>
-              <span className={`text-xs px-2 py-1 rounded-full ${activity.color}`}>
-                {activity.time}
-              </span>
-            </div>
-          ))}
+              Executive Campus Intelligence
+            </h1>
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold"
+              style={{
+                backgroundColor: 'color-mix(in srgb, #38bdf8 14%, transparent)',
+                color: '#38bdf8',
+              }}
+            >
+              <IcChart s={13} />
+              Bklit Metrics
+            </span>
+          </div>
+          <p
+            className="text-xs mt-1"
+            style={{ color: 'var(--brand-text-muted, #64748b)' }}
+          >
+            Real-time enrollment velocities, academic workload, and departmental capacity.
+          </p>
         </div>
-      </div> */}
+
+        {/* Action Controls */}
+        <div className="flex items-center gap-3 self-start sm:self-auto">
+          {/* Live Refresh Trigger to see NumberFlow roll */}
+          <button
+            type="button"
+            onClick={handleLivePulse}
+            disabled={isRefreshing}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all hover:bg-slate-50 dark:hover:bg-slate-800"
+            style={{
+              borderColor: 'var(--iv-border, rgba(15, 23, 42, 0.08))',
+              color: 'var(--brand-text, #0f172a)',
+            }}
+            title="Simulate live metric updates"
+          >
+            <svg
+              className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin' : ''}`}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="23 4 23 10 17 10" />
+              <polyline points="1 20 1 14 7 14" />
+              <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+            </svg>
+            <span>Live Pulse</span>
+          </button>
+        </div>
+      </div>
+
+      {/* ── 4 Bklit KPI Cards with NumberFlow & Live Sparklines ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <BklitKpiCard
+          title="Total Active Students"
+          value={stats.totalStudents + randomOffset}
+          delta={stats.studentsDelta}
+          deltaLabel="enrollment surge"
+          isPositive={true}
+          sparkData={stats.studentsSpark}
+          color="#38bdf8"
+          icon={IcUsers}
+        />
+
+        <BklitKpiCard
+          title="Faculty Members"
+          value={stats.totalFaculty + (randomOffset > 0 ? 1 : 0)}
+          delta={stats.facultyDelta}
+          deltaLabel="active roster"
+          isPositive={true}
+          sparkData={stats.facultySpark}
+          color="#a855f7"
+          icon={IcUser}
+        />
+
+        <BklitKpiCard
+          title="Active Course Offerings"
+          value={stats.totalCourses + (randomOffset > 0 ? 3 : 0)}
+          delta={stats.coursesDelta}
+          deltaLabel="this term"
+          isPositive={true}
+          sparkData={stats.coursesSpark}
+          color="#10b981"
+          icon={IcBook}
+        />
+
+        <BklitKpiCard
+          title="Academic Departments"
+          value={stats.totalDepartments}
+          delta={stats.departmentsDelta}
+          deltaLabel="accredited"
+          isPositive={true}
+          sparkData={stats.departmentsSpark}
+          color="#f59e0b"
+          icon={IcTenant}
+        />
+      </div>
+
+      {/* ── Main Interactive Area Chart (Enrollment Trends) ── */}
+      <BklitAreaChart
+        title="Enrollment & Matriculation Velocity"
+        subtitle="Live spline trajectory with interactive scrubbing and NumberFlow readout"
+        data={currentDataset.enrollments}
+        periods={['6M', '1Y', 'All']}
+        activePeriod={period}
+        onPeriodChange={(p) => setPeriod(p)}
+        color="#38bdf8"
+        secondaryColor="#818cf8"
+      />
+
+      {/* ── Bento Grid Bottom Row: Department Breakdown & Live Campus Activity ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <BklitDepartmentBreakdown
+          title="Department Allocation & Capacity"
+          subtitle="Student concentration per accredited department"
+          data={DEPARTMENT_DISTRIBUTION}
+        />
+
+        <BklitActivityFeed
+          title="Live Campus Audit & Event Log"
+          subtitle="Chronological stream of administrative and academic operations"
+          activities={RECENT_ACTIVITIES}
+        />
+      </div>
     </div>
   );
 }
